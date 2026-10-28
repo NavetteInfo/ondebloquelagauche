@@ -256,6 +256,39 @@ async function loadFiches() {
   return response.json();
 }
 
+function paintVisits(data) {
+  const node = $("#visits");
+  if (!node || !data) return;
+  const total = Number(data.total) || 0;
+  const today = Number(data.today) || 0;
+  if (total <= 0) {
+    node.textContent = "Aucun passage pour l'instant.";
+    return;
+  }
+  if (total === 1) {
+    node.textContent = "1 passage. Le registre vient de s'ouvrir.";
+    return;
+  }
+  const many = total > 1 ? "s" : "";
+  node.textContent = `${formatInt(total)} passage${many}, dont ${formatInt(today)} aujourd'hui.`;
+}
+
+async function loadVisits() {
+  const node = $("#visits");
+  if (!node) return;
+  try {
+    const response = await fetch("/api/visits", { cache: "no-store" });
+    if (response.status === 404) {
+      node.hidden = true;
+      return;
+    }
+    if (!response.ok) return;
+    paintVisits(await response.json());
+  } catch {
+    /* le compteur manque, la page reste lisible */
+  }
+}
+
 async function watchLive() {
   try {
     const response = await fetch("/api/status", { cache: "no-store" });
@@ -266,6 +299,7 @@ async function watchLive() {
     if (!response.ok) throw new Error(String(response.status));
     const status = await response.json();
     paintLive(status);
+    loadVisits();
     if (status.ok && status.as_of && status.as_of !== seenAsOf) {
       const data = await loadFiches();
       paintCatalog(data);
@@ -292,6 +326,7 @@ async function init() {
     }
     bind();
     render();
+    loadVisits();
     watchLive();
     liveTimer = window.setInterval(watchLive, 15000);
   } catch {

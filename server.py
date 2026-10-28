@@ -12,6 +12,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from refresh import FICHES, refresh_once
+from visits import record_visit, snapshot as visit_snapshot
 
 ROOT = Path(__file__).resolve().parent
 HOST = os.environ.get("HOST", "0.0.0.0")
@@ -209,7 +210,14 @@ class Handler(SimpleHTTPRequestHandler):
                 body = json.dumps(_status, ensure_ascii=False).encode("utf-8")
             self._bytes(200, body, "application/json; charset=utf-8")
             return
+        if path == "/api/visits":
+            body = json.dumps(visit_snapshot(), ensure_ascii=False).encode("utf-8")
+            self._bytes(200, body, "application/json; charset=utf-8")
+            return
         if path in {"/", "/index.html"}:
+            purpose = (self.headers.get("Sec-Purpose") or self.headers.get("Purpose") or "").lower()
+            if "prefetch" not in purpose:
+                record_visit()
             self._serve_text((ROOT / "index.html").read_text(encoding="utf-8"), "text/html; charset=utf-8")
             return
         if path == "/robots.txt":

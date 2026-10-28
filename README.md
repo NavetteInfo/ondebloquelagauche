@@ -29,6 +29,8 @@ python3 refresh.py
 
 Les bruts atterrissent dans `data/raw/` (non versionné). Le merge publié est `data/fiches.json`.
 
+Le compteur de passages vit dans `data/visits.json` (non versionné). Il augmente quand quelqu'un ouvre la page, pas quand le navigateur charge une image ou le relevé. `/api/visits` renvoie le total et le jour en cours, en UTC.
+
 ## Docker
 
 ```bash
