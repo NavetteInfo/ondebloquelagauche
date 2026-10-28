@@ -275,16 +275,22 @@ function paintSubmissions(data) {
   if (!data.ok) {
     const status = Number(data.http_status) || 0;
     const message = String(data.message || "lecture ratée");
-    line.textContent = when
+    let text = when
       ? `Pull de /api/submissions, le ${when}. Réponse ${status} : ${message}`
       : `Pull de /api/submissions. Réponse ${status} : ${message}`;
-    return;
+    const published = data.via === "api/accounts" && Array.isArray(data.items) && data.items.length;
+    if (published) {
+      text += " En attendant la réouverture, les lignes viennent de /api/accounts.";
+    }
+    line.textContent = text;
+    if (!published) return;
+  } else {
+    const total = Number(data.total) || 0;
+    const plural = total > 1 ? "s" : "";
+    line.textContent = when
+      ? `Pull de /api/submissions, le ${when}. ${formatInt(total)} ligne${plural} publique${plural}.`
+      : `Pull de /api/submissions. ${formatInt(total)} ligne${plural} publique${plural}.`;
   }
-  const total = Number(data.total) || 0;
-  const plural = total > 1 ? "s" : "";
-  line.textContent = when
-    ? `Pull de /api/submissions, le ${when}. ${formatInt(total)} ligne${plural} publique${plural}.`
-    : `Pull de /api/submissions. ${formatInt(total)} ligne${plural} publique${plural}.`;
   const items = Array.isArray(data.items) ? data.items : [];
   if (!items.length) {
     const empty = document.createElement("p");

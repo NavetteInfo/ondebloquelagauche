@@ -62,6 +62,10 @@ def clean(value: str) -> str:
 
 
 _PROFILE_RE = re.compile(r"https://[A-Za-z0-9._~:/?#\[\]@!$&'()*+,;=%-]{1,400}\Z")
+_UUID_RE = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\Z",
+    re.IGNORECASE,
+)
 _COUNT_CAP = 10**15
 
 
@@ -117,7 +121,7 @@ class _PinHost(urllib.request.HTTPRedirectHandler):
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
-def fetch_json(url: str) -> dict:
+def _read_source(url: str) -> tuple[int, bytes]:
     request = urllib.request.Request(
         url,
         headers={
@@ -130,7 +134,28 @@ def fetch_json(url: str) -> dict:
     with opener.open(request, timeout=60) as response:
         if not _same_source(response.geturl()):
             raise RuntimeError("hôte inattendu")
+        status = int(getattr(response, "status", 200))
         payload = response.read(MAX_BYTES + 1)
+    return status, payload
+
+
+def fetch_json(url: str) -> dict:
+    """Deux essais. Le second ne sert que si la lecture cale, pas si le JSON est faux."""
+    last = None
+    for attempt in range(2):
+        try:
+            _status, payload = _read_source(url)
+            break
+        except urllib.error.HTTPError as exc:
+            if exc.code < 500 or attempt:
+                raise
+            last = exc
+        except (TimeoutError, urllib.error.URLError, ConnectionError, OSError) as exc:
+            last = exc
+            if attempt:
+                raise
+    else:
+        raise last
     if len(payload) > MAX_BYTES:
         raise RuntimeError("réponse trop grosse")
     if payload.lstrip().startswith(b"<"):
@@ -249,7 +274,70 @@ def _submission_rows(data) -> tuple[list[dict], int]:
     return items, len(rows)
 
 
-def pull_submissions(pulled_at: str | None = None) -> dict:
+def _published_rows(accounts: dict | None) -> list[dict]:
+    """Ce que /api/accounts a déjà versé : ajouts non vérifiés, mises à jour, retraits.
+
+    Le GET /api/submissions ne publie pas cette file. Pendant la maintenance il
+    répond 404. Ces lignes sont la trace publique, pas le contenu du guichet fermé.
+    """
+    if not isinstance(accounts, dict) or not isinstance(accounts.get("entries"), list):
+        return []
+    picked = []
+    hidden_removals = 0
+    for entry in accounts["entries"]:
+        if not isinstance(entry, dict):
+            continue
+        kind = str(entry.get("type") or "").strip().lower()
+        if kind == "removal":
+            target = str(entry.get("target_id") or "").strip()
+            if not target or any(ord(char) < 32 for char in target) or len(target) > 80:
+                continue
+            if _UUID_RE.fullmatch(target):
+                hidden_removals += 1
+                continue
+            picked.append(
+                {
+                    "name": target,
+                    "platform": "",
+                    "profile_url": "",
+                    "type": "removal",
+                    "reason": "Retrait déjà versé dans la liste.",
+                }
+            )
+            continue
+        # L'API envoie 1, pas le booléen true.
+        if kind not in {"new", "update"} or entry.get("verified") in (True, 1):
+            continue
+        row = {
+            "name": entry.get("name"),
+            "platform": entry.get("platform"),
+            "profile_url": entry.get("profile_url") or entry.get("url") or "",
+            "type": kind,
+            "reason": entry.get("reason"),
+        }
+        if not str(row["reason"] or "").strip():
+            row["reason"] = (
+                "Ajout publié, pas vérifié à la main."
+                if kind == "new"
+                else "Mise à jour publiée, pas vérifiée à la main."
+            )
+        picked.append(row)
+    if hidden_removals:
+        label = "retrait sans nom public" if hidden_removals == 1 else "retraits sans nom public"
+        picked.append(
+            {
+                "name": f"{hidden_removals} {label}",
+                "platform": "",
+                "profile_url": "",
+                "type": "removal",
+                "reason": "Identifiants déjà retirés de la liste.",
+            }
+        )
+    items, _total = _submission_rows(picked)
+    return items
+
+
+def pull_submissions(accounts: dict | None = None, pulled_at: str | None = None) -> dict:
     """Lecture seule. Aucune proposition n'est envoyée."""
     doc = {
         "source": "api/submissions",
@@ -260,21 +348,8 @@ def pull_submissions(pulled_at: str | None = None) -> dict:
         "total": 0,
         "items": [],
     }
-    request = urllib.request.Request(
-        SUBMISSIONS_URL,
-        headers={
-            "Accept": "application/json",
-            "User-Agent": USER_AGENT,
-            "X-BF": CLIENT_HEADER,
-        },
-    )
-    opener = urllib.request.build_opener(_PinHost)
     try:
-        with opener.open(request, timeout=60) as response:
-            if not _same_source(response.geturl()):
-                raise RuntimeError("hôte inattendu")
-            status = int(getattr(response, "status", 200))
-            payload = response.read(MAX_BYTES + 1)
+        status, payload = _read_source(SUBMISSIONS_URL)
     except urllib.error.HTTPError as exc:
         doc["http_status"] = int(exc.code)
         try:
@@ -282,20 +357,24 @@ def pull_submissions(pulled_at: str | None = None) -> dict:
         except Exception:
             payload = b""
         doc["message"] = _public_text(payload)
+        _fill_published(doc, accounts)
         _write_json(SUBMISSIONS, doc)
         return doc
     except Exception:
+        _fill_published(doc, accounts)
         _write_json(SUBMISSIONS, doc)
         return doc
     doc["http_status"] = status
     if len(payload) > MAX_BYTES or payload.lstrip().startswith(b"<"):
         doc["message"] = "la source a renvoyé une page, pas du JSON"
+        _fill_published(doc, accounts)
         _write_json(SUBMISSIONS, doc)
         return doc
     try:
         data = json.loads(payload.decode("utf-8"))
     except json.JSONDecodeError:
         doc["message"] = "JSON inattendu"
+        _fill_published(doc, accounts)
         _write_json(SUBMISSIONS, doc)
         return doc
     items, total = _submission_rows(data)
@@ -307,6 +386,15 @@ def pull_submissions(pulled_at: str | None = None) -> dict:
     return doc
 
 
+def _fill_published(doc: dict, accounts: dict | None) -> None:
+    items = _published_rows(accounts)
+    if not items:
+        return
+    doc["via"] = "api/accounts"
+    doc["total"] = len(items)
+    doc["items"] = items
+
+
 def refresh_once() -> dict:
     counts_doc = fetch_json(COUNTS_URL)
     accounts = fetch_json(ACCOUNTS_URL)
@@ -316,7 +404,7 @@ def refresh_once() -> dict:
     _write_json(RAW / "counts.json", counts_doc)
     _write_json(RAW / "accounts.json", accounts)
     _write_json(FICHES, merged)
-    pull_submissions(refreshed_at)
+    pull_submissions(accounts, refreshed_at)
     return merged
 
 
