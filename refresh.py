@@ -12,12 +12,24 @@ import urllib.request
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
 RAW = DATA / "raw"
 FICHES = DATA / "fiches.json"
+ABONNES = DATA / "abonnes.json"
+# Sortie publique du dispositif, mardi 27 octobre 2026.
+LAUNCH_DAY = "2026-10-27"
+_DAY_RE = re.compile(r"\d{4}-\d{2}-\d{2}\Z")
+_FOLLOWER_KEY_RE = re.compile(r"[a-z]+:/[a-z0-9._~:@-]{1,200}\Z")
+_FOLLOWER_FIELDS = (
+    "followers_before",
+    "followers_after",
+    "followers_gained",
+    "followers_from",
+    "followers_to",
+)
 
 COUNTS_URL = "https://onbloquelextremedroite.fun/api/counts"
 ACCOUNTS_URL = "https://onbloquelextremedroite.fun/api/accounts"
@@ -50,6 +62,21 @@ ALLOWED_PROFILE_HOSTS = {
     "www.tiktok.com",
 }
 PLATFORMS = {"x", "instagram", "facebook", "youtube", "tiktok"}
+_HOST_NET = {
+    "x.com": "x",
+    "www.x.com": "x",
+    "twitter.com": "x",
+    "www.twitter.com": "x",
+    "instagram.com": "instagram",
+    "www.instagram.com": "instagram",
+    "facebook.com": "facebook",
+    "www.facebook.com": "facebook",
+    "youtube.com": "youtube",
+    "www.youtube.com": "youtube",
+    "m.youtube.com": "youtube",
+    "tiktok.com": "tiktok",
+    "www.tiktok.com": "tiktok",
+}
 
 
 def clean(value: str) -> str:
@@ -99,6 +126,118 @@ def safe_profile_url(raw: str) -> str | None:
         return None
     query = f"?{url.query}" if url.query else ""
     return f"https://{host}{url.path or '/'}{query}"
+
+
+def profile_key(url: str) -> str | None:
+    """Même identité que le relevé public : réseau:/chemin, sans la requête."""
+    safe = safe_profile_url(url if isinstance(url, str) else "")
+    if not safe:
+        return None
+    parsed = urlparse(safe)
+    net = _HOST_NET.get((parsed.hostname or "").lower())
+    if not net:
+        return None
+    path = (parsed.path or "/").lower()
+    if len(path) > 1 and path.endswith("/"):
+        path = path[:-1]
+    if net == "facebook" and path.endswith("/profile.php"):
+        ident = (parse_qs(parsed.query).get("id") or [""])[0]
+        if ident.isdigit():
+            path = f"/id:{ident}"
+    key = f"{net}:{path}"
+    if not _FOLLOWER_KEY_RE.fullmatch(key):
+        return None
+    return key
+
+
+def _rounded_thousand(value: int) -> bool:
+    return value % 1000 == 0
+
+
+def _follower_hit(entry: dict) -> dict | None:
+    before = entry.get("before")
+    after = entry.get("after")
+    gained = entry.get("gained")
+    start = entry.get("from")
+    end = entry.get("to")
+    if (
+        isinstance(before, bool)
+        or not isinstance(before, int)
+        or isinstance(after, bool)
+        or not isinstance(after, int)
+        or isinstance(gained, bool)
+        or not isinstance(gained, int)
+    ):
+        return None
+    if not 0 < before <= _COUNT_CAP or not 0 < after <= _COUNT_CAP:
+        return None
+    if gained == 0 or abs(gained) > _COUNT_CAP or gained != after - before:
+        return None
+    if _rounded_thousand(before) or _rounded_thousand(after):
+        return None
+    if start != LAUNCH_DAY or not isinstance(end, str) or not _DAY_RE.fullmatch(end):
+        return None
+    if end <= start:
+        return None
+    return {
+        "followers_before": before,
+        "followers_after": after,
+        "followers_gained": gained,
+        "followers_from": start,
+        "followers_to": end,
+    }
+
+
+def _follower_table() -> dict[str, dict]:
+    """data/abonnes.json est un extrait figé. On ne le retélécharge pas ici."""
+    if not ABONNES.is_file():
+        return {}
+    try:
+        payload = json.loads(ABONNES.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    entries = payload.get("entries") if isinstance(payload, dict) else None
+    if not isinstance(entries, list):
+        return {}
+    table: dict[str, dict] = {}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        key = entry.get("key")
+        if not isinstance(key, str) or not _FOLLOWER_KEY_RE.fullmatch(key):
+            continue
+        hit = _follower_hit(entry)
+        if hit:
+            table[key] = hit
+    return table
+
+
+def attach_followers(doc: dict) -> None:
+    """Pose le gain d'abonnés. Ces chiffres ne comptent pas dans les blocages."""
+    table = _follower_table()
+    fiches = doc.get("fiches")
+    if not isinstance(fiches, list):
+        return
+    matched = 0
+    latest = ""
+    for fiche in fiches:
+        if not isinstance(fiche, dict):
+            continue
+        for field in _FOLLOWER_FIELDS:
+            fiche.pop(field, None)
+        hit = table.get(profile_key(str(fiche.get("url") or "")))
+        if not hit:
+            continue
+        fiche.update(hit)
+        matched += 1
+        if hit["followers_to"] > latest:
+            latest = hit["followers_to"]
+    doc["followers"] = {
+        "baseline": LAUNCH_DAY,
+        "latest": latest or None,
+        "matched": matched,
+        "source": "followers.js",
+    }
 
 
 def _same_source(url: str) -> bool:
@@ -400,6 +539,7 @@ def refresh_once() -> dict:
     accounts = fetch_json(ACCOUNTS_URL)
     refreshed_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     merged = merge(accounts, counts_doc, refreshed_at)
+    attach_followers(merged)
     RAW.mkdir(parents=True, exist_ok=True)
     _write_json(RAW / "counts.json", counts_doc)
     _write_json(RAW / "accounts.json", accounts)

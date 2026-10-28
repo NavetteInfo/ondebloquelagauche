@@ -63,6 +63,17 @@ export function filterFiches(fiches, { q = "", category = "", platform = "", sor
     if (sort === "category") {
       return a.category.localeCompare(b.category, "fr") || b.count - a.count || a.name.localeCompare(b.name, "fr");
     }
+    if (sort === "followers") {
+      const gain = (fiche) => (Number.isInteger(fiche.followers_gained) ? fiche.followers_gained : null);
+      const ag = gain(a);
+      const bg = gain(b);
+      if (ag === null && bg === null) {
+        return b.count - a.count || a.name.localeCompare(b.name, "fr");
+      }
+      if (ag === null) return 1;
+      if (bg === null) return -1;
+      return bg - ag || b.count - a.count || a.name.localeCompare(b.name, "fr");
+    }
     return b.count - a.count || a.name.localeCompare(b.name, "fr");
   });
 

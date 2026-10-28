@@ -1,0 +1,14 @@
+{
+  "baseline": "2026-10-27",
+  "note": "Extrait figé. Compte dont followers.js portait encore la date du 27 octobre 2026 dans l'instantané du 28 octobre à 11:16 UTC, et dont le fichier relu ensuite donne un second chiffre non arrondi au millier. La série qui recopie le 26 octobre sur le 27 n'est pas utilisée.",
+  "entries": [
+    {
+      "key": "facebook:/nicolasdupontaignan",
+      "before": 819234,
+      "after": 819282,
+      "gained": 48,
+      "from": "2026-10-27",
+      "to": "2026-10-28"
+    }
+  ]
+}

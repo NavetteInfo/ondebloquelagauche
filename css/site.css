@@ -645,6 +645,21 @@ select {
   font-size: 0.78rem;
 }
 
+.fiche-gain {
+  grid-column: 1 / -1;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.fiche-gain .delta {
+  color: var(--red);
+  font-variant-numeric: tabular-nums;
+}
+
+.fiche-gain .delta.down {
+  color: var(--ink);
+}
+
 .sk {
   height: 4.2rem;
   background: #dedbd4;
@@ -798,6 +813,7 @@ blockquote p {
   .fiche-cat,
   .fiche-net,
   .fiche-go,
+  .fiche-gain,
   .fiche-reason {
     grid-column: 1 / -1;
   }

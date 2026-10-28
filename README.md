@@ -63,3 +63,5 @@ MAX_INFLIGHT=2 MAX_QUEUE=12 QUEUE_WAIT=20 IP_CAPACITY=16 IP_REFILL=0.25 IP_WAIT=
 Cloudflare peut renvoyer une page au lieu du JSON. En recovery, `/api/counts` et `/api/accounts` répondent `404` tant que la lecture n'envoie pas l'en-tête `X-BF` de la page publique. Avec cet en-tête, les deux JSON passent. Une lecture qui cale est retentée une fois. Le serveur garde la dernière copie valide et `/api/status` signale un relevé raté.
 
 `GET /api/submissions` reste fermé pendant la maintenance (`Page indisponible pendant la maintenance.`). Rien n'est envoyé en POST. En attendant la réouverture, le guichet affiche la trace déjà publique dans `/api/accounts` : ajouts non vérifiés à la main, mises à jour, et retraits. Dès que le GET rend du JSON, cette trace cède la place.
+
+Le gain d'abonnés vient de `data/abonnes.json`, un extrait figé, pas d'un pull. Il faut deux relevés du même compte, le premier daté du 27 octobre 2026, et aucun des deux arrondi au millier. Ce chiffre reste sur la fiche. Il n'entre pas dans le total des blocages.

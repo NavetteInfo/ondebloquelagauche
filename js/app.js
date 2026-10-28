@@ -21,6 +21,27 @@ function formatInt(value) {
   return nf.format(Number(value) || 0);
 }
 
+const SHORT_MONTHS = [
+  "janv.", "févr.", "mars", "avr.", "mai", "juin",
+  "juil.", "août", "sept.", "oct.", "nov.", "déc.",
+];
+
+function formatDay(iso) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ""));
+  if (!match) return null;
+  const month = SHORT_MONTHS[Number(match[2]) - 1];
+  if (!month) return null;
+  return { month, day: Number(match[3]), key: match[2] };
+}
+
+function formatSpan(from, to) {
+  const start = formatDay(from);
+  const end = formatDay(to);
+  if (!start || !end) return "depuis le 27 oct.";
+  if (start.key === end.key) return `du ${start.day} au ${end.day} ${end.month}`;
+  return `du ${start.day} ${start.month} au ${end.day} ${end.month}`;
+}
+
 function setText(id, value) {
   const node = document.getElementById(id);
   if (node) node.textContent = formatInt(value);
@@ -59,6 +80,7 @@ function paintCatalog(data) {
       ? `La liste ci-dessous date du dernier pull, le ${when.replace(" UTC", "\u00A0UTC")}.`
       : "La liste ci-dessous date du dernier pull.";
   }
+  paintFollowers(data);
   fillSelect("cat", data.categories || [], "Tous");
   fillSelect("net", data.platforms || [], "Tous");
   $("#net").querySelectorAll("option").forEach((option) => {
@@ -150,6 +172,36 @@ function showState(message) {
   list.removeAttribute("aria-busy");
 }
 
+function paintFollowers(data) {
+  const node = document.getElementById("followers-line");
+  if (!node) return;
+  const matched = Number(data.followers && data.followers.matched) || 0;
+  if (matched <= 0) {
+    node.textContent = "Abonnés gagnés depuis le 27 octobre : aucun relevé public daté de ce jour ne retombe sur une fiche. Pas de chiffre inventé.";
+    return;
+  }
+  if (matched === 1) {
+    node.textContent = "Abonnés gagnés depuis le 27 octobre : 1 fiche a les deux relevés, sans arrondi au millier. Le reste du tiroir n'a pas de point de départ.";
+    return;
+  }
+  node.textContent = `Abonnés gagnés depuis le 27 octobre : ${formatInt(matched)} fiches ont les deux relevés, sans arrondi au millier. Le reste du tiroir n'a pas de point de départ.`;
+}
+
+function followerLine(fiche) {
+  const gained = fiche.followers_gained;
+  if (!Number.isInteger(gained) || gained === 0) return null;
+  const line = document.createElement("p");
+  line.className = "fiche-gain";
+  const delta = document.createElement("span");
+  delta.className = gained > 0 ? "delta" : "delta down";
+  delta.textContent = gained > 0 ? `+${formatInt(gained)}` : formatInt(Math.abs(gained));
+  const rest = document.createElement("span");
+  const span = formatSpan(fiche.followers_from, fiche.followers_to);
+  rest.textContent = gained > 0 ? ` abonnés ${span}` : ` abonnés en moins ${span}`;
+  line.append(delta, rest);
+  return line;
+}
+
 function renderRow(fiche) {
   const article = document.createElement("article");
   article.className = "fiche";
@@ -197,7 +249,10 @@ function renderRow(fiche) {
   reason.className = "fiche-reason";
   reason.textContent = String(fiche.reason || "Motif non inscrit.");
 
-  article.append(name, category, network, count, action, reason);
+  article.append(name, category, network, count, action);
+  const gain = followerLine(fiche);
+  if (gain) article.append(gain);
+  article.append(reason);
   return article;
 }
 
