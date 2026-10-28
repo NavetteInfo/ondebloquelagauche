@@ -430,6 +430,237 @@ function paintSubmissions(data) {
   });
 }
 
+function node(tag, className, text) {
+  const el = document.createElement(tag);
+  if (className) el.className = className;
+  if (text != null) el.textContent = text;
+  return el;
+}
+
+function plural(count, one, many) {
+  return `${formatInt(count)} ${count > 1 ? many : one}`;
+}
+
+function pushText(parent, text, marked) {
+  if (!text) return;
+  if (parent.childNodes.length) parent.append(document.createTextNode(" "));
+  if (marked) parent.append(node("span", "mark", text));
+  else parent.append(document.createTextNode(text));
+}
+
+function stepLine(step, index) {
+  const line = document.createElement("p");
+  if (step.source === "site") pushText(line, "Relevé du site.");
+  else if (index === 0) pushText(line, "Premier relevé.");
+  if (step.accounts == null) {
+    pushText(line, "Comptes absents.");
+  } else if (index === 0) {
+    pushText(line, `${formatInt(step.accounts)} lignes.`);
+  } else if (step.accounts_same) {
+    pushText(line, "Comptes inchangés.");
+  } else {
+    const marks = [];
+    if (step.removed) marks.push(`${plural(step.removed, "retrait", "retraits")}.`);
+    if (step.added) marks.push(`${plural(step.added, "ajout", "ajouts")}.`);
+    if (step.rewritten) marks.push(`${plural(step.rewritten, "retouche", "retouches")}.`);
+    if (marks.length) marks.forEach((text) => pushText(line, text, true));
+    else if (step.lines_delta) pushText(line, "Le nombre de lignes change, sans autre retouche.");
+    else pushText(line, "Comptes inchangés.");
+  }
+  if (step.counts_absent) {
+    pushText(line, "Compteurs absents.");
+  } else if (step.total != null && step.total_delta == null) {
+    pushText(line, `Compteur ${formatInt(step.total)}.`);
+  } else if (step.total_delta > 0) {
+    pushText(line, `Compteur +${formatInt(step.total_delta)}.`);
+  } else if (step.total_delta < 0) {
+    pushText(line, `Compteur en baisse de ${formatInt(-step.total_delta)}.`, true);
+  } else if (step.total_delta === 0) {
+    pushText(line, "Compteur stable.");
+  }
+  if (step.total_delta != null) {
+    if (step.down_count) {
+      pushText(line, step.down_count > 1
+        ? `${formatInt(step.down_count)} compteurs en recul.`
+        : "1 compteur en recul.", true);
+    } else {
+      pushText(line, "Aucun recul.");
+    }
+  }
+  if (step.counts_gap) pushText(line, "Le créneau d'avant n'avait pas de compteur.");
+  if (step.keys_added) pushText(line, `${plural(step.keys_added, "clé en plus", "clés en plus")}.`);
+  if (step.keys_removed) pushText(line, `${plural(step.keys_removed, "clé en moins", "clés en moins")}.`, true);
+  return line;
+}
+
+function editRow(item) {
+  const row = node("article", "edit");
+  const title = node("h3", "", item.name || "Sans nom");
+  row.append(title);
+  const network = PLATFORM_LABEL[item.platform] || "";
+  const meta = [item.category, network].filter(Boolean).join(", ");
+  if (meta) row.append(node("p", "before", meta));
+  if (item.kind === "removal") {
+    row.classList.add("is-removed");
+    title.classList.add("mark");
+    row.append(node("p", "mark", "Retiré du fichier."));
+    if (item.reason) row.append(node("p", "before", `Motif recopié : ${item.reason}`));
+  } else if (item.kind === "addition") {
+    row.append(node("p", "mark", "Ajouté au fichier."));
+    if (item.reason) row.append(node("p", "before", `Motif recopié : ${item.reason}`));
+  } else {
+    const fields = Array.isArray(item.changes) ? item.changes : [];
+    const onlyMotive = fields.length === 1 && fields[0].field === "motif";
+    row.append(node("p", "mark", onlyMotive ? "Motif réécrit." : "Fiche réécrite."));
+    fields.forEach((change) => {
+      if (change.hidden || (!change.before && !change.after)) {
+        row.append(node("p", "mark", `${change.field || "Champ"} modifié.`));
+        return;
+      }
+      if (!onlyMotive && change.field) row.append(node("p", "before", change.field));
+      if (change.before) row.append(node("p", "before", `Avant : ${change.before}`));
+      if (change.after) row.append(node("p", "after", `Après : ${change.after}`));
+    });
+  }
+  const href = safeProfileUrl(item.url);
+  if (href) {
+    const link = node("a", "", "Profil public");
+    link.href = href;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    row.append(link);
+  }
+  return row;
+}
+
+function paintComparaison(data) {
+  const line = document.getElementById("pulls-line");
+  const stepsHost = document.getElementById("pulls-steps");
+  const editsHost = document.getElementById("pulls-edits");
+  const countsHost = document.getElementById("pulls-counts");
+  if (!line || !stepsHost || !editsHost || !countsHost || !data || typeof data !== "object") return;
+  const bits = ["Les heures du tableau sont celles de Paris."];
+  if (data.snapshot_stable && data.snapshot_at) {
+    const when = formatUtc(data.snapshot_at);
+    if (when) bits.push(`Chaque copie des comptes reste datée du ${when}.`);
+  } else if (data.snapshot_stable === false) {
+    bits.push("La date inscrite dans le fichier des comptes change d'une copie à l'autre.");
+  }
+  if (data.frozen === true) bits.push("Le fichier reste marqué gelé.");
+  if (data.rejected_stable && Number.isInteger(data.rejected)) {
+    bits.push(`${formatInt(data.rejected)} demandes de retrait refusées, inchangées. Ce compte n'est pas une liste de profils qu'on refuserait de bloquer.`);
+  }
+  if (data.journal && data.journal.lines) {
+    let journal = `Le journal du collecteur compte ${formatInt(data.journal.lines)} échecs`;
+    if (data.journal.http_404) journal += `, dont ${formatInt(data.journal.http_404)} réponses 404`;
+    journal += ". Le texte du journal n'est pas recopié.";
+    bits.push(journal);
+  }
+  if (data.steps_omitted) {
+    bits.push(`${formatInt(data.steps_omitted)} copies plus anciennes ne sont pas dans le tableau.`);
+  }
+  line.textContent = bits.join(" ");
+
+  const steps = Array.isArray(data.steps) ? data.steps : [];
+  stepsHost.replaceChildren();
+  if (!steps.length) {
+    stepsHost.append(node("p", "howto", "Aucune copie à comparer."));
+  } else {
+    const list = node("ol", "pull-steps");
+    steps.forEach((step, index) => {
+      const item = node("li", "pull-step");
+      const when = step.source === "site" && step.utc
+        ? `${step.local} Paris, ${step.utc} UTC`
+        : `${step.local || ""} Paris`;
+      item.append(node("p", "pull-when", when.trim()));
+      item.append(stepLine(step, index));
+      list.append(item);
+    });
+    stepsHost.append(list);
+  }
+
+  const edits = Array.isArray(data.edits) ? data.edits : [];
+  editsHost.replaceChildren();
+  editsHost.append(node("p", "pull-label", edits.length ? "Retouches du fichier" : "Retouches"));
+  if (!edits.length) {
+    editsHost.append(node("p", "howto", "Aucune retouche de fiche entre ces copies."));
+  } else {
+    edits.forEach((item) => editsHost.append(editRow(item)));
+    if (data.edits_hidden) {
+      editsHost.append(node("p", "howto", `Et ${plural(data.edits_hidden, "autre retouche", "autres retouches")}.`));
+    }
+  }
+
+  const span = data.span || {};
+  const gains = Array.isArray(data.gains) ? data.gains : [];
+  const downs = Array.isArray(data.downs) ? data.downs : [];
+  countsHost.replaceChildren();
+  countsHost.append(node("p", "pull-label", "Compteur"));
+  if (span.from_total != null && span.to_total != null) {
+    let sentence = `Du premier relevé au dernier, le compteur passe de ${formatInt(span.from_total)} à ${formatInt(span.to_total)}`;
+    if (span.delta > 0) sentence += `, soit +${formatInt(span.delta)}.`;
+    else if (span.delta < 0) sentence += `, soit ${formatInt(-span.delta)} de moins.`;
+    else sentence += ", sans écart.";
+    if (span.keys_added || span.keys_removed) {
+      const parts = [];
+      if (span.keys_added) parts.push(plural(span.keys_added, "clé apparaît", "clés apparaissent"));
+      if (span.keys_removed) parts.push(plural(span.keys_removed, "clé disparaît", "clés disparaissent"));
+      sentence += ` ${parts.join(", ")}.`;
+    } else {
+      sentence += " Aucune clé n'apparaît ni ne disparaît.";
+    }
+    sentence += span.net_downs
+      ? ` ${plural(span.net_downs, "compteur finit plus bas", "compteurs finissent plus bas")}.`
+      : " Aucun compteur ne finit plus bas qu'au début.";
+    countsHost.append(node("p", "howto", sentence));
+  }
+  if (gains.length) {
+    const list = node("ol", "pull-gains");
+    gains.forEach((item) => {
+      const row = document.createElement("li");
+      const network = PLATFORM_LABEL[item.platform] || "";
+      row.append(node("span", "", [network, item.name].filter(Boolean).join(", ")));
+      row.append(node("strong", "", `+${formatInt(item.delta)}`));
+      list.append(row);
+    });
+    countsHost.append(list);
+  }
+  if (downs.length) {
+    countsHost.append(node("p", "pull-label", "Reculs à retenir"));
+    const list = node("ol", "pull-gains");
+    downs.forEach((item) => {
+      const row = document.createElement("li");
+      const network = PLATFORM_LABEL[item.platform] || "";
+      row.append(node("span", "", [network, item.name, item.local].filter(Boolean).join(", ")));
+      row.append(node("strong", "mark", `${formatInt(item.before)} à ${formatInt(item.after)}`));
+      list.append(row);
+    });
+    countsHost.append(list);
+    if (data.downs_hidden) {
+      countsHost.append(node("p", "howto", `Et ${plural(data.downs_hidden, "autre recul", "autres reculs")}.`));
+    }
+  }
+  if (data.dip_count) {
+    const ampleur = data.dip_max <= 1 ? "d'un point" : `de ${formatInt(data.dip_max)} points au plus`;
+    countsHost.append(node(
+      "p",
+      "howto",
+      `${plural(data.dip_count, "compteur a baissé", "compteurs ont baissé")} ${ampleur} entre deux relevés, puis ${data.dip_count > 1 ? "sont revenus" : "est revenu"}. Le nom n'est pas repris pour un écart aussi court.`,
+    ));
+  }
+}
+
+async function loadComparaison() {
+  const line = document.getElementById("pulls-line");
+  try {
+    const response = await fetch(`data/comparaison.json?t=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) throw new Error(String(response.status));
+    paintComparaison(await response.json());
+  } catch {
+    if (line) line.textContent = "La comparaison n'est pas arrivée.";
+  }
+}
+
 async function loadSubmissions() {
   const line = document.getElementById("sub-line");
   try {
@@ -513,6 +744,7 @@ async function watchLive() {
       const data = await loadFiches();
       paintCatalog(data);
       render();
+      if (blocksMoved) loadComparaison();
     }
   } catch {
     const node = $("#live-line");
@@ -524,6 +756,7 @@ async function watchLive() {
 
 async function init() {
   const pending = readQuery();
+  loadComparaison();
   try {
     const data = await loadFiches();
     paintCatalog(data);

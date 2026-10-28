@@ -1,11 +1,12 @@
 FROM python:3.12-slim
 
 WORKDIR /app
-COPY refresh.py server.py visits.py index.html favicon.svg robots.txt sitemap.xml ./
+COPY refresh.py server.py visits.py pulls.py index.html favicon.svg robots.txt sitemap.xml ./
 COPY css ./css
 COPY js ./js
 COPY data/fiches.json ./data/fiches.json
 COPY data/submissions.json ./data/submissions.json
+COPY data/comparaison.json ./data/comparaison.json
 COPY data/abonnes.json ./data/abonnes.json
 COPY fonts ./fonts
 COPY media ./media

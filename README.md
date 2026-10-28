@@ -29,6 +29,8 @@ python3 refresh.py
 
 Les bruts atterrissent dans `data/raw/` (non versionné). Le merge publié est `data/fiches.json`. `/api/submissions` est lu en GET seulement, et le résultat tient dans `data/submissions.json`. Rien n'est proposé, rien n'est envoyé.
 
+`data/comparaison.json` compare les pulls déposés dans `PULLS_DIR`, sinon `/pulls`, sinon le dossier `pulls` à côté du dépôt, puis le relevé brut du site s'il est plus récent ou différent. `python3 pulls.py` reconstruit ce fichier. Sans ce dossier, la copie déjà publiée reste en place. Le serveur rend la comparaison, pas les bruts.
+
 Le compteur de passages vit dans `data/visits.json` (non versionné). Il augmente quand un navigateur ouvre la page : en-tête `User-Agent` de navigateur, `Accept: text/html`, une langue, `Sec-Fetch-Mode: navigate` et `Sec-Fetch-Dest: document`. Les scripts, les préchargements, les aperçus et les robots ne comptent pas. Une image ou le relevé non plus. `/api/visits` renvoie le total et le jour en cours, en UTC. Le chiffre est écrit dans la page, sous le compteur global, avant le tiroir. Une copie sans ce serveur laisse la ligne visible et dit que le registre n'y est pas tenu.
 
 ## Docker

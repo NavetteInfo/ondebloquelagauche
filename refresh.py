@@ -779,6 +779,11 @@ def refresh_once() -> dict:
         _write_json(RAW / "accounts.json", accounts)
         _write_json(FICHES, merged)
     pull_submissions(accounts, refreshed_at)
+    try:
+        import pulls
+        pulls.write_comparaison()
+    except Exception as exc:
+        print(f"comparaison non écrite : {exc}", file=sys.stderr)
     return merged
 
 

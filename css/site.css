@@ -439,7 +439,8 @@ h2 {
 
 .rite,
 .guichet,
-.tiroir {
+.tiroir,
+.pulls {
   padding: 1.35rem 1rem 1.5rem;
   border-bottom: 2px solid var(--line);
 }
@@ -541,6 +542,107 @@ h2 {
   margin-top: 0.35rem;
   color: var(--ink);
   font-weight: 700;
+}
+
+.pulls .lede {
+  margin: 0 0 0.7rem;
+  font-weight: 700;
+}
+
+.pull-label {
+  margin: 1.15rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pull-steps,
+.pull-gains {
+  margin: 0.45rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pull-step,
+.pull-gains li,
+.edit {
+  padding: 0.7rem 0;
+  border-top: 2px solid var(--line);
+}
+
+.pull-step {
+  display: grid;
+  grid-template-columns: minmax(8rem, 15rem) minmax(0, 1fr);
+  gap: 0.35rem 0.9rem;
+  align-items: start;
+}
+
+.pull-when {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pull-step p,
+.edit p,
+.pull-gains li {
+  margin: 0;
+}
+
+.pull-gains li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: baseline;
+  font-weight: 700;
+}
+
+.pull-gains span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.pull-gains strong {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.edit h3 {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--display);
+  font-size: 1.15rem;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.edit .before {
+  margin-top: 0.25rem;
+  color: var(--muted);
+}
+
+.edit .after {
+  margin-top: 0.25rem;
+  font-weight: 700;
+}
+
+.edit a {
+  display: inline-block;
+  margin-top: 0.35rem;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.edit.is-removed h3,
+.edit .after,
+.mark {
+  color: var(--red);
 }
 
 .tiroir-head {
@@ -917,6 +1019,11 @@ blockquote p {
     border-bottom: 2px solid var(--line);
   }
 
+  .pull-step {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+
   .ladder {
     grid-template-columns: 1fr 1fr;
   }
@@ -953,6 +1060,18 @@ blockquote p {
     justify-self: stretch;
     width: 100%;
     margin-top: 0.35rem;
+  }
+}
+
+@media (max-width: 370px) {
+  .top {
+    gap: 0.4rem;
+  }
+
+  .nav {
+    gap: 0.32rem;
+    font-size: 0.6rem;
+    letter-spacing: 0;
   }
 }
 
