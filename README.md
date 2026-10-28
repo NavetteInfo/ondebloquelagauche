@@ -36,6 +36,24 @@ docker build -t ondebloquelagauche .
 docker run --rm -p 8080:8080 ondebloquelagauche
 ```
 
+## Adresse publique
+
+`SITE_URL` réécrit le canonical, Open Graph, la carte Twitter et le sitemap. Sans cette variable, le serveur utilise l'hôte de la requête.
+
+```bash
+SITE_URL=https://exemple.fr python3 server.py
+```
+
+La carte est `media/card.jpg` (1200×630).
+
+## File d'attente
+
+Pas de répartiteur de charge. Deux requêtes passent en même temps. Douze autres attendent, vingt secondes au plus. Chaque adresse a 16 jetons, qui reviennent au rythme de 0,25 par seconde. Au-delà, la connexion attend, puis reçoit `429` et `Retry-After`.
+
+```bash
+MAX_INFLIGHT=2 MAX_QUEUE=12 QUEUE_WAIT=20 IP_CAPACITY=16 IP_REFILL=0.25 IP_WAIT=12 python3 server.py
+```
+
 ## Ce qui reste affiché si la source refuse
 
 Cloudflare peut renvoyer une page au lieu du JSON. Le serveur garde alors la dernière copie valide et `/api/status` porte l'erreur. La page le dit.
