@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>On débloque la gauche</title>
+  <meta name="description" content="Satire. 3 803 fiches publiques, six millions de blocages, et pas une seule réponse. Le tiroir de la libre pensée.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/archivo-black.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="media/archive.jpg" as="image">
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <a class="skip" href="#tiroir">Aller aux fiches</a>
+  <header class="top">
+    <a class="brand" href="#haut">
+      <span class="brand-full">On débloque la gauche</span>
+      <span class="brand-short">Débloque</span>
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#tiroir">Fiches</a>
+      <a href="#constat">Constat</a>
+    </nav>
+  </header>
+
+  <main id="haut">
+    <section class="hero" aria-labelledby="titre">
+      <div class="hero-copy">
+        <p class="stamp">Catastrophe</p>
+        <h1 id="titre">On débloque<br><span class="mis">la gauche</span></h1>
+        <p class="lede">Six millions de blocages, 3&nbsp;803 fiches, et pas une seule réponse.</p>
+        <div class="actions">
+          <a class="btn btn-red" href="#tiroir">Ouvrir les fiches</a>
+          <a class="btn btn-ink" href="#constat">Lire le constat</a>
+        </div>
+      </div>
+      <figure class="hero-photo">
+        <img src="media/archive.jpg" width="1280" height="720" alt="Archives administratives éventrées, feuilles volantes et un tampon d'encre rouge." fetchpriority="high">
+      </figure>
+    </section>
+
+    <section class="compteur" id="compteur" aria-labelledby="compteur-title">
+      <div class="compteur-main">
+        <h2 id="compteur-title">Le compteur</h2>
+        <p class="giant" id="total-blocks">6&nbsp;194&nbsp;112</p>
+        <p class="caption">Compteur global de la liste au 28 octobre 2026. Une partie du total n'est rattachée à aucun nom.</p>
+      </div>
+      <dl class="facts">
+        <div>
+          <dt>Fiches</dt>
+          <dd id="fiche-count">3&nbsp;803</dd>
+        </div>
+        <div>
+          <dt>Noms</dt>
+          <dd id="name-count">2&nbsp;400</dd>
+        </div>
+        <div>
+          <dt>Somme des fiches</dt>
+          <dd id="fiche-sum">2&nbsp;638&nbsp;833</dd>
+        </div>
+        <div>
+          <dt>Hérités du vieux compteur</dt>
+          <dd id="historical">1&nbsp;400&nbsp;000</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="tiroir" id="tiroir" aria-labelledby="tiroir-title">
+      <h2 id="tiroir-title">Le tiroir</h2>
+      <p class="lede">Chaque ligne est une fiche recopiée. Le chiffre est le nombre de blocages inscrit par la liste. Aucune adresse privée n'a été ajoutée.</p>
+      <p class="howto">Lire le nom. Vérifier le réseau. Constater le verrou.</p>
+
+      <form id="filters" role="search">
+        <div class="filters">
+          <label class="field field-q">
+            <span>Nom ou motif</span>
+            <input id="q" type="search" name="q" placeholder="Philippot, une radio, un parti" autocomplete="off">
+          </label>
+          <label class="field">
+            <span>Rayon</span>
+            <select id="cat" name="cat">
+              <option value="">Tous</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Réseau</span>
+            <select id="net" name="net">
+              <option value="">Tous</option>
+            </select>
+          </label>
+          <label class="field field-sort">
+            <span>Ordre</span>
+            <select id="sort" name="sort">
+              <option value="count">Compteur de la liste</option>
+              <option value="name">Nom</option>
+              <option value="category">Rayon</option>
+            </select>
+          </label>
+        </div>
+      </form>
+
+      <p id="status" role="status">Ouverture du tiroir.</p>
+      <div class="headrow" aria-hidden="true">
+        <span>Nom</span>
+        <span>Rayon</span>
+        <span>Réseau</span>
+        <span>Blocages</span>
+        <span>Lien</span>
+      </div>
+      <div id="list" aria-busy="true">
+        <div class="fiche sk"></div>
+        <div class="fiche sk"></div>
+        <div class="fiche sk"></div>
+        <div class="fiche sk"></div>
+      </div>
+      <div class="pager">
+        <button type="button" id="prev">Précédent</button>
+        <p id="page-label">Page 1</p>
+        <button type="button" id="next">Suivant</button>
+      </div>
+      <noscript>
+        <p class="state">Le classeur tourne les pages avec JavaScript. Les chiffres au-dessus restent vrais sans lui.</p>
+      </noscript>
+    </section>
+
+    <section class="constat" id="constat" aria-labelledby="constat-title">
+      <h2 id="constat-title">Tueurs de libre pensée</h2>
+      <div class="prose">
+        <p>Les tueurs de libre pensée n'ont pas d'arme. Ils ont un bouton, une liste, et le sentiment d'avoir bien agi.</p>
+        <p>Le premier nom du tiroir est une radio. Dans ce classeur, la bande FM suffit comme motif.</p>
+        <p>Si votre nom est là, vous êtes vivant. Votre droit de répondre, lui, a eu un accident de tiroir.</p>
+      </div>
+      <blockquote>
+        <p>« Ils n'ont pas gagné le débat. Ils ont fermé la porte et compté les verrous. »</p>
+      </blockquote>
+      <p class="attr">Service des archives</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Satire. Fiches tirées d'une liste publique de blocage (« on bloque l'extrême droite »), export figé le 28 octobre 2026 à 16:34 UTC. Profils publics seulement.</p>
+    <p>Ce site ne demande à personne de bloquer, d'écrire ou de harceler qui que ce soit. Le bouton Bloquer a déjà fait le travail.</p>
+  </footer>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
