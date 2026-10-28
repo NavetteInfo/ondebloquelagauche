@@ -46,7 +46,7 @@ docker run --rm -p 8080:8080 ondebloquelagauche
 SITE_URL=https://exemple.fr python3 server.py
 ```
 
-La carte est `media/card.jpg` (1200×630).
+La carte est `media/card.jpg` (1200×630). Les balises `twitter:` et `og:` sont avant la politique de sécurité. Une URL déjà partagée sur X reste en cache environ 7 jours : `?v=2` force une nouvelle lecture. Le `robots.txt` du dépôt autorise `Twitterbot`. X lit celui de `https://navetteinfo.github.io/robots.txt`, qui reste une 404 sans site utilisateur.
 
 Seuls `GET` et `HEAD` passent. Le reste reçoit un 405 et compte dans la même file. Le serveur ne rend pas les chemins en point (dont `.git`), `data/raw/`, `data/visits.json`, ni le code. Le relevé public est `data/fiches.json`. Les liens vers les profils partent sans Referer.
 

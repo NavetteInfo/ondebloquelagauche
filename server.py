@@ -347,7 +347,15 @@ class Handler(SimpleHTTPRequestHandler):
             return
         if path == "/robots.txt":
             origin = site_origin()
-            text = f"User-agent: *\nAllow: /\n\nSitemap: {origin}/sitemap.xml\n"
+            text = (
+                "User-agent: Twitterbot\n"
+                "Disallow:\n"
+                "\n"
+                "User-agent: *\n"
+                "Allow: /\n"
+                "\n"
+                f"Sitemap: {origin}/sitemap.xml\n"
+            )
             self._bytes(200, text.encode("utf-8"), "text/plain; charset=utf-8")
             return
         if path == "/sitemap.xml":
