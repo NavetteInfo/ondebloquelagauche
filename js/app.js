@@ -467,6 +467,12 @@ function paintVisits(data) {
   note.textContent = `Dont ${formatInt(today)} aujourd'hui. Le registre, lui, ne débloque rien.`;
 }
 
+function endpoint(name) {
+  const here = new URL(document.baseURI);
+  if (!here.pathname.endsWith("/")) here.pathname = here.pathname.replace(/[^/]*$/, "");
+  return new URL(name, here).href;
+}
+
 function markVisitsMissing() {
   const note = document.getElementById("visits-note");
   if (note) {
@@ -478,20 +484,20 @@ async function loadVisits() {
   const node = document.getElementById("visits");
   if (!node) return;
   try {
-    const response = await fetch("/api/visits", { cache: "no-store" });
+    const response = await fetch(endpoint("api/visits"), { cache: "no-store" });
     if (!response.ok) {
-      markVisitsMissing();
+      if (node.dataset.held !== "1") markVisitsMissing();
       return;
     }
     paintVisits(await response.json());
   } catch {
-    markVisitsMissing();
+    if (node.dataset.held !== "1") markVisitsMissing();
   }
 }
 
 async function watchLive() {
   try {
-    const response = await fetch("/api/status", { cache: "no-store" });
+    const response = await fetch(endpoint("api/status"), { cache: "no-store" });
     if (response.status === 404) {
       window.clearInterval(liveTimer);
       return;

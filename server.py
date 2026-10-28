@@ -15,7 +15,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from refresh import FICHES, refresh_followers, refresh_once
-from visits import record_visit, snapshot as visit_snapshot
+from visits import countable, record_visit, snapshot as visit_snapshot
 
 ROOT = Path(__file__).resolve().parent
 HOST = os.environ.get("HOST", "0.0.0.0")
@@ -93,6 +93,23 @@ WAIT_CSP = (
     f"style-src 'sha256-{_WAIT_HASH}'; frame-ancestors 'none'"
 )
 FRAME_CSP = PAGE_CSP + "; frame-ancestors 'none'"
+
+
+def bare_path(url_path: str) -> str:
+    """Chemin du site, avec ou sans le préfixe de la copie Pages."""
+    path = url_path.split("?", 1)[0].split("#", 1)[0]
+    if not path.startswith("/"):
+        path = "/" + path
+    prefix = urllib.parse.urlparse(PUBLIC_ORIGIN).path.rstrip("/")
+    if prefix and (path == prefix or path.startswith(prefix + "/")):
+        path = path[len(prefix):] or "/"
+    if len(path) > 1 and path.endswith("/"):
+        path = path[:-1]
+    return path
+
+
+def _fr_int(value: int) -> str:
+    return f"{value:,}".replace(",", "\u202f")
 
 
 def site_origin() -> str:
@@ -347,8 +364,24 @@ class Handler(SimpleHTTPRequestHandler):
         cache = "no-store" if path.name in {"fiches.json", "submissions.json"} else "public, max-age=3600"
         self._bytes(200, body, _TYPES[path.suffix.lower()], cache=cache)
 
+    def _page(self) -> None:
+        snap = visit_snapshot()
+        if countable(self.command, self.headers):
+            try:
+                snap = record_visit()
+            except Exception as exc:
+                print(f"compteur raté: {exc}", flush=True)
+        shown = _fr_int(int(snap["total"]))
+        text = (ROOT / "index.html").read_text(encoding="utf-8")
+        text = text.replace(
+            '<strong id="visits">…</strong>',
+            f'<strong id="visits" data-held="1">{shown}</strong>',
+            1,
+        )
+        self._serve_text(text, "text/html; charset=utf-8")
+
     def _route(self) -> None:
-        path = self.path.split("?", 1)[0]
+        path = bare_path(self.path)
         if path == "/api/status":
             with _lock:
                 body = json.dumps(_status, ensure_ascii=False).encode("utf-8")
@@ -359,13 +392,7 @@ class Handler(SimpleHTTPRequestHandler):
             self._bytes(200, body, "application/json; charset=utf-8")
             return
         if path in {"/", "/index.html"}:
-            purpose = (self.headers.get("Sec-Purpose") or self.headers.get("Purpose") or "").lower()
-            if self.command == "GET" and "prefetch" not in purpose:
-                try:
-                    record_visit()
-                except Exception as exc:
-                    print(f"compteur raté: {exc}", flush=True)
-            self._serve_text((ROOT / "index.html").read_text(encoding="utf-8"), "text/html; charset=utf-8")
+            self._page()
             return
         if path == "/robots.txt":
             origin = site_origin()
@@ -390,7 +417,7 @@ class Handler(SimpleHTTPRequestHandler):
             )
             self._bytes(200, text.encode("utf-8"), "application/xml; charset=utf-8")
             return
-        local = public_file(self.path)
+        local = public_file(path)
         if local is None:
             self.send_error(404)
             return
