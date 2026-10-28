@@ -63,7 +63,7 @@ export function filterFiches(fiches, { q = "", category = "", platform = "", sor
     if (sort === "category") {
       return a.category.localeCompare(b.category, "fr") || b.count - a.count || a.name.localeCompare(b.name, "fr");
     }
-    if (sort === "followers") {
+    if (sort === "followers" || sort === "followers-asc") {
       const fans = (fiche) => (Number.isInteger(fiche.followers_after) ? fiche.followers_after : null);
       const ag = fans(a);
       const bg = fans(b);
@@ -72,7 +72,8 @@ export function filterFiches(fiches, { q = "", category = "", platform = "", sor
       }
       if (ag === null) return 1;
       if (bg === null) return -1;
-      return bg - ag || b.count - a.count || a.name.localeCompare(b.name, "fr");
+      const delta = sort === "followers-asc" ? ag - bg : bg - ag;
+      return delta || b.count - a.count || a.name.localeCompare(b.name, "fr");
     }
     return b.count - a.count || a.name.localeCompare(b.name, "fr");
   });
