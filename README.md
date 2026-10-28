@@ -64,6 +64,6 @@ MAX_INFLIGHT=2 MAX_QUEUE=12 QUEUE_WAIT=20 IP_CAPACITY=16 IP_REFILL=0.25 IP_WAIT=
 
 Cloudflare peut renvoyer une page au lieu du JSON. En recovery, `/api/counts` et `/api/accounts` répondent `404` tant que la lecture n'envoie pas l'en-tête `X-BF` de la page publique. Avec cet en-tête, les deux JSON passent. Une lecture qui cale est retentée une fois. Le serveur garde la dernière copie valide et `/api/status` signale un relevé raté.
 
-`GET /api/submissions` reste fermé pendant la maintenance (`Page indisponible pendant la maintenance.`). Rien n'est envoyé en POST. En attendant la réouverture, le guichet affiche la trace déjà publique dans `/api/accounts` : ajouts non vérifiés à la main, mises à jour, et retraits. Dès que le GET rend du JSON, cette trace cède la place.
+`GET /api/submissions` reste fermé pendant la maintenance (`Page indisponible pendant la maintenance.`). Rien n'est envoyé en POST. La page n'affiche plus ce guichet. Les ajouts et les retraits déjà versés dans `/api/accounts` restent dans l'onglet Pulls.
 
 Les abonnés viennent de `data/abonnes.json`. `python3 refresh.py --followers` relit leur `followers.js` et réécrit le chiffre de chaque fiche. Le serveur le fait au démarrage, puis toutes les heures (`FOLLOWERS_SECONDS`, plancher 3600). L'action `.github/workflows/abonnes.yml` fait la même chose pour la copie GitHub Pages. L'écart reste calé sur le relevé du 28 octobre 2026 à 11:16 UTC, et seulement si aucun des deux chiffres n'est arrondi au millier. Il n'entre pas dans le total des blocages. Ce passage ne touche pas `/api/counts`.

@@ -438,7 +438,6 @@ h2 {
 }
 
 .rite,
-.guichet,
 .tiroir,
 .pulls {
   padding: 1.35rem 1rem 1.5rem;
@@ -496,15 +495,6 @@ h2 {
   font-weight: 700;
 }
 
-.guichet.is-shut #sub-line {
-  margin-top: 0.35rem;
-  padding: 0.75rem 0.85rem;
-  border: 2px solid var(--red);
-  background: var(--field);
-  color: var(--ink);
-  font-weight: 700;
-}
-
 .medals {
   margin: 0.9rem 0 0;
   padding: 0;
@@ -515,32 +505,6 @@ h2 {
   margin: 0;
   padding: 0.55rem 0;
   border-top: 2px solid var(--line);
-  font-weight: 700;
-}
-
-.sub-row {
-  padding: 0.75rem 0;
-  border-top: 2px solid var(--line);
-}
-
-.sub-row h3 {
-  margin: 0;
-  font-family: var(--display);
-  font-size: 1.15rem;
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  text-transform: uppercase;
-}
-
-.sub-row p {
-  margin: 0.25rem 0 0;
-}
-
-.sub-row a {
-  display: inline-block;
-  margin-top: 0.35rem;
-  color: var(--ink);
   font-weight: 700;
 }
 
