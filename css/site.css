@@ -653,6 +653,12 @@ h2 {
 
 .gel.caisse {
   margin-top: 1rem;
+  line-height: 1.65;
+}
+
+.gel.caisse p + p {
+  color: var(--ink);
+  font-weight: 700;
 }
 
 .filters {
@@ -891,8 +897,9 @@ p.fiche-go {
 }
 
 .prose p {
-  margin: 0 0 0.9rem;
+  margin: 0 0 1rem;
   font-size: 1.02rem;
+  line-height: 1.65;
 }
 
 blockquote {
