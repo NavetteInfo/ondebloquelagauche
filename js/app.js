@@ -43,14 +43,14 @@ function paintCatalog(data) {
   setText("historical", data.historical_base);
   const lede = document.getElementById("hero-lede");
   if (lede) {
-    lede.textContent = `${formatInt(data.total_blocks)} blocages au compteur, ${formatInt(data.fiche_count)} fiches, et pas une seule réponse.`;
+    lede.textContent = `${formatInt(data.total_blocks)} blocages déclarés. ${formatInt(data.fiche_count)} fiches. Le débat, lui, est resté dehors.`;
   }
   const caption = document.querySelector(".caption");
   if (caption) {
     const when = formatUtc(data.as_of);
     caption.textContent = when
-      ? `Compteur global de la liste, relevé le ${when}. Une partie du total n'est rattachée à aucun nom.`
-      : "Compteur global de la liste. Une partie du total n'est rattachée à aucun nom.";
+      ? `Compteur global de la liste, relevé le ${when}. Une partie du total n'a même pas de nom.`
+      : "Compteur global de la liste. Une partie du total n'a même pas de nom.";
   }
   const pull = document.getElementById("pull-line");
   if (pull) {
@@ -73,7 +73,7 @@ function paintLive(status) {
   const node = $("#live-line");
   if (!node || !status) return;
   if (status.ok && status.as_of) {
-    node.textContent = `En direct. Dernier relevé le ${formatUtc(status.as_of)}.`;
+    node.textContent = `En direct. Dernier relevé le ${formatUtc(status.as_of)}. Le bouton, lui, ne dort pas.`;
     return;
   }
   if (status.error) {
@@ -208,11 +208,11 @@ function render() {
   page = windowed.page;
 
   $("#status").textContent = rows.length
-    ? `${formatInt(rows.length)} fiches`
-    : "Aucune fiche. Le tiroir ne connaît pas ce nom.";
+    ? `${formatInt(rows.length)} fiches au tiroir`
+    : "Aucune fiche. Soit le nom est libre, soit l'orthographe a été bloquée avant lui.";
   $("#page-label").textContent = rows.length
     ? `Page ${windowed.page} sur ${windowed.pages}`
-    : "Page 0";
+    : "Page 0. Le rayon est vide.";
   $("#prev").disabled = !rows.length || windowed.page <= 1;
   $("#next").disabled = !rows.length || windowed.page >= windowed.pages;
 
@@ -221,7 +221,7 @@ function render() {
   if (!rows.length) {
     const p = document.createElement("p");
     p.className = "state";
-    p.textContent = "Rien dans ce rayon. L'orthographe a peut-être été bloquée aussi.";
+    p.textContent = "Rien dans ce rayon. L'orthographe a été bloquée avant le nom.";
     list.append(p);
   } else {
     const frag = document.createDocumentFragment();
@@ -270,6 +270,8 @@ function paintSubmissions(data) {
   if (!line || !list || !data || typeof data !== "object") return;
   const when = formatUtc(data.pulled_at).replace(" UTC", "\u00A0UTC");
   list.replaceChildren();
+  const section = document.getElementById("guichet");
+  if (section) section.classList.toggle("is-shut", !data.ok);
   if (!data.ok) {
     const status = Number(data.http_status) || 0;
     const message = String(data.message || "lecture ratée");
@@ -287,7 +289,7 @@ function paintSubmissions(data) {
   if (!items.length) {
     const empty = document.createElement("p");
     empty.className = "howto";
-    empty.textContent = "La réponse ne contient aucune fiche publique.";
+    empty.textContent = "La réponse ne contient aucune fiche publique. Le guichet a répondu par le vide.";
     list.append(empty);
     return;
   }
@@ -325,6 +327,7 @@ async function loadSubmissions() {
     paintSubmissions(await response.json());
   } catch {
     if (line) line.textContent = "Pull de /api/submissions raté. Le fichier n'est pas arrivé.";
+    document.getElementById("guichet")?.classList.add("is-shut");
   }
 }
 
@@ -340,7 +343,7 @@ function paintVisits(data) {
   const total = Number(data.total) || 0;
   const today = Number(data.today) || 0;
   if (total <= 0) {
-    node.textContent = "Aucun passage pour l'instant.";
+    node.textContent = "Aucun passage pour l'instant. Le registre attend.";
     return;
   }
   if (total === 1) {
@@ -348,7 +351,7 @@ function paintVisits(data) {
     return;
   }
   const many = total > 1 ? "s" : "";
-  node.textContent = `${formatInt(total)} passage${many}, dont ${formatInt(today)} aujourd'hui.`;
+  node.textContent = `${formatInt(total)} passage${many}, dont ${formatInt(today)} aujourd'hui. Le registre, lui, ne débloque rien.`;
 }
 
 async function loadVisits() {
@@ -411,7 +414,7 @@ async function init() {
     liveTimer = window.setInterval(watchLive, 15000);
   } catch {
     showState("Le tiroir est coincé. Le fichier des fiches n'est pas arrivé.");
-    $("#status").textContent = "Erreur de chargement.";
+    $("#status").textContent = "Erreur de chargement. Le classeur a avalé la page.";
   }
 }
 

@@ -79,6 +79,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-h);
 }
 
 body {
@@ -241,7 +242,7 @@ h1 .mis {
 
 .hero .lede {
   margin: 0;
-  max-width: 36ch;
+  max-width: 42ch;
   font-size: 1rem;
   font-weight: 700;
 }
@@ -280,6 +281,16 @@ h1 .mis {
 .btn-ink {
   background: var(--ink);
   color: var(--paper);
+}
+
+.btn:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.btn-red:hover {
+  color: var(--red);
+  border-color: var(--red);
 }
 
 .btn:active {
@@ -401,7 +412,7 @@ h2 {
 
 .ladder {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   margin: 1rem 0 0;
   padding: 0;
   list-style: none;
@@ -436,8 +447,27 @@ h2 {
   text-transform: uppercase;
 }
 
+.ladder li:first-child {
+  grid-column: span 2;
+  background: var(--field);
+}
+
 .ladder li:first-child strong {
   color: var(--red);
+}
+
+.medals strong {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.guichet.is-shut #sub-line {
+  margin-top: 0.35rem;
+  padding: 0.75rem 0.85rem;
+  border: 2px solid var(--red);
+  background: var(--field);
+  color: var(--ink);
+  font-weight: 700;
 }
 
 .medals {
@@ -561,7 +591,7 @@ select {
 }
 
 .headrow {
-  padding: 0.35rem 0;
+  padding: 0.35rem 0.4rem;
   border-top: 2px solid var(--line);
   color: var(--muted);
   font-size: 0.68rem;
@@ -571,8 +601,12 @@ select {
 }
 
 .fiche {
-  padding: 0.8rem 0 0.7rem;
+  padding: 0.8rem 0.4rem 0.7rem;
   border-top: 2px solid var(--line);
+}
+
+.fiche:hover {
+  background: var(--field);
 }
 
 .fiche h3 {
@@ -635,6 +669,11 @@ select {
   letter-spacing: 0.03em;
   text-transform: uppercase;
   cursor: pointer;
+}
+
+.pager button:hover:not(:disabled) {
+  background: var(--paper);
+  color: var(--ink);
 }
 
 .pager button:disabled {
@@ -733,6 +772,10 @@ blockquote p {
 
   .ladder {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .ladder li:first-child {
+    grid-column: 1 / -1;
   }
 
   .filters {
