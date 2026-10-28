@@ -28,7 +28,7 @@
       <div class="hero-copy">
         <p class="stamp">Catastrophe</p>
         <h1 id="titre">On débloque<br><span class="mis">la gauche</span></h1>
-        <p class="lede">Six millions de blocages, 3&nbsp;803 fiches, et pas une seule réponse.</p>
+        <p class="lede" id="hero-lede">Le compteur tourne. Les fiches aussi. Pas une seule réponse.</p>
         <div class="actions">
           <a class="btn btn-red" href="#tiroir">Ouvrir les fiches</a>
           <a class="btn btn-ink" href="#constat">Lire le constat</a>
@@ -42,21 +42,22 @@
     <section class="compteur" id="compteur" aria-labelledby="compteur-title">
       <div class="compteur-main">
         <h2 id="compteur-title">Le compteur</h2>
-        <p class="giant" id="total-blocks">6&nbsp;194&nbsp;112</p>
-        <p class="caption">Compteur global de la liste au 28 octobre 2026. Une partie du total n'est rattachée à aucun nom.</p>
+        <p class="giant" id="total-blocks">7&nbsp;866&nbsp;289</p>
+        <p class="caption">Compteur global de la liste. Une partie du total n'est rattachée à aucun nom.</p>
+        <p class="live-line" id="live-line">Copie locale, en attendant le prochain relevé.</p>
       </div>
       <dl class="facts">
         <div>
           <dt>Fiches</dt>
-          <dd id="fiche-count">3&nbsp;803</dd>
+          <dd id="fiche-count">3&nbsp;552</dd>
         </div>
         <div>
           <dt>Noms</dt>
-          <dd id="name-count">2&nbsp;400</dd>
+          <dd id="name-count">2&nbsp;296</dd>
         </div>
         <div>
           <dt>Somme des fiches</dt>
-          <dd id="fiche-sum">2&nbsp;638&nbsp;833</dd>
+          <dd id="fiche-sum">3&nbsp;306&nbsp;441</dd>
         </div>
         <div>
           <dt>Hérités du vieux compteur</dt>
@@ -138,7 +139,7 @@
   </main>
 
   <footer class="foot">
-    <p>Satire. Fiches tirées d'une liste publique de blocage (« on bloque l'extrême droite »), export figé le 28 octobre 2026 à 16:34 UTC. Profils publics seulement.</p>
+    <p>Satire. Fiches tirées de la liste publique « on bloque l'extrême droite », relue via api/accounts et api/counts. Profils publics seulement.</p>
     <p>Ce site ne demande à personne de bloquer, d'écrire ou de harceler qui que ce soit. Le bouton Bloquer a déjà fait le travail.</p>
   </footer>
   <script type="module" src="js/app.js"></script>

@@ -5,8 +5,15 @@ const $ = (sel) => document.querySelector(sel);
 
 const nf = new Intl.NumberFormat("fr-FR");
 
+const MONTHS = [
+  "janvier", "février", "mars", "avril", "mai", "juin",
+  "juillet", "août", "septembre", "octobre", "novembre", "décembre",
+];
+
 let all = [];
 let page = 1;
+let seenAsOf = null;
+let liveTimer = 0;
 
 function formatInt(value) {
   return nf.format(Number(value) || 0);
@@ -15,6 +22,54 @@ function formatInt(value) {
 function setText(id, value) {
   const node = document.getElementById(id);
   if (node) node.textContent = formatInt(value);
+}
+
+function formatUtc(iso) {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  const pad = (value) => String(value).padStart(2, "0");
+  return `${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()} à ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())} UTC`;
+}
+
+function paintCatalog(data) {
+  all = Array.isArray(data.fiches) ? data.fiches : [];
+  seenAsOf = data.as_of || seenAsOf;
+  setText("total-blocks", data.total_blocks);
+  setText("fiche-count", data.fiche_count);
+  setText("name-count", data.name_count);
+  setText("fiche-sum", data.fiche_count_sum);
+  setText("historical", data.historical_base);
+  const lede = document.getElementById("hero-lede");
+  if (lede) {
+    lede.textContent = `${formatInt(data.total_blocks)} blocages au compteur, ${formatInt(data.fiche_count)} fiches, et pas une seule réponse.`;
+  }
+  const caption = document.querySelector(".caption");
+  if (caption) {
+    const when = formatUtc(data.as_of);
+    caption.textContent = when
+      ? `Compteur global de la liste, relevé le ${when}. Une partie du total n'est rattachée à aucun nom.`
+      : "Compteur global de la liste. Une partie du total n'est rattachée à aucun nom.";
+  }
+  fillSelect("cat", data.categories || [], "Tous");
+  fillSelect("net", data.platforms || [], "Tous");
+  $("#net").querySelectorAll("option").forEach((option) => {
+    if (!option.value) return;
+    const label = PLATFORM_LABEL[option.value] || option.value;
+    const count = option.textContent.match(/\(([^)]+)\)$/);
+    option.textContent = count ? `${label} (${count[1]})` : label;
+  });
+}
+
+function paintLive(status) {
+  const node = $("#live-line");
+  if (!node || !status) return;
+  if (status.ok && status.as_of) {
+    node.textContent = `En direct. Dernier relevé le ${formatUtc(status.as_of)}.`;
+    return;
+  }
+  if (status.error) {
+    node.textContent = "Le relevé vient de rater. La copie affichée est la dernière qui a marché.";
+  }
 }
 
 
@@ -195,46 +250,50 @@ function bind() {
   });
 }
 
+async function loadFiches() {
+  const response = await fetch(`data/fiches.json?t=${Date.now()}`, { cache: "no-store" });
+  if (!response.ok) throw new Error(String(response.status));
+  return response.json();
+}
+
+async function watchLive() {
+  try {
+    const response = await fetch("/api/status", { cache: "no-store" });
+    if (response.status === 404) {
+      window.clearInterval(liveTimer);
+      return;
+    }
+    if (!response.ok) throw new Error(String(response.status));
+    const status = await response.json();
+    paintLive(status);
+    if (status.ok && status.as_of && status.as_of !== seenAsOf) {
+      const data = await loadFiches();
+      paintCatalog(data);
+      render();
+    }
+  } catch {
+    const node = $("#live-line");
+    if (node && seenAsOf) {
+      node.textContent = "Le fil direct est coupé. La copie affichée reste la dernière qui a marché.";
+    }
+  }
+}
+
 async function init() {
   const pending = readQuery();
   try {
-    const response = await fetch("data/fiches.json");
-    if (!response.ok) throw new Error(String(response.status));
-    const data = await response.json();
-    all = Array.isArray(data.fiches) ? data.fiches : [];
-    setText("total-blocks", data.total_blocks);
-    setText("fiche-count", data.fiche_count);
-    setText("name-count", data.name_count);
-    setText("fiche-sum", data.fiche_count_sum);
-    setText("historical", data.historical_base);
-
-    const categories = (data.categories || []).map(([name, count]) => [name, count]);
-    const platforms = (data.platforms || []).map(([name, count]) => [
-      PLATFORM_LABEL[name] ? name : name,
-      count,
-    ]);
-    fillSelect("cat", categories, "Tous");
-    fillSelect(
-      "net",
-      platforms.map(([name, count]) => [name, count]),
-      "Tous",
-    );
-    $("#net").querySelectorAll("option").forEach((option) => {
-      if (!option.value) return;
-      const label = PLATFORM_LABEL[option.value] || option.value;
-      const count = option.textContent.match(/\(([^)]+)\)$/);
-      option.textContent = count ? `${label} (${count[1]})` : label;
-    });
-
+    const data = await loadFiches();
+    paintCatalog(data);
     if (pending.cat && [...$("#cat").options].some((option) => option.value === pending.cat)) {
       $("#cat").value = pending.cat;
     }
     if (pending.net && [...$("#net").options].some((option) => option.value === pending.net)) {
       $("#net").value = pending.net;
     }
-
     bind();
     render();
+    watchLive();
+    liveTimer = window.setInterval(watchLive, 15000);
   } catch {
     showState("Le tiroir est coincé. Le fichier des fiches n'est pas arrivé.");
     $("#status").textContent = "Erreur de chargement.";

@@ -346,10 +346,17 @@ h2 {
 
 .caption,
 .howto,
-.attr {
+.attr,
+.live-line {
   margin: 0.85rem 0 0;
   color: var(--muted);
   font-size: 0.82rem;
+}
+
+.live-line {
+  margin-top: 0.45rem;
+  color: var(--red);
+  font-weight: 700;
 }
 
 .facts {
