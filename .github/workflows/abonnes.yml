@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: abonnes
+  group: publication
   cancel-in-progress: false
 
 jobs:

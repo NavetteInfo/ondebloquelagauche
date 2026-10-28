@@ -377,6 +377,20 @@ def fetch_json(url: str) -> dict:
     return data
 
 
+def _latest_archive(directory: Path, kind: str) -> Path | None:
+    """Dernier JSON de ce type. Les liens ne comptent pas."""
+    prefix = f"{kind}_"
+    found: list[Path] = []
+    for path in directory.iterdir():
+        if path.is_symlink() or not path.is_file():
+            continue
+        if path.name.startswith(prefix) and path.suffix == ".json":
+            found.append(path)
+    if not found:
+        return None
+    return max(found, key=lambda path: path.name)
+
+
 def archive_payload(kind: str, payload: bytes, moment: datetime) -> Path:
     """Conserve le JSON tel qu'il a été reçu. Un fichier déjà là n'est pas réécrit."""
     if kind not in _ARCHIVE_KINDS:
@@ -393,6 +407,9 @@ def archive_payload(kind: str, payload: bytes, moment: datetime) -> Path:
         json.loads(payload.decode("utf-8"))
     except (UnicodeError, json.JSONDecodeError):
         raise ValueError("pull vide") from None
+    latest = _latest_archive(directory, kind)
+    if latest is not None and latest.read_bytes() == payload:
+        return latest
     path = directory / f"{kind}_{stamp}.json"
     suffix = 2
     while path.exists() or path.is_symlink():
