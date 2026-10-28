@@ -28,6 +28,9 @@ USER_AGENT = (
     "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 "
     "OnDebloqueLaGauche/1.0"
 )
+# La page publique envoie cet en-tête sur ses lectures. En recovery, sans lui,
+# /api/counts et /api/accounts répondent 404 « Page introuvable. »
+CLIENT_HEADER = "1"
 MAX_BYTES = 8_000_000
 ALLOWED_PROFILE_HOSTS = {
     "x.com",
@@ -115,10 +118,14 @@ class _PinHost(urllib.request.HTTPRedirectHandler):
 def fetch_json(url: str) -> dict:
     request = urllib.request.Request(
         url,
-        headers={"Accept": "application/json", "User-Agent": USER_AGENT},
+        headers={
+            "Accept": "application/json",
+            "User-Agent": USER_AGENT,
+            "X-BF": CLIENT_HEADER,
+        },
     )
     opener = urllib.request.build_opener(_PinHost)
-    with opener.open(request, timeout=30) as response:
+    with opener.open(request, timeout=60) as response:
         if not _same_source(response.geturl()):
             raise RuntimeError("hôte inattendu")
         payload = response.read(MAX_BYTES + 1)

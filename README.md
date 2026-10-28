@@ -60,4 +60,4 @@ MAX_INFLIGHT=2 MAX_QUEUE=12 QUEUE_WAIT=20 IP_CAPACITY=16 IP_REFILL=0.25 IP_WAIT=
 
 ## Ce qui reste affiché si la source refuse
 
-Cloudflare peut renvoyer une page au lieu du JSON. Le serveur garde alors la dernière copie valide et `/api/status` signale un relevé raté. Le détail reste dans la sortie du processus.
+Cloudflare peut renvoyer une page au lieu du JSON. En recovery, les deux adresses répondent aussi `404` tant que la lecture n'envoie pas l'en-tête `X-BF` de la page publique. Le serveur garde alors la dernière copie valide et `/api/status` signale un relevé raté. Le détail reste dans la sortie du processus.
