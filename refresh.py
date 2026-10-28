@@ -22,13 +22,15 @@ ABONNES = DATA / "abonnes.json"
 # Sortie publique du dispositif, mardi 27 octobre 2026.
 LAUNCH_DAY = "2026-10-27"
 _DAY_RE = re.compile(r"\d{4}-\d{2}-\d{2}\Z")
-_FOLLOWER_KEY_RE = re.compile(r"[a-z]+:/[a-z0-9._~:@-]{1,200}\Z")
+_STAMP_RE = re.compile(r"\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}Z)?\Z")
+_FOLLOWER_KEY_RE = re.compile(r"[a-z]+:/[a-z0-9._~:@/-]{1,200}\Z")
 _FOLLOWER_FIELDS = (
     "followers_before",
     "followers_after",
     "followers_gained",
     "followers_from",
     "followers_to",
+    "followers_rounded",
 )
 
 COUNTS_URL = "https://onbloquelextremedroite.fun/api/counts"
@@ -145,7 +147,7 @@ def profile_key(url: str) -> str | None:
         if ident.isdigit():
             path = f"/id:{ident}"
     key = f"{net}:{path}"
-    if not _FOLLOWER_KEY_RE.fullmatch(key):
+    if not _FOLLOWER_KEY_RE.fullmatch(key) or ".." in key:
         return None
     return key
 
@@ -154,72 +156,84 @@ def _rounded_thousand(value: int) -> bool:
     return value % 1000 == 0
 
 
+def _pos_int(value) -> int | None:
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    if not 0 < value <= _COUNT_CAP:
+        return None
+    return value
+
+
 def _follower_hit(entry: dict) -> dict | None:
-    before = entry.get("before")
-    after = entry.get("after")
-    gained = entry.get("gained")
-    start = entry.get("from")
+    """Compte public, et écart seulement si les deux relevés ne sont pas arrondis."""
+    after = _pos_int(entry.get("after"))
     end = entry.get("to")
-    if (
-        isinstance(before, bool)
-        or not isinstance(before, int)
-        or isinstance(after, bool)
-        or not isinstance(after, int)
-        or isinstance(gained, bool)
-        or not isinstance(gained, int)
-    ):
+    if after is None or not isinstance(end, str) or not _DAY_RE.fullmatch(end):
         return None
-    if not 0 < before <= _COUNT_CAP or not 0 < after <= _COUNT_CAP:
-        return None
-    if gained == 0 or abs(gained) > _COUNT_CAP or gained != after - before:
-        return None
-    if _rounded_thousand(before) or _rounded_thousand(after):
-        return None
-    if start != LAUNCH_DAY or not isinstance(end, str) or not _DAY_RE.fullmatch(end):
-        return None
-    if end <= start:
-        return None
-    return {
-        "followers_before": before,
-        "followers_after": after,
-        "followers_gained": gained,
-        "followers_from": start,
-        "followers_to": end,
-    }
+    hit = {"followers_after": after, "followers_to": end}
+    if _rounded_thousand(after):
+        hit["followers_rounded"] = True
+    before = entry.get("before")
+    start = entry.get("from")
+    if before is None:
+        return hit
+    before_n = _pos_int(before)
+    if before_n is None or not isinstance(start, str) or not _STAMP_RE.fullmatch(start):
+        return hit
+    if _rounded_thousand(before_n) or _rounded_thousand(after):
+        return hit
+    gained = after - before_n
+    if abs(gained) > _COUNT_CAP:
+        return hit
+    hit["followers_before"] = before_n
+    hit["followers_gained"] = gained
+    hit["followers_from"] = start
+    return hit
 
 
-def _follower_table() -> dict[str, dict]:
-    """data/abonnes.json est un extrait figé. On ne le retélécharge pas ici."""
+def _follower_table() -> tuple[dict[str, dict], dict]:
+    """data/abonnes.json est un extrait figé de followers.js. Pas de retéléchargement."""
+    meta = {"baseline": "", "latest": "", "source": "followers.js"}
     if not ABONNES.is_file():
-        return {}
+        return {}, meta
     try:
         payload = json.loads(ABONNES.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
-        return {}
-    entries = payload.get("entries") if isinstance(payload, dict) else None
+        return {}, meta
+    if not isinstance(payload, dict):
+        return {}, meta
+    for field in ("baseline", "latest"):
+        value = payload.get(field)
+        if isinstance(value, str) and _STAMP_RE.fullmatch(value):
+            meta[field] = value
+    entries = payload.get("entries")
     if not isinstance(entries, list):
-        return {}
+        return {}, meta
     table: dict[str, dict] = {}
     for entry in entries:
         if not isinstance(entry, dict):
             continue
         key = entry.get("key")
-        if not isinstance(key, str) or not _FOLLOWER_KEY_RE.fullmatch(key):
+        if (
+            not isinstance(key, str)
+            or not _FOLLOWER_KEY_RE.fullmatch(key)
+            or ".." in key
+        ):
             continue
         hit = _follower_hit(entry)
         if hit:
             table[key] = hit
-    return table
+    return table, meta
 
 
 def attach_followers(doc: dict) -> None:
-    """Pose le gain d'abonnés. Ces chiffres ne comptent pas dans les blocages."""
-    table = _follower_table()
+    """Pose les abonnés. Ces chiffres ne comptent pas dans les blocages."""
+    table, meta = _follower_table()
     fiches = doc.get("fiches")
     if not isinstance(fiches, list):
         return
     matched = 0
-    latest = ""
+    compared = 0
     for fiche in fiches:
         if not isinstance(fiche, dict):
             continue
@@ -230,12 +244,13 @@ def attach_followers(doc: dict) -> None:
             continue
         fiche.update(hit)
         matched += 1
-        if hit["followers_to"] > latest:
-            latest = hit["followers_to"]
+        if "followers_gained" in hit:
+            compared += 1
     doc["followers"] = {
-        "baseline": LAUNCH_DAY,
-        "latest": latest or None,
+        "baseline": meta["baseline"] or None,
+        "latest": meta["latest"] or None,
         "matched": matched,
+        "compared": compared,
         "source": "followers.js",
     }
 

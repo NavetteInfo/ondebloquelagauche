@@ -34,12 +34,14 @@ function formatDay(iso) {
   return { month, day: Number(match[3]), key: match[2] };
 }
 
-function formatSpan(from, to) {
-  const start = formatDay(from);
-  const end = formatDay(to);
-  if (!start || !end) return "depuis le 27 oct.";
-  if (start.key === end.key) return `du ${start.day} au ${end.day} ${end.month}`;
-  return `du ${start.day} ${start.month} au ${end.day} ${end.month}`;
+function formatStamp(iso) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})Z)?$/.exec(String(iso || ""));
+  if (!match) return "";
+  const month = SHORT_MONTHS[Number(match[2]) - 1];
+  if (!month) return "";
+  const day = `${Number(match[3])} ${month}`;
+  if (!match[4]) return day;
+  return `${match[4]}:${match[5]} UTC`;
 }
 
 function setText(id, value) {
@@ -175,30 +177,64 @@ function showState(message) {
 function paintFollowers(data) {
   const node = document.getElementById("followers-line");
   if (!node) return;
-  const matched = Number(data.followers && data.followers.matched) || 0;
+  const info = data.followers || {};
+  const matched = Number(info.matched) || 0;
+  const compared = Number(info.compared) || 0;
   if (matched <= 0) {
-    node.textContent = "Abonnés gagnés depuis le 27 octobre : aucun relevé public daté de ce jour ne retombe sur une fiche. Pas de chiffre inventé.";
+    node.textContent = "Abonnés : leur followers.js ne retombe sur aucune fiche.";
     return;
   }
-  if (matched === 1) {
-    node.textContent = "Abonnés gagnés depuis le 27 octobre : 1 fiche a les deux relevés, sans arrondi au millier. Le reste du tiroir n'a pas de point de départ.";
-    return;
+  const day = formatDay(String(info.baseline || "").slice(0, 10));
+  const from = formatStamp(info.baseline);
+  const latest = formatStamp(info.latest);
+  let span = "sur deux relevés du 28 octobre.";
+  if (day && from && latest) {
+    const stop = day.month.endsWith(".") ? "" : ".";
+    span = `entre ${from} et ${latest}, le ${day.day} ${day.month}${stop}`;
+  } else if (from) {
+    span = `depuis ${from}.`;
   }
-  node.textContent = `Abonnés gagnés depuis le 27 octobre : ${formatInt(matched)} fiches ont les deux relevés, sans arrondi au millier. Le reste du tiroir n'a pas de point de départ.`;
+  node.textContent = `Abonnés pris dans leur followers.js. ${formatInt(matched)} fiches ont un chiffre. ${formatInt(compared)} ont un écart ${span} Un relevé arrondi au millier reste sans écart.`;
 }
 
 function followerLine(fiche) {
-  const gained = fiche.followers_gained;
-  if (!Number.isInteger(gained) || gained === 0) return null;
+  const after = fiche.followers_after;
   const line = document.createElement("p");
   line.className = "fiche-gain";
-  const delta = document.createElement("span");
-  delta.className = gained > 0 ? "delta" : "delta down";
-  delta.textContent = gained > 0 ? `+${formatInt(gained)}` : formatInt(Math.abs(gained));
-  const rest = document.createElement("span");
-  const span = formatSpan(fiche.followers_from, fiche.followers_to);
-  rest.textContent = gained > 0 ? ` abonnés ${span}` : ` abonnés en moins ${span}`;
-  line.append(delta, rest);
+  if (!Number.isInteger(after) || after <= 0) {
+    line.classList.add("is-empty");
+    line.textContent = "Abonnés non relevés.";
+    return line;
+  }
+  const num = document.createElement("span");
+  num.className = "delta";
+  num.textContent = formatInt(after);
+  const unit = document.createElement("span");
+  unit.textContent = " abonnés";
+  line.append(num, unit);
+  const cmp = document.createElement("span");
+  const gained = fiche.followers_gained;
+  if (Number.isInteger(gained)) {
+    const since = formatStamp(fiche.followers_from) || "le relevé précédent";
+    if (gained > 0) {
+      cmp.className = "cmp up";
+      cmp.textContent = `, +${formatInt(gained)} depuis ${since}`;
+    } else if (gained < 0) {
+      cmp.className = "cmp";
+      cmp.textContent = `, ${formatInt(Math.abs(gained))} en moins depuis ${since}`;
+    } else {
+      cmp.className = "cmp";
+      cmp.textContent = `, inchangé depuis ${since}`;
+    }
+  } else if (fiche.followers_rounded) {
+    cmp.className = "cmp";
+    cmp.textContent = ", relevé arrondi";
+  } else {
+    const day = formatDay(fiche.followers_to);
+    cmp.className = "cmp";
+    cmp.textContent = day ? `, relevé du ${day.day} ${day.month}` : ", relevé public";
+  }
+  line.append(cmp);
   return line;
 }
 
@@ -234,10 +270,10 @@ function renderRow(fiche) {
     action.href = href;
     action.target = "_blank";
     action.rel = "noopener noreferrer";
-    action.textContent = "Suivre";
+    action.textContent = "Profil public";
     const hidden = document.createElement("span");
     hidden.className = "sr-only";
-    hidden.textContent = ` le profil public de ${fiche.name}, nouvelle fenêtre`;
+    hidden.textContent = `, ${fiche.name}, nouvelle fenêtre`;
     action.append(hidden);
   } else {
     action = document.createElement("p");

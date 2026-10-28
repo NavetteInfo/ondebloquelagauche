@@ -652,12 +652,16 @@ select {
 }
 
 .fiche-gain .delta {
-  color: var(--red);
   font-variant-numeric: tabular-nums;
 }
 
-.fiche-gain .delta.down {
-  color: var(--ink);
+.fiche-gain .cmp.up {
+  color: var(--red);
+}
+
+.fiche-gain.is-empty {
+  color: var(--muted);
+  font-weight: 400;
 }
 
 .sk {

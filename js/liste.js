@@ -64,9 +64,9 @@ export function filterFiches(fiches, { q = "", category = "", platform = "", sor
       return a.category.localeCompare(b.category, "fr") || b.count - a.count || a.name.localeCompare(b.name, "fr");
     }
     if (sort === "followers") {
-      const gain = (fiche) => (Number.isInteger(fiche.followers_gained) ? fiche.followers_gained : null);
-      const ag = gain(a);
-      const bg = gain(b);
+      const fans = (fiche) => (Number.isInteger(fiche.followers_after) ? fiche.followers_after : null);
+      const ag = fans(a);
+      const bg = fans(b);
       if (ag === null && bg === null) {
         return b.count - a.count || a.name.localeCompare(b.name, "fr");
       }

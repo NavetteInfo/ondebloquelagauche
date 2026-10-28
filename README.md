@@ -64,4 +64,4 @@ Cloudflare peut renvoyer une page au lieu du JSON. En recovery, `/api/counts` et
 
 `GET /api/submissions` reste fermé pendant la maintenance (`Page indisponible pendant la maintenance.`). Rien n'est envoyé en POST. En attendant la réouverture, le guichet affiche la trace déjà publique dans `/api/accounts` : ajouts non vérifiés à la main, mises à jour, et retraits. Dès que le GET rend du JSON, cette trace cède la place.
 
-Le gain d'abonnés vient de `data/abonnes.json`, un extrait figé, pas d'un pull. Il faut deux relevés du même compte, le premier daté du 27 octobre 2026, et aucun des deux arrondi au millier. Ce chiffre reste sur la fiche. Il n'entre pas dans le total des blocages.
+Les abonnés viennent de `data/abonnes.json`, un extrait figé de leur `followers.js`, pas d'un pull à chaque passage. L'écart n'est inscrit que si les deux relevés du 28 octobre 2026 existent et qu'aucun n'est arrondi au millier. Ce chiffre reste sur la fiche. Il n'entre pas dans le total des blocages.
