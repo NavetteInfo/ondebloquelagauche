@@ -44,6 +44,28 @@ COUNTS_URL = "https://onbloquelextremedroite.fun/api/counts"
 ACCOUNTS_URL = "https://onbloquelextremedroite.fun/api/accounts"
 SUBMISSIONS_URL = "https://onbloquelextremedroite.fun/api/submissions"
 FOLLOWERS_URL = "https://onbloquelextremedroite.fun/followers.js"
+ACCOUNTS_JS_URL = "https://onbloquelextremedroite.fun/accounts.js"
+SOCIALS_JS_URL = "https://onbloquelextremedroite.fun/socials.js"
+_DIR_CATS = {
+    "RN",
+    "Reconquête",
+    "Politiques",
+    "Partis & mouvements",
+    "Médias",
+    "Influenceurs",
+    "Groupes",
+    "Autres",
+}
+_HANDLE_RE = re.compile(r"[A-Za-z0-9_]{1,30}\Z")
+_ASSIGN_RE = re.compile(r"\A(?:\ufeff)?const\s+(accounts|socials)\s*=\s*")
+# Le site traite ces hôtes comme le réseau déjà admis, après avoir retiré le préfixe.
+_HOST_ALIAS = {
+    "fr-fr.facebook.com": "www.facebook.com",
+    "fr.facebook.com": "www.facebook.com",
+    "m.facebook.com": "www.facebook.com",
+    "web.facebook.com": "www.facebook.com",
+    "m.instagram.com": "www.instagram.com",
+}
 _IO_LOCK = threading.Lock()
 _FOLLOWERS_ASSIGN = re.compile(
     r"\A(?:\ufeff)?(?://[^\n]*\n|\s)*const\s+followerCounts\s*=\s*"
@@ -150,7 +172,10 @@ def safe_profile_url(raw: str) -> str | None:
         return None
     if url.port not in (None, 443):
         return None
-    if not host or host.endswith(".") or host not in ALLOWED_PROFILE_HOSTS:
+    if not host or host.endswith("."):
+        return None
+    host = _HOST_ALIAS.get(host, host)
+    if host not in ALLOWED_PROFILE_HOSTS:
         return None
     query = f"?{url.query}" if url.query else ""
     return f"https://{host}{url.path or '/'}{query}"
@@ -391,42 +416,152 @@ def archive_payload(kind: str, payload: bytes, moment: datetime) -> Path:
     return path
 
 
-def merge(accounts: dict, counts_doc: dict, refreshed_at: str | None = None) -> dict:
+def _person_key(person: dict) -> str:
+    return str(person.get("id") or person.get("handle") or "").strip().lower()
+
+
+def _directory_fiches(curated: list, socials: dict, entries: list, counts: dict) -> list[dict]:
+    """Liste affichée : accounts.js, puis les ajouts de l'API, moins les retraits."""
+    people: list[dict] = []
+    index: dict[str, dict] = {}
+    for raw in curated:
+        if not isinstance(raw, dict):
+            continue
+        person = {
+            "id": raw.get("id") if isinstance(raw.get("id"), str) else "",
+            "handle": raw.get("handle") if isinstance(raw.get("handle"), str) else "",
+            "name": raw.get("name") if isinstance(raw.get("name"), str) else "",
+            "category": raw.get("category") if isinstance(raw.get("category"), str) else "",
+            "reason": raw.get("reason") if isinstance(raw.get("reason"), str) else "",
+        }
+        key = _person_key(person)
+        if not key or key in index:
+            continue
+        people.append(person)
+        index[key] = person
+    links: dict[str, dict[str, str]] = {}
+    for key, entry in socials.items():
+        if not isinstance(key, str) or not isinstance(entry, dict):
+            continue
+        slot: dict[str, str] = {}
+        for net, url in entry.items():
+            if net in PLATFORMS and isinstance(url, str) and url:
+                slot[net] = url
+        if slot:
+            links[key.lower()] = slot
+    removed: set[str] = set()
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        if entry.get("type") == "removal":
+            removed.add(str(entry.get("target_id") or "").strip().lower())
+            continue
+        ident = str(entry.get("id") if entry.get("type") == "new" else entry.get("target_id") or "")
+        ident = ident.strip().lower()
+        if not ident or len(ident) > 200 or any(ord(char) < 32 for char in ident):
+            continue
+        person = index.get(ident)
+        if entry.get("type") == "new" and person is None:
+            category = entry.get("category")
+            person = {
+                "id": str(entry.get("id") or ""),
+                "handle": "",
+                "name": entry.get("name") if isinstance(entry.get("name"), str) else "",
+                "category": category if category in _DIR_CATS else "Autres",
+                "reason": entry.get("reason") if isinstance(entry.get("reason"), str) else "",
+            }
+            people.append(person)
+            index[ident] = person
+        if person is None:
+            continue
+        platform = str(entry.get("platform") or "").strip().lower()
+        url = entry.get("profile_url")
+        if platform in PLATFORMS and isinstance(url, str) and url:
+            links.setdefault(_person_key(person), {})[platform] = url
+    fiches = []
+    seen: set[str] = set()
+    for person in people:
+        key = _person_key(person)
+        if not key or key in removed:
+            continue
+        name = _clip(person.get("name"), 180)
+        if not name:
+            continue
+        category = _clip(person.get("category"), 80) or "Autres"
+        reason = _clip(person.get("reason"), 400)
+        slot = dict(links.get(key) or {})
+        handle = person.get("handle") or ""
+        if "x" not in slot and _HANDLE_RE.fullmatch(handle):
+            slot["x"] = f"https://x.com/{handle}"
+        for platform, raw in slot.items():
+            url = safe_profile_url(raw)
+            if not url:
+                continue
+            # profile_key refuse « .. ». Le lien public reste une fiche.
+            ident = profile_key(url) or url.casefold()
+            if ident in seen:
+                continue
+            seen.add(ident)
+            fiches.append(
+                {
+                    "name": name,
+                    "category": category,
+                    "platform": platform,
+                    "url": url,
+                    "reason": reason,
+                    "count": _count(counts.get(f"{platform}:{key}")),
+                }
+            )
+    return fiches
+
+
+def merge(
+    accounts: dict,
+    counts_doc: dict,
+    refreshed_at: str | None = None,
+    directory: tuple[list, dict] | None = None,
+) -> dict:
     entries = accounts.get("entries")
     counts = counts_doc.get("counts")
     if not isinstance(entries, list) or not isinstance(counts, dict):
         raise RuntimeError("fichiers incomplets")
 
-    fiches = []
-    for entry in entries:
-        if not isinstance(entry, dict) or entry.get("type") == "removal":
-            continue
-        name = _clip(entry.get("name"), 180)
-        platform = str(entry.get("platform") or "").strip().lower()
-        entry_id = str(entry.get("id") or "").strip().lower()
-        if not name or platform not in PLATFORMS or not entry_id or len(entry_id) > 200:
-            continue
-        if any(ord(char) < 32 for char in entry_id):
-            continue
-        url = safe_profile_url(entry.get("profile_url") or "")
-        if not url:
-            continue
-        fiches.append(
-            {
-                "name": name,
-                "category": _clip(entry.get("category"), 80) or "Autres",
-                "platform": platform,
-                "url": url,
-                "reason": _clip(entry.get("reason"), 400),
-                "count": _count(counts.get(f"{platform}:{entry_id}")),
-            }
-        )
+    curated, socials = directory if directory else ([], {})
+    if curated and isinstance(socials, dict):
+        fiches = _directory_fiches(curated, socials, entries, counts)
+        source = "accounts.js + api/accounts + api/counts"
+    else:
+        source = "api/accounts + api/counts"
+        fiches = []
+        for entry in entries:
+            if not isinstance(entry, dict) or entry.get("type") == "removal":
+                continue
+            name = _clip(entry.get("name"), 180)
+            platform = str(entry.get("platform") or "").strip().lower()
+            entry_id = str(entry.get("id") or "").strip().lower()
+            if not name or platform not in PLATFORMS or not entry_id or len(entry_id) > 200:
+                continue
+            if any(ord(char) < 32 for char in entry_id):
+                continue
+            url = safe_profile_url(entry.get("profile_url") or "")
+            if not url:
+                continue
+            fiches.append(
+                {
+                    "name": name,
+                    "category": _clip(entry.get("category"), 80) or "Autres",
+                    "platform": platform,
+                    "url": url,
+                    "reason": _clip(entry.get("reason"), 400),
+                    "count": _count(counts.get(f"{platform}:{entry_id}")),
+                }
+            )
 
     fiches.sort(key=lambda fiche: (-fiche["count"], fiche["name"].casefold()))
     categories = Counter(fiche["category"] for fiche in fiches)
     platforms = Counter(fiche["platform"] for fiche in fiches)
     return {
-        "source": "api/accounts + api/counts",
+        "source": source,
         "snapshot_at": accounts.get("snapshot_at"),
         "as_of": counts_doc.get("as_of"),
         "refreshed_at": refreshed_at or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -631,6 +766,90 @@ def _stamp_fr(iso: str) -> str:
     return label
 
 
+def _parse_assigned(text: str, name: str):
+    match = _ASSIGN_RE.match(text)
+    if not match or match.group(1) != name:
+        raise RuntimeError("script inattendu")
+    body = text[match.end() :].strip()
+    if body.endswith(";"):
+        body = body[:-1].strip()
+    return json.loads(body)
+
+
+def _read_script(url: str) -> str:
+    """GET d'un script public du même hôte. Pas de POST."""
+    if not _same_source(url):
+        raise RuntimeError("hôte inattendu")
+    last: Exception | None = None
+    payload = b""
+    for attempt in range(2):
+        try:
+            request = urllib.request.Request(
+                url,
+                headers={
+                    "Accept": "text/javascript, */*;q=0.1",
+                    "Accept-Encoding": "gzip",
+                    "User-Agent": USER_AGENT,
+                    "X-BF": CLIENT_HEADER,
+                },
+            )
+            opener = urllib.request.build_opener(_PinHost)
+            with opener.open(request, timeout=60) as response:
+                if not _same_source(response.geturl()):
+                    raise RuntimeError("hôte inattendu")
+                payload = response.read(MAX_BYTES + 1)
+            break
+        except urllib.error.HTTPError as exc:
+            if exc.code < 500 or attempt:
+                raise
+            last = exc
+        except (TimeoutError, urllib.error.URLError, ConnectionError, OSError) as exc:
+            last = exc
+            if attempt:
+                raise
+    else:
+        raise last or RuntimeError("lecture ratée")
+    if len(payload) > MAX_BYTES:
+        raise RuntimeError("réponse trop grosse")
+    if payload[:2] == b"\x1f\x8b":
+        try:
+            payload = gzip.decompress(payload)
+        except OSError as exc:
+            raise RuntimeError("script compressé illisible") from exc
+    if len(payload) > MAX_BYTES or payload.lstrip().startswith((b"<", b"\x28\xb5\x2f\xfd")):
+        raise RuntimeError("script inutilisable")
+    return payload.decode("utf-8")
+
+
+def _stored_directory() -> tuple[list, dict]:
+    try:
+        curated = _parse_assigned((RAW / "accounts.js").read_text(encoding="utf-8"), "accounts")
+        socials = _parse_assigned((RAW / "socials.js").read_text(encoding="utf-8"), "socials")
+    except (OSError, UnicodeError, json.JSONDecodeError, RuntimeError):
+        return [], {}
+    if not isinstance(curated, list) or not isinstance(socials, dict):
+        return [], {}
+    return curated, socials
+
+
+def load_directory() -> tuple[list, dict]:
+    """accounts.js et socials.js, la liste que la page affiche avant l'API."""
+    try:
+        accounts_text = _read_script(ACCOUNTS_JS_URL)
+        socials_text = _read_script(SOCIALS_JS_URL)
+        curated = _parse_assigned(accounts_text, "accounts")
+        socials = _parse_assigned(socials_text, "socials")
+        if not isinstance(curated, list) or not isinstance(socials, dict):
+            raise RuntimeError("liste inattendue")
+        RAW.mkdir(parents=True, exist_ok=True)
+        (RAW / "accounts.js").write_text(accounts_text, encoding="utf-8")
+        (RAW / "socials.js").write_text(socials_text, encoding="utf-8")
+        return curated, socials
+    except Exception as exc:
+        print(f"liste affichée non relue : {exc}", file=sys.stderr)
+        return _stored_directory()
+
+
 def _read_followers() -> str:
     """GET du script public. Pas de POST, pas d'autre hôte."""
     if not _same_source(FOLLOWERS_URL):
@@ -821,12 +1040,13 @@ def _load_abonnes() -> dict:
 def refresh_once() -> dict:
     counts_doc, counts_raw = fetch_pair(COUNTS_URL)
     accounts, accounts_raw = fetch_pair(ACCOUNTS_URL)
+    directory = load_directory()
     refreshed = datetime.now(timezone.utc).replace(microsecond=0)
     refreshed_at = refreshed.strftime("%Y-%m-%dT%H:%M:%SZ")
     with _IO_LOCK:
         archive_payload("counts", counts_raw, refreshed)
         archive_payload("accounts", accounts_raw, refreshed)
-        merged = merge(accounts, counts_doc, refreshed_at)
+        merged = merge(accounts, counts_doc, refreshed_at, directory or None)
         attach_followers(merged)
         RAW.mkdir(parents=True, exist_ok=True)
         _write_json(RAW / "counts.json", counts_doc)
