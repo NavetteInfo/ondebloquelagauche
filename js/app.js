@@ -234,10 +234,10 @@ function renderRow(fiche) {
     action.href = href;
     action.target = "_blank";
     action.rel = "noopener noreferrer";
-    action.textContent = "Profil public";
+    action.textContent = "Suivre";
     const hidden = document.createElement("span");
     hidden.className = "sr-only";
-    hidden.textContent = `, ${fiche.name}, nouvelle fenêtre`;
+    hidden.textContent = ` le profil public de ${fiche.name}, nouvelle fenêtre`;
     action.append(hidden);
   } else {
     action = document.createElement("p");

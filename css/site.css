@@ -711,7 +711,8 @@ select {
   font-weight: 700;
 }
 
-.constat {
+.constat,
+.cgu {
   padding: 1.5rem 1.25rem 2rem;
   border-bottom: 2px solid var(--line);
 }
