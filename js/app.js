@@ -50,6 +50,13 @@ function paintCatalog(data) {
       ? `Compteur global de la liste, relevé le ${when}. Une partie du total n'est rattachée à aucun nom.`
       : "Compteur global de la liste. Une partie du total n'est rattachée à aucun nom.";
   }
+  const pull = document.getElementById("pull-line");
+  if (pull) {
+    const when = formatUtc(data.refreshed_at || data.snapshot_at || data.as_of);
+    pull.textContent = when
+      ? `La liste ci-dessous date du dernier pull, le ${when.replace(" UTC", "\u00A0UTC")}.`
+      : "La liste ci-dessous date du dernier pull.";
+  }
   fillSelect("cat", data.categories || [], "Tous");
   fillSelect("net", data.platforms || [], "Tous");
   $("#net").querySelectorAll("option").forEach((option) => {

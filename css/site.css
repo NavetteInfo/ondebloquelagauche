@@ -402,6 +402,24 @@ h2 {
   font-weight: 700;
 }
 
+.gel {
+  margin: 0 0 1rem;
+  padding: 0.8rem 0.9rem;
+  border: 2px solid var(--red);
+  background: var(--field);
+}
+
+.gel p {
+  margin: 0;
+  font-weight: 700;
+}
+
+.gel p + p {
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-weight: 400;
+}
+
 .filters {
   display: grid;
   grid-template-columns: 1.5fr 0.9fr 0.8fr 0.9fr;
