@@ -245,13 +245,10 @@ function renderRow(fiche) {
   const name = document.createElement("h3");
   name.textContent = String(fiche.name ?? "");
 
-  const category = document.createElement("p");
-  category.className = "fiche-cat";
-  category.textContent = String(fiche.category ?? "");
-
-  const network = document.createElement("p");
-  network.className = "fiche-net";
-  network.textContent = PLATFORM_LABEL[fiche.platform] || String(fiche.platform ?? "");
+  const meta = document.createElement("p");
+  meta.className = "fiche-meta";
+  const network = PLATFORM_LABEL[fiche.platform] || String(fiche.platform ?? "");
+  meta.textContent = [fiche.category, network].filter(Boolean).join(", ");
 
   const count = document.createElement("p");
   count.className = "fiche-count";
@@ -266,7 +263,7 @@ function renderRow(fiche) {
   let action;
   if (href) {
     action = document.createElement("a");
-    action.className = "btn btn-red fiche-go";
+    action.className = "btn fiche-go";
     action.href = href;
     action.target = "_blank";
     action.rel = "noopener noreferrer";
@@ -285,7 +282,7 @@ function renderRow(fiche) {
   reason.className = "fiche-reason";
   reason.textContent = String(fiche.reason || "Motif non inscrit.");
 
-  article.append(name, category, network, count, action);
+  article.append(name, meta, count, action);
   const gain = followerLine(fiche);
   if (gain) article.append(gain);
   article.append(reason);
@@ -435,35 +432,43 @@ async function loadFiches() {
 }
 
 function paintVisits(data) {
-  const node = $("#visits");
+  const node = document.getElementById("visits");
+  const note = document.getElementById("visits-note");
   if (!node || !data) return;
   const total = Number(data.total) || 0;
   const today = Number(data.today) || 0;
+  node.textContent = formatInt(total);
+  if (!note) return;
   if (total <= 0) {
-    node.textContent = "Aucun passage pour l'instant. Le registre attend.";
+    note.textContent = "Aucun passage pour l'instant. Le registre attend.";
     return;
   }
   if (total === 1) {
-    node.textContent = "1 passage. Le registre vient de s'ouvrir.";
+    note.textContent = "Un passage. Le registre vient de s'ouvrir.";
     return;
   }
-  const many = total > 1 ? "s" : "";
-  node.textContent = `${formatInt(total)} passage${many}, dont ${formatInt(today)} aujourd'hui. Le registre, lui, ne débloque rien.`;
+  note.textContent = `Dont ${formatInt(today)} aujourd'hui. Le registre, lui, ne débloque rien.`;
+}
+
+function markVisitsMissing() {
+  const note = document.getElementById("visits-note");
+  if (note) {
+    note.textContent = "Le registre des passages est sur le serveur. Cette copie ne le tient pas.";
+  }
 }
 
 async function loadVisits() {
-  const node = $("#visits");
+  const node = document.getElementById("visits");
   if (!node) return;
   try {
     const response = await fetch("/api/visits", { cache: "no-store" });
-    if (response.status === 404) {
-      node.hidden = true;
+    if (!response.ok) {
+      markVisitsMissing();
       return;
     }
-    if (!response.ok) return;
     paintVisits(await response.json());
   } catch {
-    /* le compteur manque, la page reste lisible */
+    markVisitsMissing();
   }
 }
 

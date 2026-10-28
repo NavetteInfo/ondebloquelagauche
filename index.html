@@ -49,6 +49,7 @@
       <span class="brand-short">Débloque</span>
     </a>
     <nav class="nav" aria-label="Sections">
+      <a href="#compteur">Compteur</a>
       <a href="#tiroir">Fiches</a>
       <a href="#succes">Succès</a>
       <a href="#constat">Constat</a>
@@ -78,6 +79,11 @@
         <p class="giant" id="total-blocks">7&nbsp;866&nbsp;289</p>
         <p class="caption">Compteur global de la liste. Une partie du total n'est rattachée à aucun nom.</p>
         <p class="live-line" id="live-line">Copie locale, en attendant le prochain relevé.</p>
+        <p class="visits-line">
+          <span>Passages</span>
+          <strong id="visits">…</strong>
+        </p>
+        <p class="caption" id="visits-note">Ouvertures de cette page, tenues par le serveur.</p>
       </div>
       <dl class="facts">
         <div>
@@ -99,45 +105,22 @@
       </dl>
     </section>
 
-    <section class="rite" id="succes" aria-labelledby="succes-title">
-      <h2 id="succes-title">Les succès</h2>
-      <p class="lede">Un bouton, un toast « Bien joué », un succès. Personne n'a vérifié le blocage. Le clic a suffi.</p>
-      <p class="howto">Le même clic part au compteur collectif. Avoir cliqué compte comme un blocage. Le palier d'après s'appelle déjà Légende.</p>
-      <ol class="ladder">
-        <li><span>1 clic</span><strong>Premier pas</strong></li>
-        <li><span>3 clics</span><strong>Lancé</strong></li>
-        <li><span>5 clics</span><strong>Engagé</strong></li>
-        <li><span>10 clics</span><strong>Rempart</strong></li>
-        <li><span>25 clics</span><strong>Bouclier</strong></li>
-        <li><span>50 clics</span><strong>Vigie</strong></li>
-        <li><span>100 clics</span><strong>Légende</strong></li>
-      </ol>
-      <ul class="medals">
-        <li>Premier clic sur un réseau : <strong>Premier blocage</strong>. Le réseau n'a rien vu.</li>
-        <li>10 clics dans la journée : <strong>10 en un jour</strong>. L'objectif du jour est de 3.</li>
-        <li>10 clics en 45 secondes : <strong>Combo x10</strong>. La cadence d'un distributeur.</li>
-        <li>Un clic entre minuit et 5 h : <strong>Noctambule</strong>. L'insomnie a aussi son badge.</li>
-        <li>3, 7 ou 30 jours de suite : une série, pour être revenu cliquer.</li>
-      </ul>
-    </section>
-
-    <section class="guichet" id="guichet" aria-labelledby="guichet-title">
-      <h2 id="guichet-title">Le guichet</h2>
-      <p id="sub-line">Pull de /api/submissions. Lecture en cours.</p>
-      <p class="howto">Lecture seule. Rien n'est proposé depuis ici. Le GET reste en maintenance : les lignes viennent alors de /api/accounts, ajouts non vérifiés et retraits déjà versés.</p>
-      <div id="sub-list"></div>
-    </section>
-
     <section class="tiroir" id="tiroir" aria-labelledby="tiroir-title">
-      <h2 id="tiroir-title">Le tiroir</h2>
-      <aside class="gel">
-        <p>Ces gros nuls ont fait une mise à jour pour cacher les compteurs.</p>
-        <p id="pull-line">La liste ci-dessous date du dernier pull, le 28 octobre 2026 à 19:07&nbsp;UTC.</p>
-      </aside>
-      <p class="lede">Chaque ligne est une fiche recopiée. Le chiffre est le nombre de blocages inscrit par la liste. Le motif vient d'eux. Aucune adresse privée n'a été ajoutée.</p>
-      <p class="howto">Lire le nom. Vérifier le réseau. Constater le verrou. Refermer le tiroir.</p>
-      <p class="howto" id="followers-line">Abonnés pris dans leur followers.js. L'écart compare deux relevés du 28 octobre. Un chiffre arrondi au millier reste sans écart.</p>
-      <p class="howto">Source : le fichier public followers.js, qui cite <a href="https://lepodium2027.fr/donnees">Le Podium 2027</a> (CC BY 4.0).</p>
+      <div class="tiroir-head">
+        <div class="tiroir-title">
+          <h2 id="tiroir-title">Le tiroir</h2>
+          <aside class="gel">
+            <p>Ces gros nuls ont fait une mise à jour pour cacher les compteurs.</p>
+            <p id="pull-line">La liste ci-dessous date du dernier pull, le 28 octobre 2026 à 19:07&nbsp;UTC.</p>
+          </aside>
+        </div>
+        <div class="tiroir-notes">
+          <p class="lede">Chaque ligne est une fiche recopiée. Le chiffre est le nombre de blocages inscrit par la liste. Le motif vient d'eux. Aucune adresse privée n'a été ajoutée.</p>
+          <p class="howto">Lire le nom. Vérifier le réseau. Constater le verrou. Refermer le tiroir.</p>
+          <p class="howto" id="followers-line">Abonnés pris dans leur followers.js. L'écart compare deux relevés du 28 octobre. Un chiffre arrondi au millier reste sans écart.</p>
+          <p class="howto">Source : le fichier public followers.js, qui cite <a href="https://lepodium2027.fr/donnees">Le Podium 2027</a> (CC BY 4.0).</p>
+        </div>
+      </div>
 
       <form id="filters" role="search">
         <div class="filters">
@@ -172,8 +155,6 @@
       <p id="status" role="status">Ouverture du tiroir.</p>
       <div class="headrow" aria-hidden="true">
         <span>Nom</span>
-        <span>Rayon</span>
-        <span>Réseau</span>
         <span>Blocages</span>
         <span>Lien</span>
       </div>
@@ -191,6 +172,35 @@
       <noscript>
         <p class="state">Le classeur tourne les pages avec JavaScript. Les chiffres au-dessus restent vrais sans lui.</p>
       </noscript>
+    </section>
+
+    <section class="rite" id="succes" aria-labelledby="succes-title">
+      <h2 id="succes-title">Les succès</h2>
+      <p class="lede">Un bouton, un toast « Bien joué », un succès. Personne n'a vérifié le blocage. Le clic a suffi.</p>
+      <p class="howto">Le même clic part au compteur collectif. Avoir cliqué compte comme un blocage. Le palier d'après s'appelle déjà Légende.</p>
+      <ol class="ladder">
+        <li><span>1 clic</span><strong>Premier pas</strong></li>
+        <li><span>3 clics</span><strong>Lancé</strong></li>
+        <li><span>5 clics</span><strong>Engagé</strong></li>
+        <li><span>10 clics</span><strong>Rempart</strong></li>
+        <li><span>25 clics</span><strong>Bouclier</strong></li>
+        <li><span>50 clics</span><strong>Vigie</strong></li>
+        <li><span>100 clics</span><strong>Légende</strong></li>
+      </ol>
+      <ul class="medals">
+        <li>Premier clic sur un réseau : <strong>Premier blocage</strong>. Le réseau n'a rien vu.</li>
+        <li>10 clics dans la journée : <strong>10 en un jour</strong>. L'objectif du jour est de 3.</li>
+        <li>10 clics en 45 secondes : <strong>Combo x10</strong>. La cadence d'un distributeur.</li>
+        <li>Un clic entre minuit et 5 h : <strong>Noctambule</strong>. L'insomnie a aussi son badge.</li>
+        <li>3, 7 ou 30 jours de suite : une série, pour être revenu cliquer.</li>
+      </ul>
+    </section>
+
+    <section class="guichet" id="guichet" aria-labelledby="guichet-title">
+      <h2 id="guichet-title">Le guichet</h2>
+      <p id="sub-line">Pull de /api/submissions. Lecture en cours.</p>
+      <p class="howto">Lecture seule. Rien n'est proposé depuis ici. Le GET reste en maintenance : les lignes viennent alors de /api/accounts, ajouts non vérifiés et retraits déjà versés.</p>
+      <div id="sub-list"></div>
     </section>
 
     <section class="constat" id="constat" aria-labelledby="constat-title">
@@ -218,7 +228,6 @@
   </main>
 
   <footer class="foot">
-    <p id="visits">Passages en cours de compte.</p>
     <p>Satire. Fiches tirées de la liste publique « on bloque l'extrême droite », relue via api/accounts et api/counts. Profils publics seulement. Les <a href="#cgu">CGU</a> sont juste au-dessus.</p>
     <p>Ce site ne demande à personne de bloquer, d'écrire ou de harceler qui que ce soit. Le bouton a déjà traité le clic comme un blocage.</p>
   </footer>
