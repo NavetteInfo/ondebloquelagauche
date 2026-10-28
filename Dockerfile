@@ -14,7 +14,7 @@ COPY media ./media
 
 ENV HOST=0.0.0.0
 ENV PORT=8080
-ENV REFRESH_SECONDS=60
+ENV REFRESH_SECONDS=300
 EXPOSE 8080
 
 RUN useradd --system --uid 10001 --home-dir /app --shell /usr/sbin/nologin site \
