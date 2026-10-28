@@ -40,7 +40,7 @@ docker run --rm -p 8080:8080 ondebloquelagauche
 
 ## Adresse publique
 
-`SITE_URL` réécrit le canonical, Open Graph, la carte Twitter et le sitemap. Le serveur n'utilise pas l'en-tête Host. Sans variable valide, ces adresses restent `https://ondebloquelagauche.github.io`. En production, fixe l'adresse réelle, en `http` ou `https`, sans chemin :
+`SITE_URL` réécrit le canonical, Open Graph, la carte Twitter et le sitemap. Le serveur n'utilise pas l'en-tête Host. Sans variable valide, ces adresses restent `https://navetteinfo.github.io/ondebloquelagauche`. En production, fixe l'adresse réelle, en `http` ou `https`, sans chemin :
 
 ```bash
 SITE_URL=https://exemple.fr python3 server.py

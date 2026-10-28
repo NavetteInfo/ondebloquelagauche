@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ondebloquelagauche.github.io/sitemap.xml
+Sitemap: https://navetteinfo.github.io/ondebloquelagauche/sitemap.xml

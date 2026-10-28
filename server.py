@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parent
 HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", "8080"))
 REFRESH_SECONDS = max(15, int(os.environ.get("REFRESH_SECONDS", "60")))
-PUBLIC_ORIGIN = "https://ondebloquelagauche.github.io"
+PUBLIC_ORIGIN = "https://navetteinfo.github.io/ondebloquelagauche"
 _ORIGIN_RE = re.compile(r"https?://[A-Za-z0-9.-]+(?::[0-9]{1,5})?\Z")
 
 # Deux places en même temps. Le reste fait la queue, puis repart avec un 429.
