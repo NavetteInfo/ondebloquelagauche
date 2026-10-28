@@ -14,13 +14,14 @@ import urllib.parse
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from refresh import FICHES, refresh_once
+from refresh import FICHES, refresh_followers, refresh_once
 from visits import record_visit, snapshot as visit_snapshot
 
 ROOT = Path(__file__).resolve().parent
 HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", "8080"))
 REFRESH_SECONDS = max(15, int(os.environ.get("REFRESH_SECONDS", "60")))
+FOLLOWERS_SECONDS = max(3600, int(os.environ.get("FOLLOWERS_SECONDS", "3600")))
 PUBLIC_ORIGIN = "https://navetteinfo.github.io/ondebloquelagauche"
 _ORIGIN_RE = re.compile(r"https?://[A-Za-z0-9.-]+(?::[0-9]{1,5})?\Z")
 
@@ -42,6 +43,7 @@ _status = {
     "fiche_count": None,
     "error": None,
     "refresh_seconds": REFRESH_SECONDS,
+    "followers_at": None,
 }
 
 _inflight = threading.BoundedSemaphore(MAX_INFLIGHT)
@@ -153,6 +155,9 @@ def _remember(payload: dict | None, error: str | None) -> None:
             _status["refreshed_at"] = payload.get("refreshed_at")
             _status["total_blocks"] = payload.get("total_blocks")
             _status["fiche_count"] = payload.get("fiche_count")
+            followers = payload.get("followers")
+            if isinstance(followers, dict) and followers.get("latest"):
+                _status["followers_at"] = followers.get("latest")
 
 
 def _seed_from_disk() -> None:
@@ -182,6 +187,23 @@ def _loop() -> None:
             _remember(None, "relevé raté")
             print(f"relevé raté: {exc}", flush=True)
         time.sleep(REFRESH_SECONDS)
+
+
+def _follower_loop() -> None:
+    """Relit les abonnés tout de suite, puis toutes les heures. N'appelle pas l'API des blocages."""
+    while True:
+        try:
+            info = refresh_followers()
+            with _lock:
+                _status["followers_at"] = info.get("latest")
+            print(
+                f"abonnés ok fiches={info['matched']} écarts={info['compared']} "
+                f"latest={info['latest']}",
+                flush=True,
+            )
+        except Exception as exc:
+            print(f"abonnés ratés: {exc}", flush=True)
+        time.sleep(FOLLOWERS_SECONDS)
 
 
 def _take_token(ip: str) -> tuple[bool, int]:
@@ -453,9 +475,11 @@ def main() -> None:
         print("SITE_URL ignorée, origine Pages conservée", flush=True)
     _seed_from_disk()
     threading.Thread(target=_loop, name="refresh", daemon=True).start()
+    threading.Thread(target=_follower_loop, name="followers", daemon=True).start()
     server = SiteServer((HOST, PORT), Handler)
     print(
         f"site sur http://{HOST}:{PORT}  relevé toutes les {REFRESH_SECONDS}s  "
+        f"abonnés toutes les {FOLLOWERS_SECONDS}s  "
         f"file {MAX_INFLIGHT} places, {MAX_QUEUE} en attente",
         flush=True,
     )

@@ -6,6 +6,7 @@ COPY css ./css
 COPY js ./js
 COPY data/fiches.json ./data/fiches.json
 COPY data/submissions.json ./data/submissions.json
+COPY data/abonnes.json ./data/abonnes.json
 COPY fonts ./fonts
 COPY media ./media
 

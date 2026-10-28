@@ -1,0 +1,35 @@
+name: Abonnés
+
+on:
+  schedule:
+    - cron: "5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: abonnes
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Relire followers.js
+        run: python3 refresh.py --followers
+      - name: Publier le relevé
+        run: |
+          git config user.name "Navette"
+          git config user.email "253750988+NavetteInfo@users.noreply.github.com"
+          git add data/abonnes.json data/fiches.json
+          if git diff --cached --quiet; then
+            echo "aucun changement"
+            exit 0
+          fi
+          git commit -m "Relève les abonnés."
+          git push

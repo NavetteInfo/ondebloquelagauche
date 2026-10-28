@@ -15,6 +15,7 @@ const MONTHS = [
 let all = [];
 let page = 1;
 let seenAsOf = null;
+let seenFollowers = null;
 let liveTimer = 0;
 
 function formatInt(value) {
@@ -34,14 +35,24 @@ function formatDay(iso) {
   return { month, day: Number(match[3]), key: match[2] };
 }
 
-function formatStamp(iso) {
+function formatStamp(iso, withDay) {
   const match = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}):(\d{2})Z)?$/.exec(String(iso || ""));
   if (!match) return "";
   const month = SHORT_MONTHS[Number(match[2]) - 1];
   if (!month) return "";
   const day = `${Number(match[3])} ${month}`;
   if (!match[4]) return day;
-  return `${match[4]}:${match[5]} UTC`;
+  const clock = `${match[4]}:${match[5]} UTC`;
+  return withDay ? `${day} ${clock}` : clock;
+}
+
+function sameUtcDay(iso) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || ""));
+  if (!match) return false;
+  const now = new Date();
+  return now.getUTCFullYear() === Number(match[1])
+    && now.getUTCMonth() + 1 === Number(match[2])
+    && now.getUTCDate() === Number(match[3]);
 }
 
 function setText(id, value) {
@@ -59,6 +70,7 @@ function formatUtc(iso) {
 function paintCatalog(data) {
   all = Array.isArray(data.fiches) ? data.fiches : [];
   seenAsOf = data.as_of || seenAsOf;
+  seenFollowers = (data.followers && data.followers.latest) || seenFollowers;
   setText("total-blocks", data.total_blocks);
   setText("fiche-count", data.fiche_count);
   setText("name-count", data.name_count);
@@ -184,17 +196,22 @@ function paintFollowers(data) {
     node.textContent = "Abonnés : leur followers.js ne retombe sur aucune fiche.";
     return;
   }
-  const day = formatDay(String(info.baseline || "").slice(0, 10));
-  const from = formatStamp(info.baseline);
-  const latest = formatStamp(info.latest);
-  let span = "sur deux relevés du 28 octobre.";
-  if (day && from && latest) {
+  const baseDay = String(info.baseline || "").slice(0, 10);
+  const lateDay = String(info.latest || "").slice(0, 10);
+  const split = Boolean(baseDay && lateDay && baseDay !== lateDay);
+  const from = formatStamp(info.baseline, split);
+  const latest = formatStamp(info.latest, split);
+  const day = formatDay(baseDay);
+  let span = "sur le relevé de base et le dernier passage.";
+  if (day && from && latest && !split) {
     const stop = day.month.endsWith(".") ? "" : ".";
     span = `entre ${from} et ${latest}, le ${day.day} ${day.month}${stop}`;
+  } else if (from && latest) {
+    span = `entre ${from} et ${latest}.`;
   } else if (from) {
     span = `depuis ${from}.`;
   }
-  node.textContent = `Abonnés pris dans leur followers.js. ${formatInt(matched)} fiches ont un chiffre. ${formatInt(compared)} ont un écart ${span} Un relevé arrondi au millier reste sans écart.`;
+  node.textContent = `Abonnés pris dans leur followers.js, relus toutes les heures. ${formatInt(matched)} fiches ont un chiffre. ${formatInt(compared)} ont un écart ${span} Un relevé arrondi au millier reste sans écart.`;
 }
 
 function followerLine(fiche) {
@@ -215,7 +232,7 @@ function followerLine(fiche) {
   const cmp = document.createElement("span");
   const gained = fiche.followers_gained;
   if (Number.isInteger(gained)) {
-    const since = formatStamp(fiche.followers_from) || "le relevé précédent";
+    const since = formatStamp(fiche.followers_from, !sameUtcDay(fiche.followers_from)) || "le relevé précédent";
     if (gained > 0) {
       cmp.className = "cmp up";
       cmp.textContent = `, +${formatInt(gained)} depuis ${since}`;
@@ -484,7 +501,9 @@ async function watchLive() {
     paintLive(status);
     loadVisits();
     loadSubmissions();
-    if (status.ok && status.as_of && status.as_of !== seenAsOf) {
+    const blocksMoved = status.ok && status.as_of && status.as_of !== seenAsOf;
+    const fansMoved = status.followers_at && status.followers_at !== seenFollowers;
+    if (blocksMoved || fansMoved) {
       const data = await loadFiches();
       paintCatalog(data);
       render();

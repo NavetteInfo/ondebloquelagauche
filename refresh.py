@@ -3,10 +3,13 @@
 
 from __future__ import annotations
 
+import gzip
 import json
 import os
 import re
+import sys
 import tempfile
+import threading
 import urllib.error
 import urllib.request
 from collections import Counter
@@ -36,6 +39,25 @@ _FOLLOWER_FIELDS = (
 COUNTS_URL = "https://onbloquelextremedroite.fun/api/counts"
 ACCOUNTS_URL = "https://onbloquelextremedroite.fun/api/accounts"
 SUBMISSIONS_URL = "https://onbloquelextremedroite.fun/api/submissions"
+FOLLOWERS_URL = "https://onbloquelextremedroite.fun/followers.js"
+_IO_LOCK = threading.Lock()
+_FOLLOWERS_ASSIGN = re.compile(
+    r"\A(?:\ufeff)?(?://[^\n]*\n|\s)*const\s+followerCounts\s*=\s*"
+)
+_MONTHS_FR = (
+    "janvier",
+    "février",
+    "mars",
+    "avril",
+    "mai",
+    "juin",
+    "juillet",
+    "août",
+    "septembre",
+    "octobre",
+    "novembre",
+    "décembre",
+)
 SUBMISSIONS = DATA / "submissions.json"
 ALLOWED_HOST = "onbloquelextremedroite.fun"
 # Cloudflare refuse un client sans tête de navigateur. L'API reste publique.
@@ -192,7 +214,7 @@ def _follower_hit(entry: dict) -> dict | None:
 
 
 def _follower_table() -> tuple[dict[str, dict], dict]:
-    """data/abonnes.json est un extrait figé de followers.js. Pas de retéléchargement."""
+    """Lit data/abonnes.json. Le téléchargement est dans refresh_followers."""
     meta = {"baseline": "", "latest": "", "source": "followers.js"}
     if not ABONNES.is_file():
         return {}, meta
@@ -549,21 +571,226 @@ def _fill_published(doc: dict, accounts: dict | None) -> None:
     doc["items"] = items
 
 
+def _stamp_fr(iso: str) -> str:
+    year, month, day = iso[:10].split("-")
+    label = f"{int(day)} {_MONTHS_FR[int(month) - 1]} {year}"
+    if "T" in iso:
+        hour, minute, _second = iso[11:19].split(":")
+        label += f" à {hour}:{minute} UTC"
+    return label
+
+
+def _read_followers() -> str:
+    """GET du script public. Pas de POST, pas d'autre hôte."""
+    if not _same_source(FOLLOWERS_URL):
+        raise RuntimeError("hôte inattendu")
+    last: Exception | None = None
+    payload = b""
+    for attempt in range(2):
+        try:
+            request = urllib.request.Request(
+                FOLLOWERS_URL,
+                headers={
+                    "Accept": "text/javascript, */*;q=0.1",
+                    "Accept-Encoding": "gzip",
+                    "User-Agent": USER_AGENT,
+                },
+            )
+            opener = urllib.request.build_opener(_PinHost)
+            with opener.open(request, timeout=60) as response:
+                if not _same_source(response.geturl()):
+                    raise RuntimeError("hôte inattendu")
+                payload = response.read(MAX_BYTES + 1)
+            break
+        except urllib.error.HTTPError as exc:
+            if exc.code < 500 or attempt:
+                raise
+            last = exc
+        except (TimeoutError, urllib.error.URLError, ConnectionError, OSError) as exc:
+            last = exc
+            if attempt:
+                raise
+    else:
+        raise last or RuntimeError("lecture ratée")
+    if len(payload) > MAX_BYTES:
+        raise RuntimeError("réponse trop grosse")
+    if payload[:2] == b"\x1f\x8b":
+        try:
+            payload = gzip.decompress(payload)
+        except OSError as exc:
+            raise RuntimeError("followers.js compressé illisible") from exc
+    if len(payload) > MAX_BYTES or payload.lstrip().startswith((b"<", b"\x28\xb5\x2f\xfd")):
+        raise RuntimeError("followers.js inutilisable")
+    return payload.decode("utf-8")
+
+
+def _parse_followers_js(text: str) -> dict[str, dict]:
+    match = _FOLLOWERS_ASSIGN.match(text)
+    if not match:
+        raise RuntimeError("followers.js inattendu")
+    body = text[match.end() :].strip()
+    if body.endswith(";"):
+        body = body[:-1].strip()
+    try:
+        data = json.loads(body)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("followers.js illisible") from exc
+    if not isinstance(data, dict) or len(data) > 20000:
+        raise RuntimeError("followers.js inattendu")
+    table: dict[str, dict] = {}
+    collisions: set[str] = set()
+    for raw_key, raw_value in data.items():
+        if not isinstance(raw_key, str) or not isinstance(raw_value, dict):
+            continue
+        key = raw_key.strip().lower()
+        # Leur fichier écrit facebook:id:N. La fiche, elle, est facebook:/id:N.
+        if re.fullmatch(r"facebook:id:[0-9]{1,20}", key):
+            key = f"facebook:/id:{key.split(':', 2)[2]}"
+        if not _FOLLOWER_KEY_RE.fullmatch(key) or ".." in key:
+            continue
+        count = _pos_int(raw_value.get("count"))
+        day = raw_value.get("date")
+        if count is None or not isinstance(day, str) or not _DAY_RE.fullmatch(day):
+            continue
+        if key in table:
+            collisions.add(key)
+            continue
+        table[key] = {"count": count, "date": day}
+    for key in collisions:
+        table.pop(key, None)
+    if not table:
+        raise RuntimeError("followers.js vide")
+    return table
+
+
+def _kept_before(entry: dict) -> tuple[int, str] | None:
+    before = entry.get("before")
+    start = entry.get("from")
+    if isinstance(before, bool) or not isinstance(before, int):
+        return None
+    if not 0 < before <= _COUNT_CAP or _rounded_thousand(before):
+        return None
+    if not isinstance(start, str) or not _STAMP_RE.fullmatch(start):
+        return None
+    return before, start
+
+
+def _build_abonnes(previous: dict, table: dict[str, dict], latest: str) -> dict:
+    baseline = ""
+    raw_base = previous.get("baseline")
+    if isinstance(raw_base, str) and _STAMP_RE.fullmatch(raw_base):
+        baseline = raw_base
+    kept: dict[str, tuple[int, str]] = {}
+    old_entries = previous.get("entries")
+    old_count = len(old_entries) if isinstance(old_entries, list) else 0
+    if isinstance(old_entries, list):
+        for entry in old_entries:
+            if not isinstance(entry, dict):
+                continue
+            key = entry.get("key")
+            if not isinstance(key, str) or not _FOLLOWER_KEY_RE.fullmatch(key) or ".." in key:
+                continue
+            pair = _kept_before(entry)
+            if pair:
+                kept[key] = pair
+    if old_count and len(table) * 2 < old_count:
+        raise RuntimeError("relevé d'abonnés trop court")
+    entries = []
+    for key in sorted(table):
+        item = table[key]
+        entry: dict = {"key": key, "after": item["count"], "to": item["date"]}
+        pair = kept.get(key)
+        if pair:
+            entry["before"] = pair[0]
+            entry["from"] = pair[1]
+        entries.append(entry)
+    if baseline:
+        note = (
+            f"Extrait de followers.js relu le {_stamp_fr(latest)}. "
+            f"L'écart, quand il existe, compare au relevé du {_stamp_fr(baseline)}. "
+            "Les chiffres arrondis au millier n'ont pas d'écart."
+        )
+    else:
+        note = (
+            f"Extrait de followers.js relu le {_stamp_fr(latest)}. "
+            "Pas d'écart tant qu'un relevé précédent n'est pas gardé. "
+            "Les chiffres arrondis au millier n'ont pas d'écart."
+        )
+    return {
+        "baseline": baseline,
+        "latest": latest,
+        "source": "followers.js",
+        "note": note,
+        "entries": entries,
+    }
+
+
+def refresh_followers() -> dict:
+    """Relit followers.js. Le chiffre bouge. L'écart reste calé sur le relevé de base."""
+    table = _parse_followers_js(_read_followers())
+    latest = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    with _IO_LOCK:
+        built = _build_abonnes(_load_abonnes(), table, latest)
+        _write_json(ABONNES, built)
+        matched = 0
+        compared = 0
+        blocks = None
+        if FICHES.is_file():
+            fiches = json.loads(FICHES.read_text(encoding="utf-8"))
+            if not isinstance(fiches, dict):
+                raise RuntimeError("fiches illisibles")
+            blocks = fiches.get("total_blocks")
+            attach_followers(fiches)
+            if fiches.get("total_blocks") != blocks:
+                raise RuntimeError("les abonnés ont touché le total")
+            _write_json(FICHES, fiches)
+            meta = fiches.get("followers") if isinstance(fiches.get("followers"), dict) else {}
+            matched = int(meta.get("matched") or 0)
+            compared = int(meta.get("compared") or 0)
+    return {
+        "baseline": built["baseline"],
+        "latest": latest,
+        "keys": len(built["entries"]),
+        "matched": matched,
+        "compared": compared,
+        "total_blocks": blocks,
+    }
+
+
+def _load_abonnes() -> dict:
+    if not ABONNES.is_file():
+        return {}
+    try:
+        payload = json.loads(ABONNES.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
 def refresh_once() -> dict:
     counts_doc = fetch_json(COUNTS_URL)
     accounts = fetch_json(ACCOUNTS_URL)
     refreshed_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    merged = merge(accounts, counts_doc, refreshed_at)
-    attach_followers(merged)
-    RAW.mkdir(parents=True, exist_ok=True)
-    _write_json(RAW / "counts.json", counts_doc)
-    _write_json(RAW / "accounts.json", accounts)
-    _write_json(FICHES, merged)
+    with _IO_LOCK:
+        merged = merge(accounts, counts_doc, refreshed_at)
+        attach_followers(merged)
+        RAW.mkdir(parents=True, exist_ok=True)
+        _write_json(RAW / "counts.json", counts_doc)
+        _write_json(RAW / "accounts.json", accounts)
+        _write_json(FICHES, merged)
     pull_submissions(accounts, refreshed_at)
     return merged
 
 
 def main() -> None:
+    if len(sys.argv) > 1 and sys.argv[1] == "--followers":
+        info = refresh_followers()
+        print(
+            f"ok abonnés={info['keys']} fiches={info['matched']} "
+            f"écarts={info['compared']} latest={info['latest']} "
+            f"total={info['total_blocks']}"
+        )
+        return
     merged = refresh_once()
     print(
         f"ok fiches={merged['fiche_count']} total={merged['total_blocks']} "
