@@ -63,8 +63,13 @@ export function filterFiches(fiches, { q = "", category = "", platform = "", sor
     if (sort === "category") {
       return a.category.localeCompare(b.category, "fr") || b.count - a.count || a.name.localeCompare(b.name, "fr");
     }
-    if (sort === "followers" || sort === "followers-asc") {
-      const fans = (fiche) => (Number.isInteger(fiche.followers_after) ? fiche.followers_after : null);
+    if (sort === "followers" || sort === "followers-asc" || sort === "gain") {
+      const fans = (fiche) => {
+        if (sort === "gain") {
+          return Number.isInteger(fiche.followers_gained) ? fiche.followers_gained : null;
+        }
+        return Number.isInteger(fiche.followers_after) ? fiche.followers_after : null;
+      };
       const ag = fans(a);
       const bg = fans(b);
       if (ag === null && bg === null) {
@@ -72,7 +77,7 @@ export function filterFiches(fiches, { q = "", category = "", platform = "", sor
       }
       if (ag === null) return 1;
       if (bg === null) return -1;
-      const delta = sort === "followers-asc" ? ag - bg : bg - ag;
+      const delta = sort === "followers" ? bg - ag : ag - bg;
       return delta || b.count - a.count || a.name.localeCompare(b.name, "fr");
     }
     return b.count - a.count || a.name.localeCompare(b.name, "fr");
