@@ -392,9 +392,91 @@ h2 {
   letter-spacing: -0.04em;
 }
 
+.rite,
+.guichet,
 .tiroir {
   padding: 1.35rem 1rem 1.5rem;
   border-bottom: 2px solid var(--line);
+}
+
+.ladder {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 2px solid var(--line);
+  border-left: 2px solid var(--line);
+}
+
+.ladder li {
+  margin: 0;
+  padding: 0.7rem 0.55rem 0.85rem;
+  border-right: 2px solid var(--line);
+  border-bottom: 2px solid var(--line);
+}
+
+.ladder span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ladder strong {
+  display: block;
+  margin-top: 0.35rem;
+  font-family: var(--display);
+  font-size: clamp(0.95rem, 1.5vw, 1.25rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.ladder li:first-child strong {
+  color: var(--red);
+}
+
+.medals {
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.medals li {
+  margin: 0;
+  padding: 0.55rem 0;
+  border-top: 2px solid var(--line);
+  font-weight: 700;
+}
+
+.sub-row {
+  padding: 0.75rem 0;
+  border-top: 2px solid var(--line);
+}
+
+.sub-row h3 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 1.15rem;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.sub-row p {
+  margin: 0.25rem 0 0;
+}
+
+.sub-row a {
+  display: inline-block;
+  margin-top: 0.35rem;
+  color: var(--ink);
+  font-weight: 700;
 }
 
 .tiroir .lede {
@@ -647,6 +729,10 @@ blockquote p {
   .compteur-main {
     border-right: 0;
     border-bottom: 2px solid var(--line);
+  }
+
+  .ladder {
+    grid-template-columns: 1fr 1fr;
   }
 
   .filters {

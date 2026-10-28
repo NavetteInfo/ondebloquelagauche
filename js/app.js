@@ -1,5 +1,7 @@
 import { PLATFORM_LABEL, filterFiches, pageWindow, safeProfileUrl } from "./liste.js";
 
+const SUB_KIND = { new: "Ajout", removal: "Retrait", update: "Mise à jour" };
+
 const PAGE_SIZE = 20;
 const $ = (sel) => document.querySelector(sel);
 
@@ -262,6 +264,70 @@ function bind() {
   });
 }
 
+function paintSubmissions(data) {
+  const line = document.getElementById("sub-line");
+  const list = document.getElementById("sub-list");
+  if (!line || !list || !data || typeof data !== "object") return;
+  const when = formatUtc(data.pulled_at).replace(" UTC", "\u00A0UTC");
+  list.replaceChildren();
+  if (!data.ok) {
+    const status = Number(data.http_status) || 0;
+    const message = String(data.message || "lecture ratée");
+    line.textContent = when
+      ? `Pull de /api/submissions, le ${when}. Réponse ${status} : ${message}`
+      : `Pull de /api/submissions. Réponse ${status} : ${message}`;
+    return;
+  }
+  const total = Number(data.total) || 0;
+  const plural = total > 1 ? "s" : "";
+  line.textContent = when
+    ? `Pull de /api/submissions, le ${when}. ${formatInt(total)} ligne${plural} publique${plural}.`
+    : `Pull de /api/submissions. ${formatInt(total)} ligne${plural} publique${plural}.`;
+  const items = Array.isArray(data.items) ? data.items : [];
+  if (!items.length) {
+    const empty = document.createElement("p");
+    empty.className = "howto";
+    empty.textContent = "La réponse ne contient aucune fiche publique.";
+    list.append(empty);
+    return;
+  }
+  items.forEach((item) => {
+    const row = document.createElement("article");
+    row.className = "sub-row";
+    const title = document.createElement("h3");
+    title.textContent = String(item.name || "Profil public");
+    row.append(title);
+    const bits = [SUB_KIND[item.type] || "", PLATFORM_LABEL[item.platform] || ""].filter(Boolean);
+    if (item.reason) bits.push(String(item.reason));
+    if (bits.length) {
+      const meta = document.createElement("p");
+      meta.textContent = bits.join(" - ");
+      row.append(meta);
+    }
+    const url = safeProfileUrl(item.url);
+    if (url) {
+      const link = document.createElement("a");
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "Profil public";
+      row.append(link);
+    }
+    list.append(row);
+  });
+}
+
+async function loadSubmissions() {
+  const line = document.getElementById("sub-line");
+  try {
+    const response = await fetch(`data/submissions.json?t=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) throw new Error(String(response.status));
+    paintSubmissions(await response.json());
+  } catch {
+    if (line) line.textContent = "Pull de /api/submissions raté. Le fichier n'est pas arrivé.";
+  }
+}
+
 async function loadFiches() {
   const response = await fetch(`data/fiches.json?t=${Date.now()}`, { cache: "no-store" });
   if (!response.ok) throw new Error(String(response.status));
@@ -312,6 +378,7 @@ async function watchLive() {
     const status = await response.json();
     paintLive(status);
     loadVisits();
+    loadSubmissions();
     if (status.ok && status.as_of && status.as_of !== seenAsOf) {
       const data = await loadFiches();
       paintCatalog(data);
@@ -339,6 +406,7 @@ async function init() {
     bind();
     render();
     loadVisits();
+    loadSubmissions();
     watchLive();
     liveTimer = window.setInterval(watchLive, 15000);
   } catch {

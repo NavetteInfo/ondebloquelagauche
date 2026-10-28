@@ -122,7 +122,7 @@ def public_file(url_path: str) -> Path | None:
         return None
     rel = "/".join(parts)
     suffix = Path(parts[-1]).suffix.lower()
-    allowed = rel in {"favicon.svg", "data/fiches.json"} or (
+    allowed = rel in {"favicon.svg", "data/fiches.json", "data/submissions.json"} or (
         len(parts) >= 2 and parts[0] in _DIR_SUFFIX and suffix in _DIR_SUFFIX[parts[0]]
     )
     if not allowed:
@@ -322,7 +322,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def _serve_static(self, path: Path) -> None:
         body = path.read_bytes()
-        cache = "no-store" if path.name == "fiches.json" else "public, max-age=3600"
+        cache = "no-store" if path.name in {"fiches.json", "submissions.json"} else "public, max-age=3600"
         self._bytes(200, body, _TYPES[path.suffix.lower()], cache=cache)
 
     def _route(self) -> None:

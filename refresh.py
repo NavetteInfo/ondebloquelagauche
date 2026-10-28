@@ -21,6 +21,8 @@ FICHES = DATA / "fiches.json"
 
 COUNTS_URL = "https://onbloquelextremedroite.fun/api/counts"
 ACCOUNTS_URL = "https://onbloquelextremedroite.fun/api/accounts"
+SUBMISSIONS_URL = "https://onbloquelextremedroite.fun/api/submissions"
+SUBMISSIONS = DATA / "submissions.json"
 ALLOWED_HOST = "onbloquelextremedroite.fun"
 # Cloudflare refuse un client sans tête de navigateur. L'API reste publique.
 USER_AGENT = (
@@ -205,6 +207,106 @@ def _write_json(path: Path, payload: dict) -> None:
         raise
 
 
+def _public_text(payload: bytes) -> str:
+    text = payload.decode("utf-8", "replace").strip()
+    if not text:
+        return "réponse vide"
+    if text[:1] == "<" or "<html" in text[:240].lower():
+        return "la source a renvoyé une page, pas du JSON"
+    return _clip(text, 180)
+
+
+def _submission_rows(data) -> tuple[list[dict], int]:
+    rows = data if isinstance(data, list) else None
+    if rows is None and isinstance(data, dict):
+        for key in ("submissions", "entries", "items", "proposals"):
+            if isinstance(data.get(key), list):
+                rows = data[key]
+                break
+    if rows is None:
+        return [], 0
+    items = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        name = _clip(row.get("name"), 180)
+        url = safe_profile_url(row.get("profile_url") or row.get("url") or "")
+        if not name and not url:
+            continue
+        platform = str(row.get("platform") or "").strip().lower()
+        kind = str(row.get("type") or "").strip().lower()
+        items.append(
+            {
+                "name": name,
+                "platform": platform if platform in PLATFORMS else "",
+                "url": url or "",
+                "type": kind if kind in {"new", "removal", "update"} else "",
+                "reason": _clip(row.get("reason"), 400),
+            }
+        )
+        if len(items) >= 40:
+            break
+    return items, len(rows)
+
+
+def pull_submissions(pulled_at: str | None = None) -> dict:
+    """Lecture seule. Aucune proposition n'est envoyée."""
+    doc = {
+        "source": "api/submissions",
+        "ok": False,
+        "http_status": 0,
+        "message": "lecture ratée",
+        "pulled_at": pulled_at or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "total": 0,
+        "items": [],
+    }
+    request = urllib.request.Request(
+        SUBMISSIONS_URL,
+        headers={
+            "Accept": "application/json",
+            "User-Agent": USER_AGENT,
+            "X-BF": CLIENT_HEADER,
+        },
+    )
+    opener = urllib.request.build_opener(_PinHost)
+    try:
+        with opener.open(request, timeout=60) as response:
+            if not _same_source(response.geturl()):
+                raise RuntimeError("hôte inattendu")
+            status = int(getattr(response, "status", 200))
+            payload = response.read(MAX_BYTES + 1)
+    except urllib.error.HTTPError as exc:
+        doc["http_status"] = int(exc.code)
+        try:
+            payload = exc.read(8192)
+        except Exception:
+            payload = b""
+        doc["message"] = _public_text(payload)
+        _write_json(SUBMISSIONS, doc)
+        return doc
+    except Exception:
+        _write_json(SUBMISSIONS, doc)
+        return doc
+    doc["http_status"] = status
+    if len(payload) > MAX_BYTES or payload.lstrip().startswith(b"<"):
+        doc["message"] = "la source a renvoyé une page, pas du JSON"
+        _write_json(SUBMISSIONS, doc)
+        return doc
+    try:
+        data = json.loads(payload.decode("utf-8"))
+    except json.JSONDecodeError:
+        doc["message"] = "JSON inattendu"
+        _write_json(SUBMISSIONS, doc)
+        return doc
+    items, total = _submission_rows(data)
+    doc["ok"] = True
+    doc["message"] = ""
+    doc["total"] = total
+    doc["items"] = items
+    _write_json(SUBMISSIONS, doc)
+    return doc
+
+
 def refresh_once() -> dict:
     counts_doc = fetch_json(COUNTS_URL)
     accounts = fetch_json(ACCOUNTS_URL)
@@ -214,6 +316,7 @@ def refresh_once() -> dict:
     _write_json(RAW / "counts.json", counts_doc)
     _write_json(RAW / "accounts.json", accounts)
     _write_json(FICHES, merged)
+    pull_submissions(refreshed_at)
     return merged
 
 
