@@ -13,4 +13,9 @@ ENV PORT=8080
 ENV REFRESH_SECONDS=60
 EXPOSE 8080
 
+RUN useradd --system --uid 10001 --home-dir /app --shell /usr/sbin/nologin site \
+    && mkdir -p /app/data/raw \
+    && chown -R site:site /app/data
+USER site
+
 CMD ["python3", "server.py"]

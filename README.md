@@ -40,13 +40,15 @@ docker run --rm -p 8080:8080 ondebloquelagauche
 
 ## Adresse publique
 
-`SITE_URL` réécrit le canonical, Open Graph, la carte Twitter et le sitemap. Sans cette variable, le serveur utilise l'hôte de la requête.
+`SITE_URL` réécrit le canonical, Open Graph, la carte Twitter et le sitemap. Le serveur n'utilise pas l'en-tête Host. Sans variable valide, ces adresses restent celles de GitHub Pages. En production, fixe l'adresse réelle, en `http` ou `https`, sans chemin :
 
 ```bash
 SITE_URL=https://exemple.fr python3 server.py
 ```
 
 La carte est `media/card.jpg` (1200×630).
+
+Seuls `GET` et `HEAD` passent. Le reste reçoit un 405 et compte dans la même file. Le serveur ne rend pas les chemins en point (dont `.git`), `data/raw/`, `data/visits.json`, ni le code. Le relevé public est `data/fiches.json`. Les liens vers les profils partent sans Referer.
 
 ## File d'attente
 
@@ -58,4 +60,4 @@ MAX_INFLIGHT=2 MAX_QUEUE=12 QUEUE_WAIT=20 IP_CAPACITY=16 IP_REFILL=0.25 IP_WAIT=
 
 ## Ce qui reste affiché si la source refuse
 
-Cloudflare peut renvoyer une page au lieu du JSON. Le serveur garde alors la dernière copie valide et `/api/status` porte l'erreur. La page le dit.
+Cloudflare peut renvoyer une page au lieu du JSON. Le serveur garde alors la dernière copie valide et `/api/status` signale un relevé raté. Le détail reste dans la sortie du processus.

@@ -56,25 +56,59 @@ def clean(value: str) -> str:
     return text
 
 
+_PROFILE_RE = re.compile(r"https://[A-Za-z0-9._~:/?#\[\]@!$&'()*+,;=%-]{1,400}\Z")
+_COUNT_CAP = 10**15
+
+
+def _count(value) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        return 0
+    if value < 0 or value > _COUNT_CAP:
+        return 0
+    return value
+
+
+def _clip(value, limit: int) -> str:
+    return clean(value)[:limit]
+
+
 def safe_profile_url(raw: str) -> str | None:
+    if not isinstance(raw, str) or not _PROFILE_RE.fullmatch(raw):
+        return None
+    if re.search(r"%0[0adAD]|%5[cC]", raw):
+        return None
     try:
         url = urlparse(raw)
     except Exception:
         return None
+    host = (url.hostname or "").lower()
     if url.scheme != "https" or url.username or url.password:
         return None
-    if url.port and url.port != 443:
+    if url.port not in (None, 443):
         return None
-    if url.netloc.lower() not in ALLOWED_PROFILE_HOSTS:
+    if not host or host.endswith(".") or host not in ALLOWED_PROFILE_HOSTS:
         return None
-    return url.geturl()
+    query = f"?{url.query}" if url.query else ""
+    return f"https://{host}{url.path or '/'}{query}"
+
+
+def _same_source(url: str) -> bool:
+    parsed = urlparse(url)
+    host = (parsed.hostname or "").lower()
+    return (
+        parsed.scheme == "https"
+        and host == ALLOWED_HOST
+        and not host.endswith(".")
+        and not parsed.username
+        and not parsed.password
+        and parsed.port in (None, 443)
+    )
 
 
 class _PinHost(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
-        host = urlparse(newurl).hostname or ""
-        if host != ALLOWED_HOST:
-            raise urllib.error.URLError(f"redirection refusée vers {host}")
+        if not _same_source(newurl):
+            raise urllib.error.URLError("redirection refusée")
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
@@ -85,9 +119,8 @@ def fetch_json(url: str) -> dict:
     )
     opener = urllib.request.build_opener(_PinHost)
     with opener.open(request, timeout=30) as response:
-        final = urlparse(response.geturl()).hostname
-        if final != ALLOWED_HOST:
-            raise RuntimeError(f"hôte inattendu: {final}")
+        if not _same_source(response.geturl()):
+            raise RuntimeError("hôte inattendu")
         payload = response.read(MAX_BYTES + 1)
     if len(payload) > MAX_BYTES:
         raise RuntimeError("réponse trop grosse")
@@ -109,10 +142,12 @@ def merge(accounts: dict, counts_doc: dict, refreshed_at: str | None = None) -> 
     for entry in entries:
         if not isinstance(entry, dict) or entry.get("type") == "removal":
             continue
-        name = clean(entry.get("name"))
+        name = _clip(entry.get("name"), 180)
         platform = str(entry.get("platform") or "").strip().lower()
         entry_id = str(entry.get("id") or "").strip().lower()
-        if not name or platform not in PLATFORMS or not entry_id:
+        if not name or platform not in PLATFORMS or not entry_id or len(entry_id) > 200:
+            continue
+        if any(ord(char) < 32 for char in entry_id):
             continue
         url = safe_profile_url(entry.get("profile_url") or "")
         if not url:
@@ -120,11 +155,11 @@ def merge(accounts: dict, counts_doc: dict, refreshed_at: str | None = None) -> 
         fiches.append(
             {
                 "name": name,
-                "category": clean(entry.get("category")) or "Autres",
+                "category": _clip(entry.get("category"), 80) or "Autres",
                 "platform": platform,
                 "url": url,
-                "reason": clean(entry.get("reason")),
-                "count": int(counts.get(f"{platform}:{entry_id}") or 0),
+                "reason": _clip(entry.get("reason"), 400),
+                "count": _count(counts.get(f"{platform}:{entry_id}")),
             }
         )
 
@@ -136,8 +171,8 @@ def merge(accounts: dict, counts_doc: dict, refreshed_at: str | None = None) -> 
         "snapshot_at": accounts.get("snapshot_at"),
         "as_of": counts_doc.get("as_of"),
         "refreshed_at": refreshed_at or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "total_blocks": int(counts_doc.get("total") or 0),
-        "historical_base": int(counts_doc.get("historical_base") or 0),
+        "total_blocks": _count(counts_doc.get("total")),
+        "historical_base": _count(counts_doc.get("historical_base")),
         "live": bool(counts_doc.get("live")),
         "fiche_count": len(fiches),
         "name_count": len({fiche["name"].casefold() for fiche in fiches}),

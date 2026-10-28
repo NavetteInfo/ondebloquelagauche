@@ -22,14 +22,19 @@ export const PLATFORM_LABEL = {
   tiktok: "TikTok",
 };
 
+const PROFILE_RE = /^https:\/\/[A-Za-z0-9._~:/?#\[\]@!$&'()*+,;=%-]{1,400}$/;
+
 export function safeProfileUrl(raw) {
+  const text = String(raw ?? "");
+  if (!PROFILE_RE.test(text) || /%0[0ad]|%5c/i.test(text)) return null;
   try {
-    const url = new URL(String(raw));
+    const url = new URL(text);
     if (url.protocol !== "https:") return null;
     if (url.username || url.password) return null;
     if (url.port && url.port !== "443") return null;
-    if (!ALLOWED_HOSTS.has(url.hostname.toLowerCase())) return null;
-    return url.href;
+    const host = url.hostname.toLowerCase();
+    if (!host || host.endsWith(".") || !ALLOWED_HOSTS.has(host)) return null;
+    return `https://${host}${url.pathname}${url.search}`;
   } catch {
     return null;
   }

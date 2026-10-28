@@ -78,14 +78,19 @@ function fillSelect(id, pairs, allLabel) {
   const select = document.getElementById(id);
   const current = select.value;
   select.replaceChildren();
+  if (!Array.isArray(pairs)) pairs = [];
   const first = document.createElement("option");
   first.value = "";
   first.textContent = allLabel;
   select.append(first);
-  pairs.forEach(([label, count]) => {
+  pairs.forEach((pair) => {
+    if (!Array.isArray(pair)) return;
+    const [label, count] = pair;
+    const text = String(label ?? "");
+    if (!text) return;
     const option = document.createElement("option");
-    option.value = label;
-    option.textContent = `${label} (${formatInt(count)})`;
+    option.value = text;
+    option.textContent = `${text} (${formatInt(count)})`;
     select.append(option);
   });
   const wanted = [...select.options].some((option) => option.value === current);
@@ -141,15 +146,15 @@ function renderRow(fiche) {
   article.className = "fiche";
 
   const name = document.createElement("h3");
-  name.textContent = fiche.name;
+  name.textContent = String(fiche.name ?? "");
 
   const category = document.createElement("p");
   category.className = "fiche-cat";
-  category.textContent = fiche.category;
+  category.textContent = String(fiche.category ?? "");
 
   const network = document.createElement("p");
   network.className = "fiche-net";
-  network.textContent = PLATFORM_LABEL[fiche.platform] || fiche.platform;
+  network.textContent = PLATFORM_LABEL[fiche.platform] || String(fiche.platform ?? "");
 
   const count = document.createElement("p");
   count.className = "fiche-count";
@@ -181,7 +186,7 @@ function renderRow(fiche) {
 
   const reason = document.createElement("p");
   reason.className = "fiche-reason";
-  reason.textContent = fiche.reason || "Motif non inscrit.";
+  reason.textContent = String(fiche.reason || "Motif non inscrit.");
 
   article.append(name, category, network, count, action, reason);
   return article;

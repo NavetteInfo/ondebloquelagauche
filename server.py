@@ -3,11 +3,14 @@
 
 from __future__ import annotations
 
+import base64
+import hashlib
 import json
 import os
 import re
 import threading
 import time
+import urllib.parse
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -19,6 +22,7 @@ HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", "8080"))
 REFRESH_SECONDS = max(15, int(os.environ.get("REFRESH_SECONDS", "60")))
 PUBLIC_ORIGIN = "https://navetteinfo.github.io/ondebloquelagauche"
+_ORIGIN_RE = re.compile(r"https?://[A-Za-z0-9.-]+(?::[0-9]{1,5})?\Z")
 
 # Deux places en même temps. Le reste fait la queue, puis repart avec un 429.
 MAX_INFLIGHT = max(1, int(os.environ.get("MAX_INFLIGHT", "2")))
@@ -27,6 +31,7 @@ QUEUE_WAIT = max(1.0, float(os.environ.get("QUEUE_WAIT", "20")))
 IP_CAPACITY = max(1, int(os.environ.get("IP_CAPACITY", "16")))
 IP_REFILL = max(0.05, float(os.environ.get("IP_REFILL", "0.25")))
 IP_WAIT = max(0.0, float(os.environ.get("IP_WAIT", "12")))
+_SLOT_COUNT = min(64, MAX_INFLIGHT + max(MAX_QUEUE, 1))
 
 _lock = threading.Lock()
 _status = {
@@ -40,10 +45,103 @@ _status = {
 }
 
 _inflight = threading.BoundedSemaphore(MAX_INFLIGHT)
+_slots = threading.BoundedSemaphore(_SLOT_COUNT)
 _queue_lock = threading.Lock()
 _queued = 0
 _bucket_lock = threading.Lock()
 _buckets: dict[str, tuple[float, float]] = {}
+
+# Fichiers lisibles par un visiteur. Le reste du dépôt (.git, code, bruts, compteur) reste dehors.
+_DIR_SUFFIX = {
+    "css": {".css"},
+    "js": {".js"},
+    "fonts": {".woff2"},
+    "media": {".jpg", ".jpeg", ".png", ".webp", ".svg"},
+}
+_TYPES = {
+    ".css": "text/css; charset=utf-8",
+    ".js": "text/javascript; charset=utf-8",
+    ".svg": "image/svg+xml",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".webp": "image/webp",
+    ".woff2": "font/woff2",
+    ".json": "application/json; charset=utf-8",
+    ".html": "text/html; charset=utf-8",
+}
+PAGE_CSP = (
+    "default-src 'self'; base-uri 'none'; form-action 'self'; object-src 'none'; "
+    "script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; "
+    "connect-src 'self'"
+)
+WAIT_CSS = (
+    "body{margin:0;background:#eae8e3;color:#12110f;"
+    "font-family:\"IBM Plex Mono\",\"Liberation Mono\",ui-monospace,monospace}"
+    ".bar{height:10px;background:#8e0e0e}"
+    "main{padding:2.2rem 1.2rem;max-width:38rem}"
+    "h1{margin:0 0 .8rem;font-family:\"Archivo Black\",\"Liberation Sans\",sans-serif;"
+    "font-size:clamp(2.4rem,8vw,4.2rem);line-height:.9;letter-spacing:-.04em;"
+    "text-transform:uppercase}"
+    "p{font-size:1rem;font-weight:700}"
+)
+_WAIT_HASH = base64.b64encode(hashlib.sha256(WAIT_CSS.encode("utf-8")).digest()).decode("ascii")
+WAIT_CSP = (
+    "default-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'; "
+    f"style-src 'sha256-{_WAIT_HASH}'; frame-ancestors 'none'"
+)
+FRAME_CSP = PAGE_CSP + "; frame-ancestors 'none'"
+
+
+def site_origin() -> str:
+    """Origine publique. L'en-tête Host de la requête n'est pas une source."""
+    forced = os.environ.get("SITE_URL", "").strip().rstrip("/")
+    if forced and _ORIGIN_RE.fullmatch(forced):
+        return forced
+    return PUBLIC_ORIGIN
+
+
+def public_file(url_path: str) -> Path | None:
+    raw = url_path.split("?", 1)[0].split("#", 1)[0]
+    if "\\" in raw or "\x00" in raw:
+        return None
+    try:
+        decoded = urllib.parse.unquote(raw, errors="strict")
+    except UnicodeDecodeError:
+        return None
+    if "\\" in decoded or "\x00" in decoded:
+        return None
+    parts: list[str] = []
+    for part in decoded.split("/"):
+        if part in ("", "."):
+            continue
+        if part == ".." or part.startswith(".") or part != part.strip():
+            return None
+        parts.append(part)
+    if not parts:
+        return None
+    rel = "/".join(parts)
+    suffix = Path(parts[-1]).suffix.lower()
+    allowed = rel in {"favicon.svg", "data/fiches.json"} or (
+        len(parts) >= 2 and parts[0] in _DIR_SUFFIX and suffix in _DIR_SUFFIX[parts[0]]
+    )
+    if not allowed:
+        return None
+    root = ROOT.resolve()
+    cursor = root
+    for part in parts:
+        cursor = cursor / part
+        if cursor.is_symlink():
+            return None
+    try:
+        resolved = cursor.resolve(strict=True)
+    except OSError:
+        return None
+    if not resolved.is_file() or not resolved.is_relative_to(root):
+        return None
+    if resolved.stat().st_size > 12_000_000:
+        return None
+    return resolved
 
 
 def _remember(payload: dict | None, error: str | None) -> None:
@@ -81,7 +179,7 @@ def _loop() -> None:
                 flush=True,
             )
         except Exception as exc:
-            _remember(None, str(exc))
+            _remember(None, "relevé raté")
             print(f"relevé raté: {exc}", flush=True)
         time.sleep(REFRESH_SECONDS)
 
@@ -97,7 +195,11 @@ def _take_token(ip: str) -> tuple[bool, int]:
             if tokens >= 1:
                 _buckets[ip] = (tokens - 1, now)
                 if len(_buckets) > 4000:
-                    stale = [key for key, (left, seen) in _buckets.items() if now - seen > 600 and left >= IP_CAPACITY - 1]
+                    stale = [
+                        key
+                        for key, (left, seen) in _buckets.items()
+                        if now - seen > 600 and left >= IP_CAPACITY - 1
+                    ]
                     for key in stale[:2000]:
                         _buckets.pop(key, None)
                 return True, 0
@@ -140,68 +242,88 @@ def _leave() -> None:
     _inflight.release()
 
 
-WAIT_PAGE = """<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex">
-  <title>Tu attendras</title>
-  <style>
-    body {{ margin: 0; background: #eae8e3; color: #12110f; font-family: "IBM Plex Mono", "Liberation Mono", ui-monospace, monospace; }}
-    .bar {{ height: 10px; background: #8e0e0e; }}
-    main {{ padding: 2.2rem 1.2rem; max-width: 38rem; }}
-    h1 {{ margin: 0 0 0.8rem; font-family: "Archivo Black", "Liberation Sans", sans-serif; font-size: clamp(2.4rem, 8vw, 4.2rem); line-height: 0.9; letter-spacing: -0.04em; text-transform: uppercase; }}
-    p {{ font-size: 1rem; font-weight: 700; }}
-  </style>
-</head>
-<body>
-  <div class="bar"></div>
-  <main>
-    <h1>Tu attendras.</h1>
-    <p>Deux places. Pas de répartiteur de charge. Réessaie dans {seconds} secondes.</p>
-  </main>
-</body>
-</html>
-"""
-
-
 class Handler(SimpleHTTPRequestHandler):
+    timeout = 20
+    server_version = "OnDebloque"
+    sys_version = ""
+
     def __init__(self, *args, **kwargs):
+        self._csp = FRAME_CSP
+        self._cache = "no-store"
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
-    def _origin(self) -> str:
-        forced = os.environ.get("SITE_URL", "").strip().rstrip("/")
-        if forced:
-            return forced
-        host = self.headers.get("Host", "")
-        if not re.fullmatch(r"[A-Za-z0-9.:-]{1,200}", host or ""):
-            return PUBLIC_ORIGIN
-        return f"http://{host}"
+    def version_string(self) -> str:
+        return "OnDebloque"
+
+    def handle_expect_100(self) -> bool:
+        if self.command in {"GET", "HEAD"}:
+            return super().handle_expect_100()
+        self.close_connection = True
+        self.send_error(405)
+        return False
 
     def end_headers(self) -> None:
-        path = self.path.split("?", 1)[0]
-        if path.startswith("/data/") or path.startswith("/api/") or path in {"/", "/index.html"}:
-            self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Referrer-Policy", "no-referrer")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Content-Security-Policy", self._csp)
+        self.send_header("Cache-Control", self._cache)
         super().end_headers()
 
-    def _bytes(self, code: int, body: bytes, content_type: str, retry: int | None = None) -> None:
+    def _bytes(
+        self,
+        code: int,
+        body: bytes,
+        content_type: str,
+        retry: int | None = None,
+        cache: str = "no-store",
+        csp: str | None = None,
+    ) -> None:
+        self._cache = cache
+        if csp:
+            self._csp = csp
         self.send_response(code)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         if retry is not None:
-            self.send_header("Retry-After", str(retry))
-            self.send_header("Cache-Control", "no-store")
+            self.send_header("Retry-After", str(int(retry)))
         self.end_headers()
-        self.wfile.write(body)
+        if self.command != "HEAD":
+            self.wfile.write(body)
 
     def _wait_page(self, retry: int) -> None:
-        page = WAIT_PAGE.format(seconds=int(retry)).encode("utf-8")
-        self._bytes(429, page, "text/html; charset=utf-8", retry)
+        self.close_connection = True
+        page = (
+            "<!DOCTYPE html>\n"
+            '<html lang="fr">\n'
+            "<head>\n"
+            '  <meta charset="utf-8">\n'
+            '  <meta name="viewport" content="width=device-width, initial-scale=1">\n'
+            '  <meta name="referrer" content="no-referrer">\n'
+            '  <meta name="robots" content="noindex">\n'
+            "  <title>Tu attendras</title>\n"
+            f"  <style>{WAIT_CSS}</style>\n"
+            "</head>\n"
+            "<body>\n"
+            '  <div class="bar"></div>\n'
+            "  <main>\n"
+            "    <h1>Tu attendras.</h1>\n"
+            "    <p>Deux places. Pas de répartiteur de charge. "
+            f"Réessaie dans {int(retry)} secondes.</p>\n"
+            "  </main>\n"
+            "</body>\n"
+            "</html>\n"
+        ).encode("utf-8")
+        self._bytes(429, page, "text/html; charset=utf-8", retry, csp=WAIT_CSP)
 
     def _serve_text(self, text: str, content_type: str) -> None:
-        body = text.replace(PUBLIC_ORIGIN, self._origin()).encode("utf-8")
+        body = text.replace(PUBLIC_ORIGIN, site_origin()).encode("utf-8")
         self._bytes(200, body, content_type)
+
+    def _serve_static(self, path: Path) -> None:
+        body = path.read_bytes()
+        cache = "no-store" if path.name == "fiches.json" else "public, max-age=3600"
+        self._bytes(200, body, _TYPES[path.suffix.lower()], cache=cache)
 
     def _route(self) -> None:
         path = self.path.split("?", 1)[0]
@@ -216,17 +338,20 @@ class Handler(SimpleHTTPRequestHandler):
             return
         if path in {"/", "/index.html"}:
             purpose = (self.headers.get("Sec-Purpose") or self.headers.get("Purpose") or "").lower()
-            if "prefetch" not in purpose:
-                record_visit()
+            if self.command == "GET" and "prefetch" not in purpose:
+                try:
+                    record_visit()
+                except Exception as exc:
+                    print(f"compteur raté: {exc}", flush=True)
             self._serve_text((ROOT / "index.html").read_text(encoding="utf-8"), "text/html; charset=utf-8")
             return
         if path == "/robots.txt":
-            origin = self._origin()
+            origin = site_origin()
             text = f"User-agent: *\nAllow: /\n\nSitemap: {origin}/sitemap.xml\n"
             self._bytes(200, text.encode("utf-8"), "text/plain; charset=utf-8")
             return
         if path == "/sitemap.xml":
-            origin = self._origin()
+            origin = site_origin()
             text = (
                 '<?xml version="1.0" encoding="UTF-8"?>\n'
                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -235,32 +360,45 @@ class Handler(SimpleHTTPRequestHandler):
             )
             self._bytes(200, text.encode("utf-8"), "application/xml; charset=utf-8")
             return
-        super().do_GET()
+        local = public_file(self.path)
+        if local is None:
+            self.send_error(404)
+            return
+        self._serve_static(local)
 
-    def do_GET(self) -> None:
-        ip = self.client_address[0]
-        allowed, retry = _enter(ip)
+    def _guarded(self, handler) -> None:
+        self._csp = FRAME_CSP
+        self._cache = "no-store"
+        allowed, retry = _enter(self.client_address[0])
         if not allowed:
             self._wait_page(retry)
             return
         try:
-            self._route()
+            handler()
         finally:
             _leave()
 
-    def do_HEAD(self) -> None:
-        ip = self.client_address[0]
-        allowed, retry = _enter(ip)
+    def _reject(self) -> None:
+        self.close_connection = True
+        allowed, retry = _enter(self.client_address[0])
         if not allowed:
-            self.send_response(429)
-            self.send_header("Retry-After", str(int(retry)))
-            self.send_header("Content-Length", "0")
-            self.end_headers()
+            self._wait_page(retry)
             return
         try:
-            super().do_HEAD()
+            self.send_error(405)
         finally:
             _leave()
+
+    def do_GET(self) -> None:
+        self._guarded(self._route)
+
+    def do_HEAD(self) -> None:
+        self._guarded(self._route)
+
+    def __getattr__(self, name):
+        if isinstance(name, str) and name.startswith("do_"):
+            return self._reject
+        raise AttributeError(name)
 
     def log_message(self, fmt: str, *args) -> None:
         code = str(args[1]) if len(args) >= 2 else ""
@@ -269,10 +407,45 @@ class Handler(SimpleHTTPRequestHandler):
         super().log_message(fmt, *args)
 
 
+class SiteServer(ThreadingHTTPServer):
+    daemon_threads = True
+    allow_reuse_address = True
+
+    def process_request(self, request, client_address) -> None:
+        if not _slots.acquire(blocking=False):
+            try:
+                request.sendall(
+                    b"HTTP/1.1 429 Too Many Requests\r\n"
+                    b"Retry-After: 20\r\n"
+                    b"Connection: close\r\n"
+                    b"Content-Length: 0\r\n"
+                    b"X-Content-Type-Options: nosniff\r\n"
+                    b"\r\n"
+                )
+            except OSError:
+                pass
+            self.shutdown_request(request)
+            return
+        try:
+            super().process_request(request, client_address)
+        except Exception:
+            _slots.release()
+            raise
+
+    def process_request_thread(self, request, client_address) -> None:
+        try:
+            super().process_request_thread(request, client_address)
+        finally:
+            _slots.release()
+
+
 def main() -> None:
+    forced = os.environ.get("SITE_URL", "").strip()
+    if forced and not _ORIGIN_RE.fullmatch(forced.rstrip("/")):
+        print("SITE_URL ignorée, origine Pages conservée", flush=True)
     _seed_from_disk()
     threading.Thread(target=_loop, name="refresh", daemon=True).start()
-    server = ThreadingHTTPServer((HOST, PORT), Handler)
+    server = SiteServer((HOST, PORT), Handler)
     print(
         f"site sur http://{HOST}:{PORT}  relevé toutes les {REFRESH_SECONDS}s  "
         f"file {MAX_INFLIGHT} places, {MAX_QUEUE} en attente",
