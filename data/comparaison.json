@@ -1,5 +1,5 @@
 {
-  "built_at": "2026-10-28T22:15:14Z",
+  "built_at": "2026-10-28T23:36:12Z",
   "snapshot_at": "2026-10-28T00:24:00Z",
   "snapshot_stable": true,
   "frozen": true,
@@ -209,6 +209,30 @@
       "lines_delta": -13,
       "as_of": "2026-10-28T20:56:25.128Z",
       "ups": 3879
+    },
+    {
+      "at": "2026-10-28T23:36:09Z",
+      "local": "29 oct. 00:36",
+      "utc": "23:36",
+      "source": "archive",
+      "accounts": 3272,
+      "accounts_same": false,
+      "added": 0,
+      "removed": 268,
+      "rewritten": 24,
+      "counts_absent": false,
+      "total": 13058281,
+      "total_delta": 1419107,
+      "down_count": 0,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "blank": 5,
+      "snapshot_at": "2026-10-28T00:24:00Z",
+      "frozen": true,
+      "rejected": 328,
+      "lines_delta": -272,
+      "as_of": "2026-10-28T23:36:06.753Z",
+      "ups": 3865
     }
   ],
   "edits": [
@@ -247,787 +271,955 @@
       ]
     },
     {
-      "name": "Ralph Weber",
-      "platform": "x",
-      "category": "Politiques",
-      "url": "https://x.com/WeberProf",
-      "reason": "Personnalité politique - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Ramona Storm",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/ramonastorm/",
-      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Renaud Camus",
-      "platform": "youtube",
-      "category": "Influenceurs",
-      "url": "https://www.youtube.com/channel/UCzIqjl4-gbd85TP4mjLoBVA",
-      "reason": "Essayiste, membre de Conseil national de la résistance européenne (France) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "RicciardettiJ",
-      "platform": "x",
-      "category": "RN",
-      "url": "https://x.com/ricciardettij",
-      "reason": "Tête de liste RN à Besançon, vice-président du groupe RN BFC",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "RNJ 17",
-      "platform": "x",
-      "category": "RN",
-      "url": "https://x.com/rnjeunesse_17",
-      "reason": "RNJ de Charente-Maritime",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Robby Schlund",
-      "platform": "x",
-      "category": "Politiques",
-      "url": "https://x.com/DrRobbySchlund",
-      "reason": "Personnalité politique - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Robert Eschricht",
-      "platform": "x",
-      "category": "Politiques",
-      "url": "https://x.com/roberteschricht",
-      "reason": "Élu·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Roland Magerl",
-      "platform": "x",
-      "category": "Politiques",
-      "url": "https://x.com/Roland_Magerl",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Rolf Wiedenhaupt",
-      "platform": "x",
-      "category": "Politiques",
-      "url": "https://x.com/RWiedenhaupt",
-      "reason": "Élu·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Roman Kuffert",
-      "platform": "youtube",
-      "category": "Politiques",
-      "url": "https://www.youtube.com/channel/UC5RNPGm_xJJacLMbdJ6MFmQ",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Rüdiger Klos",
-      "platform": "x",
-      "category": "Politiques",
-      "url": "https://x.com/RuedigerKlos",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Sara Winter",
+      "name": "Alain Destexhe",
       "platform": "x",
       "category": "Influenceurs",
-      "url": "https://x.com/asarahuff",
-      "reason": "Youtubeur, membre de Alliance pour le Brésil (Brésil) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
+      "url": "https://x.com/Destexhe",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Ex-sénateur belge, chroniqueur (Causeur, CNews)",
+          "after": "Ex-sénateur belge, chroniqueur Causeur/CNews",
+          "hidden": false
+        }
+      ]
     },
     {
-      "name": "Sarah Wood",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/sarahrileymusic/",
-      "reason": "Membre de Reform UK (Royaume-Uni) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Siegbert Droese",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/siegbertdroese/",
-      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Sikos Zsolt",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/zsoleszface91/",
-      "reason": "Membre de Mouvement Notre patrie (Hongrie) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Silke Schöps",
-      "platform": "tiktok",
-      "category": "Politiques",
-      "url": "https://www.tiktok.com/@silke.schoeps",
-      "reason": "Personnalité politique - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Sjöbopartiet",
-      "platform": "facebook",
-      "category": "Partis & mouvements",
-      "url": "https://www.facebook.com/sjobopartiet",
-      "reason": "Idéologie : right-wing populism : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Song Si-in",
+      "name": "Alain Soral",
       "platform": "x",
       "category": "Influenceurs",
-      "url": "https://x.com/sidoonge",
-      "reason": "Youtubeur, orientation : extrême droite (Corée du Sud) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
+      "url": "https://x.com/officielsoral",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Compte « Alain Soral Officiel » (E&R)",
+          "after": "Fondateur d'Égalité et Réconciliation",
+          "hidden": false
+        }
+      ]
     },
     {
-      "name": "Sorin Oltenasu",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/sorin_oltenasu/",
-      "reason": "Membre de Parti S.O.S. Roumanie (Roumanie) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Stefan Henze",
-      "platform": "youtube",
-      "category": "Politiques",
-      "url": "https://www.youtube.com/channel/UCSb5ZxcB2wVBRLYPAKNy22Q",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Stefan Keuter",
-      "platform": "youtube",
-      "category": "Politiques",
-      "url": "https://www.youtube.com/channel/UC4nBCYs-wD0sHny9LkLb5wQ",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Stefan Löw",
-      "platform": "x",
-      "category": "Politiques",
-      "url": "https://x.com/Stefan_Loew_MdL",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Stefan Marzischewski-Drewes",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/marzischewski/",
-      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Stefan Möller",
-      "platform": "youtube",
-      "category": "Politiques",
-      "url": "https://www.youtube.com/channel/UCmGwWkPyRxNNkFKE8vv-v1A",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Steffen Janich",
-      "platform": "x",
-      "category": "Politiques",
-      "url": "https://x.com/steffen_janich",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Steffen Kubitzki",
-      "platform": "tiktok",
-      "category": "Politiques",
-      "url": "https://www.tiktok.com/@steffenkubitzki",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Stéphanie Gayet",
+      "name": "AlexandreVaraut",
       "platform": "x",
       "category": "RN",
-      "url": "https://x.com/StephanieGayet",
-      "reason": "Élu·e - Rassemblement national (France)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
+      "url": "https://x.com/AlexandreVaraut",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Eurodéputé (Patriotes pour l'Europe, RN)",
+          "after": "Eurodéputé RN (Patriotes pour l'Europe)",
+          "hidden": false
+        }
+      ]
     },
     {
-      "name": "Sven Wendorf",
+      "name": "Breizh-Info (Yann Vallerie)",
       "platform": "x",
-      "category": "Politiques",
-      "url": "https://x.com/SvenWendorf",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
+      "category": "Médias",
+      "url": "https://x.com/Breizh_Info",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Site Breizh-Info (compte du rédacteur en chef)",
+          "after": "Rédacteur en chef de Breizh-Info, site d'extrême droite",
+          "hidden": false
+        }
+      ]
     },
     {
-      "name": "Tania Mihailuk",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/taniamihailukmp/",
-      "reason": "Membre de One Nation (Australie) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Thomas Fetsch",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/thomasfetsch_mdb/",
-      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Thomas Luhn",
-      "platform": "facebook",
-      "category": "Politiques",
-      "url": "https://www.facebook.com/61563804303020",
-      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Thomas Luhn",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/t.luhn_afd/",
-      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Thomas Röckemann",
-      "platform": "youtube",
-      "category": "Politiques",
-      "url": "https://www.youtube.com/channel/UCb3tF-IBydcZdVDts1kAQKQ",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Thomas Thumm",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/thomasthumm_mdl/",
-      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Thorsten Moriße",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/thorstenmorissemdl/",
-      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Tobias Heller - Ihr Landtagskandidat für Torgau-Oschatz",
-      "platform": "facebook",
-      "category": "Politiques",
-      "url": "https://www.facebook.com/tobiashellermdl",
-      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Tomi Immonen",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/perustomilaukaa/",
-      "reason": "Membre de Parti des Finlandais (Finlande) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Torsten Gahler",
-      "platform": "x",
-      "category": "Politiques",
-      "url": "https://x.com/GahlerTorsten",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Toshinao Nakagawa",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/nakagawatoshinao2021/",
-      "reason": "Membre de Sanseitō (Japon) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Ulrich von Zons",
-      "platform": "youtube",
-      "category": "Politiques",
-      "url": "https://www.youtube.com/channel/UCAXW99qFp-p-DUyy0pl6Z-w",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Ulrike Schielke-Ziesing",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/ulschzi/",
-      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Ulrike Schielke-Ziesing",
-      "platform": "tiktok",
-      "category": "Politiques",
-      "url": "https://www.tiktok.com/@ulschzi2",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Unione di i Patriotti",
+      "name": "Chez Nous 2024",
       "platform": "x",
       "category": "Partis & mouvements",
-      "url": "https://x.com/Unionepatriotti",
-      "reason": "Plate-forme électorale corse alliée RN/UDR",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
+      "url": "https://x.com/ChezNousOff",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Parti Chez Nous (Wallonie)",
+          "after": "Parti Chez Nous (Wallonie), soutenu par le RN",
+          "hidden": false
+        }
+      ]
     },
     {
-      "name": "Uwe Krell",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/uwe_krell/",
-      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
+      "name": "Europe 1",
+      "platform": "x",
+      "category": "Médias",
+      "url": "https://x.com/Europe1",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Radio du groupe Bolloré (Europe 1)",
+          "after": "Radio du groupe Bolloré",
+          "hidden": false
+        }
+      ]
     },
     {
-      "name": "Veijo Niemi",
+      "name": "FlavioBolsonaro",
       "platform": "x",
       "category": "Politiques",
-      "url": "https://x.com/veijoniemi1",
-      "reason": "Député·e - Parti des Finlandais (Finlande)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
+      "url": "https://x.com/FlavioBolsonaro",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Sénateur brésilien, Parti libéral (bolsonariste)",
+          "after": "Sénateur brésilien bolsonariste",
+          "hidden": false
+        }
+      ]
     },
     {
-      "name": "Verginia Vedinaș",
+      "name": "Frontières",
       "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/verginiavedinas/",
-      "reason": "Membre de Parti S.O.S. Roumanie (Roumanie) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
+      "category": "Médias",
+      "url": "https://www.instagram.com/frontieresmedia",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Média Frontières",
+          "after": "Média identitaire classé à l'extrême droite",
+          "hidden": false
+        }
+      ]
     },
     {
-      "name": "Veselin Veshev",
-      "platform": "youtube",
-      "category": "Politiques",
-      "url": "https://www.youtube.com/channel/UCtIZXI4FEAfwCQQlFMDik5Q",
-      "reason": "Député·e - Renaissance (Bulgarie)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "VEYSSIERE Laurence",
+      "name": "G_Peltier",
       "platform": "x",
-      "category": "RN",
-      "url": "https://x.com/l_veyssiere",
-      "reason": "Conseillère régionale RN (Nouvelle-Aquitaine)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
+      "category": "Politiques",
+      "url": "https://x.com/G_Peltier",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Eurodéputé, ex-Reconquête, « coalition des droites »",
+          "after": "Eurodéputé, ex-vice-président de Reconquête",
+          "hidden": false
+        }
+      ]
     },
     {
-      "name": "Victor Lastécouères",
-      "platform": "instagram",
-      "category": "RN",
-      "url": "https://www.instagram.com/victorlastecoueres/",
-      "reason": "Membre de Rassemblement national (France) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Victor Lenta",
+      "name": "Geoffroy Lejeune",
       "platform": "x",
       "category": "Influenceurs",
-      "url": "https://x.com/LentaVictor",
-      "reason": "Personnalité - Les Identitaires (France)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
+      "url": "https://x.com/GeoffroyLejeune",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Directeur de la rédaction du JDD",
+          "after": "Directeur de la rédaction du JDD, ex-Valeurs actuelles",
+          "hidden": false
+        }
+      ]
     },
     {
-      "name": "Volker Dringenberg",
-      "platform": "tiktok",
-      "category": "Politiques",
-      "url": "https://www.tiktok.com/@volkerdringenberg",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
+      "name": "Jean Messiha",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/JeanMessiha",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Ex-cadre RN, président de Vivre Français",
+          "after": "Ex-cadre RN, ex-Reconquête",
+          "hidden": false
+        }
+      ]
     },
     {
-      "name": "Volker Münz",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/volker.muenz_mdb/",
-      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
+      "name": "Julien AMADOR",
+      "platform": "x",
+      "category": "Autres",
+      "url": "https://x.com/Julien_Am_off",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "lignes",
+          "before": "2",
+          "after": "1",
+          "hidden": false
+        }
+      ]
     },
     {
-      "name": "Volker Schnurrbusch",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/volker.schnurrbusch/",
-      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
+      "name": "Laurent Obertone",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/LaurentObertone",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Écrivain (« La France orange mécanique »)",
+          "after": "Écrivain classé à l'extrême droite",
+          "hidden": false
+        }
+      ]
     },
     {
-      "name": "Volker Schnurrbusch",
+      "name": "Le JDD",
+      "platform": "x",
+      "category": "Médias",
+      "url": "https://x.com/leJDD",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Hebdomadaire du groupe Bolloré (JDD)",
+          "after": "Hebdomadaire du groupe Bolloré, dirigé par Geoffroy Lejeune",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "name": "Le raptor",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/RaptorVsWild",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Vidéaste « Raptor Dissident »",
+          "after": "Vidéaste « Raptor Dissident », classé à l'extrême droite",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "name": "Les Zinfirmières Avec Zemmour 🇨🇵🌿",
+      "platform": "x",
+      "category": "Autres",
+      "url": "https://x.com/Zemmmmmour",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "lignes",
+          "before": "2",
+          "after": "1",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "name": "Matthieu Valet",
+      "platform": "x",
+      "category": "RN",
+      "url": "https://x.com/mvalet_officiel",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Eurodéputé, porte-parole du RN",
+          "after": "Eurodéputé RN, porte-parole du RN",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "name": "Mila Orriols",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/milafique",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Influenceuse anti-gauche",
+          "after": "Influenceuse décrite comme d'extrême droite (Lyon Capitale), ex-Némésis",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "name": "Mouvement Nation",
+      "platform": "x",
+      "category": "Partis & mouvements",
+      "url": "https://x.com/Nation_x_",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Mouvement Nation (nationaliste-révolutionnaire)",
+          "after": "Mouvement nationaliste-révolutionnaire belge",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "name": "MÉMÉ 🇨🇵 Honneur et Patrie 🇨🇵",
+      "platform": "x",
+      "category": "Autres",
+      "url": "https://x.com/Antemeca",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "lignes",
+          "before": "2",
+          "after": "1",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "name": "Philippe de Villiers",
       "platform": "x",
       "category": "Politiques",
-      "url": "https://x.com/V_Schnurrbusch",
-      "reason": "Eurodéputé·e - Alternative pour l'Allemagne (Allemagne)",
+      "url": "https://x.com/PhdeVilliers",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Fondateur du MPF, droite souverainiste et identitaire",
+          "after": "Fondateur du MPF, droite souverainiste",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "name": "Samuel_Lafont",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/Samuel_Lafont",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Ex-directeur numérique de Reconquête",
+          "after": "Ex-directeur de la stratégie numérique de Reconquête",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "name": "Towa 🇫🇷",
+      "platform": "x",
+      "category": "Autres",
+      "url": "https://x.com/towayowaiowa",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "lignes",
+          "before": "2",
+          "after": "1",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "name": "UNI",
+      "platform": "x",
+      "category": "Partis & mouvements",
+      "url": "https://x.com/droiteuniv",
+      "kind": "rewrite",
+      "local": "29 oct. 00:36",
+      "source": "archive",
+      "changes": [
+        {
+          "field": "motif",
+          "before": "Union nationale inter-universitaire (droite étudiante)",
+          "after": "Syndicat étudiant de droite",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "name": "Psyhodelik",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/Psyhodelikus",
+      "reason": "« Journaliste indépendant » pro-serbe",
       "kind": "removal",
-      "local": "28 oct. 18:35",
+      "local": "29 oct. 00:36",
       "source": "archive"
     },
     {
-      "name": "Wendy Lonchampt",
-      "platform": "instagram",
+      "name": "Ptiote la Patriote Z #Reconquete",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/Ptiote3",
+      "reason": "Nom X : « Patriote Z 🇫🇷🇮🇹#Reconquete »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Raison Patriote 🇫🇷",
+      "platform": "tiktok",
+      "category": "Influenceurs",
+      "url": "https://www.tiktok.com/@raison.patriote",
+      "reason": "TikTokeur « patriote »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Renard_Patriote",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/renard_patriote",
+      "reason": "Bio X : « #Remigration #UnionDesDroites »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Riposte Reconquête ! (soutien)",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/Riposte_R",
+      "reason": "Bio X : « compte de soutien à Reconquête »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Robot Z-5610 ⓩ 🇫🇷",
+      "platform": "x",
       "category": "Reconquête",
-      "url": "https://www.instagram.com/wendy.lonchampt/",
-      "reason": "Membre de Reconquête (France) : Wikidata",
+      "url": "https://x.com/Ben_voyons2022",
+      "reason": "Militant Reconquête",
       "kind": "removal",
-      "local": "28 oct. 18:35",
+      "local": "29 oct. 00:36",
       "source": "archive"
     },
     {
-      "name": "Wilhelm von Gottberg",
+      "name": "Romualddu13",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/romualddu13",
+      "reason": "Soutien de Zemmour",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Régis Le Sommier",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/LeSommierRgis",
+      "reason": "Journaliste, catégorie Wikipédia « Extrême droite sur Internet en France » (France) : Wikipédia",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Sardoche",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/Sardoche",
+      "reason": "Streamer aux prises de position de droite radicale",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "schnauzer 85",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/Yvon15854596",
+      "reason": "Bio X : « Reconquête ! Dans un prenier temps une »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "SL",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/Steve_Laws_",
+      "reason": "Bio X : « Founder of @remigrationnow_ »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Starsky007",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/starsky007",
+      "reason": "Bio X : « pour #Zemmour et #Reconquête »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Stayone",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/stayone10",
+      "reason": "Bio X : « populiste, anti-immigrationniste, complotiste… »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "SteffannyWz",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/zezette2022",
+      "reason": "Bio X : « 100% Zemmour💤... 100% Reconquête🌿 »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Steph Sainte Marie",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/steph16656",
+      "reason": "Compte « à droite toute »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "SwordOfSalomon",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/SwordOfSalomon",
+      "reason": "Compte militant d'extrême droite",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Sébastien JALLAMION",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/SJallamion",
+      "reason": "Ex-policier, auteur",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Tannhäuser P.",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/TannhausPierre",
+      "reason": "Bio X : « Zemmour »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "TatianaVentose",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/TatianaVentose",
+      "reason": "Analyste politique souverainiste",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Team Louise 🇫🇷⚜️",
+      "platform": "tiktok",
+      "category": "Influenceurs",
+      "url": "https://www.tiktok.com/@louise.offi",
+      "reason": "Compte fan de Louise Montangon (UNI)",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "teambardella",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/Mrpolitique88",
+      "reason": "Bio X : « Soutien à Jordan Bardella et au RN »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Templier 71",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/Templier711",
+      "reason": "Bio X : « 🇲🇫 #udr 🇲🇫 #RN 🇲🇫 🐷@CanonFrancais🐷 »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "thierry CHOLLET",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/thierryCHO33128",
+      "reason": "Bio X : « Médecin retraité. Reconquête, 🇪🇺 des nations, 🥰❤️ma »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Thierry le Conquérant",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/OERTHERT",
+      "reason": "Bio X : « Monsieur Zemmour merci d’aimer et de »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Tigrero",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/Tigrero28757044",
+      "reason": "Bio X : « RN d'abord »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "TITI B",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/titibellini",
+      "reason": "Bio X : « Enracinement et transmission. Identitaire. »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Tnrli Mélinda",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/Mtnrl73",
+      "reason": "Bio X : « #RN 🇨🇵 @MLP_officiel »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Tous avec le RN",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/marinejordanrn",
+      "reason": "Bio X : « compte soutenons le RN »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "TrumpDailyPosts",
+      "platform": "x",
+      "category": "Médias",
+      "url": "https://x.com/TrumpDailyPosts",
+      "reason": "Compte non officiel relayant Donald Trump",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "TwitchGauchiste",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/TwitchGauchiste",
+      "reason": "Compte anti-gauche (extraits de streams)",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Union Identité Souveraineté QcFREXIT",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/UnionPatriotesF",
+      "reason": "Bio X : « @Reconquete_off|@RNational_off »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "urbany. jamais sans Zemmour",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/urbany73",
+      "reason": "Bio X : « Zemmour un jour Zemmour toujours »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Valloo#Frexit - France souveraine",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/VallooValloo",
+      "reason": "Bio X : « Adhérente Les Patriotes. »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "volga Droite",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/volga207",
+      "reason": "Compte pro-RN, anti-gauche",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Wolf",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/PsyGuy007",
+      "reason": "Influenceur « patriote » pro-MAGA",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "Xavier MALLET",
       "platform": "x",
       "category": "Politiques",
-      "url": "https://x.com/vonGottberg_AfD",
-      "reason": "Personnalité politique - Alternative pour l'Allemagne (Allemagne)",
+      "url": "https://x.com/xaviermallet77",
+      "reason": "Bio X : « - Seine-et-Marne - Reconquête! »",
       "kind": "removal",
-      "local": "28 oct. 18:35",
+      "local": "29 oct. 00:36",
       "source": "archive"
     },
     {
-      "name": "Wojciech Wierzejski",
-      "platform": "x",
-      "category": "Politiques",
-      "url": "https://x.com/WWierzejski",
-      "reason": "Député·e - Ligue des familles polonaises (Pologne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Wolfgang Lauerwald",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/wolfganglauerwald/",
-      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Wolfgang Wiehle",
-      "platform": "youtube",
-      "category": "Politiques",
-      "url": "https://www.youtube.com/channel/UC1NPmwG9IOyRclHHjx0ilnQ",
-      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Yolanda Couceiro Morín",
-      "platform": "instagram",
-      "category": "Influenceurs",
-      "url": "https://www.instagram.com/yolandamorin/",
-      "reason": "Figure d'extrême droite (Espagne) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Yvette Estermann",
-      "platform": "instagram",
-      "category": "Politiques",
-      "url": "https://www.instagram.com/yvetteestermann/",
-      "reason": "Membre de Union démocratique du centre (Suisse) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Zdeněk Kettner",
-      "platform": "x",
-      "category": "Politiques",
-      "url": "https://x.com/z_kettner",
-      "reason": "Personnalité politique - Liberté et démocratie directe (Tchéquie)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Éric Richermoz",
-      "platform": "youtube",
-      "category": "Politiques",
-      "url": "https://www.youtube.com/channel/UCCzd66NlnfNoAmQXJFwtHCg",
-      "reason": "Élu·e - Les Patriotes (France)",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Борис Пайкин",
-      "platform": "facebook",
-      "category": "Politiques",
-      "url": "https://www.facebook.com/paykin.online",
-      "reason": "Membre de Parti libéral-démocrate de Russie (Russie) : Wikidata",
-      "kind": "removal",
-      "local": "28 oct. 18:35",
-      "source": "archive"
-    },
-    {
-      "name": "Martinho de Andrade",
+      "name": "yoan",
       "platform": "x",
       "category": "Influenceurs",
-      "url": "https://x.com/martinhogo60276",
-      "reason": "Vérifié par la modération",
-      "kind": "addition",
-      "local": "28 oct. 18:35",
+      "url": "https://x.com/silure21000",
+      "reason": "Bio X : « !!🇫🇷 Seul Éric zemmour et l'équipe de Reconquête »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
       "source": "archive"
     },
     {
-      "name": "Casus Lady",
+      "name": "Young Bob",
       "platform": "x",
       "category": "Influenceurs",
-      "url": "https://x.com/CasusLady",
-      "reason": "Compte satirique (proposition visiteur)",
+      "url": "https://x.com/YoungBobRB",
+      "reason": "Bio X : « Christian Pro-life Remigration activist »",
       "kind": "removal",
-      "local": "28 oct. 21:56",
+      "local": "29 oct. 00:36",
       "source": "archive"
     },
     {
-      "name": "Constantin - Nobert",
+      "name": "Z Nelsisi",
       "platform": "x",
       "category": "Influenceurs",
-      "url": "https://x.com/norbert_fr",
-      "reason": "Influenceur (proposition visiteur)",
+      "url": "https://x.com/SylvieNellinge1",
+      "reason": "Bio X : « #jesoutiensZemmour »",
       "kind": "removal",
-      "local": "28 oct. 21:56",
+      "local": "29 oct. 00:36",
       "source": "archive"
     },
     {
-      "name": "Destination Ciné",
+      "name": "Zemmour n'a pas dit son dernier mot ⓩ",
       "platform": "x",
       "category": "Influenceurs",
-      "url": "https://x.com/destinationcine",
-      "reason": "Compte cinéma aux commentaires politiques",
+      "url": "https://x.com/n_zemmour",
+      "reason": "Nom X : « Zemmour n'a pas dit son dernier mot »",
       "kind": "removal",
-      "local": "28 oct. 21:56",
+      "local": "29 oct. 00:36",
       "source": "archive"
     },
     {
-      "name": "Faycal Jelil",
+      "name": "Zemmourienne",
       "platform": "x",
       "category": "Influenceurs",
-      "url": "https://x.com/FaycalJelil",
-      "reason": "Influenceur (proposition visiteur)",
+      "url": "https://x.com/Zemmourienne92",
+      "reason": "Nom X : « Zemmourienne 🇫🇷✝️ »",
       "kind": "removal",
-      "local": "28 oct. 21:56",
+      "local": "29 oct. 00:36",
       "source": "archive"
     },
     {
-      "name": "GoldenBoy",
-      "platform": "youtube",
-      "category": "Influenceurs",
-      "url": "https://www.youtube.com/@goldenboyy001",
-      "reason": "Vidéaste (proposition visiteur)",
-      "kind": "removal",
-      "local": "28 oct. 21:56",
-      "source": "archive"
-    },
-    {
-      "name": "JUNGO",
-      "platform": "youtube",
-      "category": "Influenceurs",
-      "url": "https://www.youtube.com/@im_Jungo",
-      "reason": "Vidéaste (proposition visiteur)",
-      "kind": "removal",
-      "local": "28 oct. 21:56",
-      "source": "archive"
-    },
-    {
-      "name": "Kroc Blanc",
+      "name": "zShoshana🇫🇷🇮🇱♿️",
       "platform": "x",
       "category": "Influenceurs",
-      "url": "https://x.com/KbgStream",
-      "reason": "Streamer (proposition visiteur)",
+      "url": "https://x.com/zerbibshoshana",
+      "reason": "Bio X : « Reconquête »",
       "kind": "removal",
-      "local": "28 oct. 21:56",
+      "local": "29 oct. 00:36",
       "source": "archive"
     },
     {
-      "name": "Le Sociologue",
+      "name": "Zyannah",
       "platform": "x",
       "category": "Influenceurs",
-      "url": "https://x.com/sociologuelvl99",
-      "reason": "Influenceur (proposition visiteur)",
+      "url": "https://x.com/Zyannah7",
+      "reason": "Bio X : « pour cuisiner. A la #Reconquête! Ça urge! #UnionDesDroites »",
       "kind": "removal",
-      "local": "28 oct. 21:56",
+      "local": "29 oct. 00:36",
       "source": "archive"
     },
     {
-      "name": "Le_Crapaud47",
+      "name": "zzz ben voyons",
       "platform": "x",
       "category": "Influenceurs",
-      "url": "https://x.com/Le_Crapaud47",
-      "reason": "Créateur satirique",
+      "url": "https://x.com/BruhatSylvie",
+      "reason": "Bio X : « Zemmourienne de la premiere »",
       "kind": "removal",
-      "local": "28 oct. 21:56",
+      "local": "29 oct. 00:36",
       "source": "archive"
     },
     {
-      "name": "Loreine_LAD",
+      "name": "Ægidius",
       "platform": "x",
       "category": "Influenceurs",
-      "url": "https://x.com/Loreine_LAD",
-      "reason": "Compte « Les Asiatiques à droite »",
+      "url": "https://x.com/aebele631974",
+      "reason": "Bio X : « #Zemmour »",
       "kind": "removal",
-      "local": "28 oct. 21:56",
+      "local": "29 oct. 00:36",
       "source": "archive"
     },
     {
-      "name": "Shanna",
+      "name": "ÉRIC ZEMMOUR 2022",
       "platform": "x",
-      "category": "Influenceurs",
-      "url": "https://x.com/shannasparkleof",
-      "reason": "Compte (proposition visiteur)",
-      "kind": "removal",
-      "local": "28 oct. 21:56",
-      "source": "archive"
-    },
-    {
-      "name": "SOS Chrétiens d'Orient",
-      "platform": "facebook",
       "category": "Partis & mouvements",
-      "url": "https://www.facebook.com/soschretiensdorient",
-      "reason": "Parti / mouvement d'extrême droite (France) : Wikidata",
+      "url": "https://x.com/ERICZEMMOUR2022",
+      "reason": "Bio X : « de soutien à Éric Zemmour. | Ce compte a vocation à »",
       "kind": "removal",
-      "local": "28 oct. 21:56",
+      "local": "29 oct. 00:36",
       "source": "archive"
     },
     {
-      "name": "👉 𝓐𝓷𝓰𝓮𝓵_𝓟𝓪𝓻𝓪𝓭𝓲𝔃𝓮 👈",
+      "name": "Ⓜ Obsevydial Ⓜ",
       "platform": "x",
       "category": "Influenceurs",
-      "url": "https://x.com/Angel_Paradize",
-      "reason": "Compte (proposition visiteur)",
+      "url": "https://x.com/obsevydial",
+      "reason": "Militant RN",
       "kind": "removal",
-      "local": "28 oct. 21:56",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "⚜️Lou⚜️✝️🎗️🇫🇷🇦🇲🇮🇹",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/LouBalian",
+      "reason": "Bio X : « Remigration »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "𝐁𝐞𝐫𝐧𝐲 𝙌𝙪𝙞𝙚𝙩 𝕽𝖊𝖈𝖔𝖓𝖖𝖚ê𝖙e",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/QuietStrenght",
+      "reason": "Bio X : « #Trump🇺🇲 #Zemmour🇫🇷 #UnionDesDroites »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "𝓥𝓲𝓸𝓵𝓮𝓽𝓽𝓮",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/Violette126649",
+      "reason": "Bio X : « Adhérente #Reconquête ! »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "𝗝𝗮𝗩𝗮",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/jeajavaka",
+      "reason": "Bio X : « ! 💙🤍❤️ #ÉricZemmour 🌿 #SarahKnafo ❤️ »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "🇨🇵🌿Pandeamonium1233🇨🇵",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/Pandeamonium121",
+      "reason": "Compte de soutien à Reconquête",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "🇫🇷 Fyda Charles",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/CharlesFyda",
+      "reason": "Bio X : « Zemmour »",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
+      "source": "archive"
+    },
+    {
+      "name": "🇫🇷 Vévé-énervé",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/EnerveVeve",
+      "reason": "Compte de soutien à Reconquête",
+      "kind": "removal",
+      "local": "29 oct. 00:36",
       "source": "archive"
     }
   ],
-  "edits_hidden": 188,
+  "edits_hidden": 480,
   "downs": [],
   "downs_hidden": 0,
   "dip_count": 111,
@@ -1037,67 +1229,67 @@
       "name": "mlp_officiel",
       "platform": "x",
       "before": 137157,
-      "after": 1601370,
-      "delta": 1464213
+      "after": 1616322,
+      "delta": 1479165
     },
     {
       "name": "Sardoche",
       "platform": "x",
       "before": 25909,
-      "after": 184860,
-      "delta": 158951,
+      "after": 192338,
+      "delta": 166429,
       "url": "https://x.com/Sardoche"
-    },
-    {
-      "name": "Coco.DTЯ ⓩ #JamaisSansZemmour",
-      "platform": "x",
-      "before": 1204,
-      "after": 47394,
-      "delta": 46190,
-      "url": "https://x.com/CorinneDTR"
     },
     {
       "name": "cnews",
       "platform": "x",
       "before": 79260,
-      "after": 117447,
-      "delta": 38187
+      "after": 130895,
+      "delta": 51635
+    },
+    {
+      "name": "Coco.DTЯ ⓩ #JamaisSansZemmour",
+      "platform": "x",
+      "before": 1204,
+      "after": 47585,
+      "delta": 46381,
+      "url": "https://x.com/CorinneDTR"
     },
     {
       "name": "Europe 1",
       "platform": "x",
       "before": 39015,
-      "after": 68773,
-      "delta": 29758,
+      "after": 79660,
+      "delta": 40645,
       "url": "https://x.com/Europe1"
     },
     {
       "name": "j_bardella",
       "platform": "x",
       "before": 67357,
-      "after": 96426,
-      "delta": 29069
+      "after": 104703,
+      "delta": 37346
     },
     {
       "name": "j_bardella",
       "platform": "instagram",
       "before": 48897,
-      "after": 76116,
-      "delta": 27219
+      "after": 84991,
+      "delta": 36094
     },
     {
       "name": "CerfiaFR",
       "platform": "x",
       "before": 34574,
-      "after": 61247,
-      "delta": 26673,
+      "after": 70616,
+      "delta": 36042,
       "url": "https://x.com/CerfiaFR"
     }
   ],
   "span": {
     "from_total": 6194112,
-    "to_total": 11639174,
-    "delta": 5445062,
+    "to_total": 13058281,
+    "delta": 6864169,
     "keys_added": 1,
     "keys_removed": 0,
     "net_downs": 0
