@@ -253,17 +253,36 @@ function followerLine(fiche) {
   return line;
 }
 
-function renderRow(fiche) {
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+function renderRow(fiche, index) {
   const article = document.createElement("article");
   article.className = "fiche";
+  article.style.setProperty("--i", String(index));
 
   const name = document.createElement("h3");
+  name.id = `fiche-name-${page}-${index}`;
   name.textContent = String(fiche.name ?? "");
 
   const meta = document.createElement("p");
   meta.className = "fiche-meta";
   const network = PLATFORM_LABEL[fiche.platform] || String(fiche.platform ?? "");
   meta.textContent = [fiche.category, network].filter(Boolean).join(", ");
+
+  const cue = document.createElement("span");
+  cue.className = "sr-only";
+  cue.textContent = "Ouvrir le motif. ";
+
+  const caret = document.createElement("span");
+  caret.className = "caret";
+  caret.setAttribute("aria-hidden", "true");
+
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "fiche-toggle";
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.setAttribute("aria-controls", `fiche-motif-${page}-${index}`);
+  toggle.append(cue, caret, name, meta);
 
   const count = document.createElement("p");
   count.className = "fiche-count";
@@ -297,10 +316,51 @@ function renderRow(fiche) {
   reason.className = "fiche-reason";
   reason.textContent = String(fiche.reason || "Motif non inscrit.");
 
-  article.append(name, meta, count, action);
+  const inner = document.createElement("div");
+  inner.className = "fiche-drop-in";
+  inner.append(reason);
+  const panel = document.createElement("div");
+  panel.className = "fiche-drop";
+  panel.id = `fiche-motif-${page}-${index}`;
+  panel.setAttribute("role", "region");
+  panel.setAttribute("aria-labelledby", name.id);
+  panel.hidden = true;
+  panel.append(inner);
+
+  toggle.addEventListener("click", () => {
+    const open = toggle.getAttribute("aria-expanded") !== "true";
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    cue.textContent = open ? "Fermer le motif. " : "Ouvrir le motif. ";
+    if (open) {
+      panel.hidden = false;
+      if (!reduceMotion.matches) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => article.classList.add("is-open"));
+        });
+      } else {
+        article.classList.add("is-open");
+      }
+      return;
+    }
+    article.classList.remove("is-open");
+    if (reduceMotion.matches) {
+      panel.hidden = true;
+      return;
+    }
+    const hide = () => {
+      if (!article.classList.contains("is-open")) panel.hidden = true;
+    };
+    panel.addEventListener("transitionend", (event) => {
+      if (event.target !== panel) return;
+      hide();
+    }, { once: true });
+    window.setTimeout(hide, 400);
+  });
+
+  article.append(toggle, count, action);
   const gain = followerLine(fiche);
   if (gain) article.append(gain);
-  article.append(reason);
+  article.append(panel);
   return article;
 }
 
@@ -328,7 +388,7 @@ function render() {
     list.append(p);
   } else {
     const frag = document.createDocumentFragment();
-    windowed.slice.forEach((fiche) => frag.append(renderRow(fiche)));
+    windowed.slice.forEach((fiche, index) => frag.append(renderRow(fiche, index)));
     list.append(frag);
   }
   list.removeAttribute("aria-busy");
@@ -430,6 +490,43 @@ function stepLine(step, index) {
   return line;
 }
 
+function fieldLabel(field) {
+  if (field === "motif") return "Motif";
+  if (field === "lignes") return "Nombre de lignes";
+  return field || "Champ";
+}
+
+function bindDrawer(details) {
+  const summary = details.querySelector("summary");
+  const panel = details.querySelector(".drawer-panel");
+  summary.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (details.classList.contains("is-open")) {
+      details.classList.remove("is-open");
+      const hide = () => {
+        if (!details.classList.contains("is-open")) details.open = false;
+      };
+      if (reduceMotion.matches) {
+        hide();
+        return;
+      }
+      panel.addEventListener("transitionend", (ev) => {
+        if (ev.target === panel) hide();
+      }, { once: true });
+      window.setTimeout(hide, 400);
+      return;
+    }
+    details.open = true;
+    if (reduceMotion.matches) {
+      details.classList.add("is-open");
+      return;
+    }
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => details.classList.add("is-open"));
+    });
+  });
+}
+
 function editRow(item) {
   const row = node("article", "edit");
   const title = node("h3", "", item.name || "Sans nom");
@@ -451,10 +548,10 @@ function editRow(item) {
     row.append(node("p", "mark", onlyMotive ? "Motif réécrit." : "Fiche réécrite."));
     fields.forEach((change) => {
       if (change.hidden || (!change.before && !change.after)) {
-        row.append(node("p", "mark", `${change.field || "Champ"} modifié.`));
+        row.append(node("p", "mark", `${fieldLabel(change.field)} modifié.`));
         return;
       }
-      if (!onlyMotive && change.field) row.append(node("p", "before", change.field));
+      if (!onlyMotive && change.field) row.append(node("p", "before", fieldLabel(change.field)));
       if (change.before) row.append(node("p", "before", `Avant : ${change.before}`));
       if (change.after) row.append(node("p", "after", `Après : ${change.after}`));
     });
@@ -518,14 +615,26 @@ function paintComparaison(data) {
 
   const edits = Array.isArray(data.edits) ? data.edits : [];
   editsHost.replaceChildren();
-  editsHost.append(node("p", "pull-label", edits.length ? "Retouches du fichier" : "Retouches"));
   if (!edits.length) {
+    editsHost.append(node("p", "pull-label", "Retouches"));
     editsHost.append(node("p", "howto", "Aucune retouche de fiche entre ces copies."));
   } else {
-    edits.forEach((item) => editsHost.append(editRow(item)));
+    const details = document.createElement("details");
+    details.className = "drawer";
+    const summary = document.createElement("summary");
+    summary.textContent = `Retouches du fichier, ${plural(edits.length, "ligne", "lignes")}`;
+    const panel = document.createElement("div");
+    panel.className = "drawer-panel";
+    const inner = document.createElement("div");
+    inner.className = "drawer-inner";
+    edits.forEach((item) => inner.append(editRow(item)));
     if (data.edits_hidden) {
-      editsHost.append(node("p", "howto", `Et ${plural(data.edits_hidden, "autre retouche", "autres retouches")}.`));
+      inner.append(node("p", "howto", `Et ${plural(data.edits_hidden, "autre retouche", "autres retouches")}.`));
     }
+    panel.append(inner);
+    details.append(summary, panel);
+    bindDrawer(details);
+    editsHost.append(details);
   }
 
   const span = data.span || {};

@@ -521,6 +521,65 @@ h2 {
   text-transform: uppercase;
 }
 
+.drawer {
+  margin-top: 1.15rem;
+  border-top: 2px solid var(--line);
+}
+
+.drawer summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 0;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  list-style: none;
+  text-transform: uppercase;
+}
+
+.drawer summary::-webkit-details-marker {
+  display: none;
+}
+
+.drawer summary::after {
+  content: "";
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  transform: rotate(-45deg);
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.drawer.is-open summary::after {
+  transform: rotate(45deg);
+}
+
+.drawer-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 320ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.drawer.is-open .drawer-panel {
+  grid-template-rows: 1fr;
+}
+
+.drawer-inner {
+  min-height: 0;
+  max-height: min(70vh, 36rem);
+  overflow: hidden;
+  scrollbar-color: var(--ink) var(--paper);
+}
+
+.drawer.is-open .drawer-inner {
+  overflow: auto;
+}
+
 .pull-steps,
 .pull-gains {
   margin: 0.45rem 0 0;
@@ -567,7 +626,7 @@ h2 {
 
 .pull-gains span {
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .pull-gains strong {
@@ -577,7 +636,7 @@ h2 {
 
 .edit h3 {
   margin: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   font-family: var(--display);
   font-size: 1.15rem;
   font-weight: 400;
@@ -663,7 +722,7 @@ h2 {
 
 .filters {
   display: grid;
-  grid-template-columns: 1.5fr 0.9fr 0.8fr 0.9fr;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr) minmax(0, 0.75fr) minmax(12rem, 1.05fr);
   gap: 0.75rem;
   margin: 1rem 0 0.8rem;
 }
@@ -692,11 +751,20 @@ button {
 input,
 select {
   width: 100%;
-  min-height: 2.7rem;
+  height: 2.7rem;
   padding: 0.45rem 0.55rem;
   background: var(--field);
   border: 2px solid var(--ink);
   border-radius: 0;
+}
+
+select {
+  appearance: none;
+  padding-right: 1.9rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 4.2 L6 8.2 L10 4.2' fill='none' stroke='%2312110f' stroke-width='1.8'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.55rem center;
+  background-size: 0.72rem;
 }
 
 ::placeholder {
@@ -722,10 +790,9 @@ select {
 
 .fiche {
   grid-template-areas:
-    "name count go"
-    "meta count go"
+    "toggle count go"
     "gain gain gain"
-    "reason reason reason";
+    "drop drop drop";
 }
 
 .headrow {
@@ -738,6 +805,10 @@ select {
   text-transform: uppercase;
 }
 
+.headrow span:first-child {
+  padding-left: 1.15rem;
+}
+
 .fiche {
   padding: 0.95rem 0.15rem 0.85rem;
   border-top: 2px solid var(--line);
@@ -747,10 +818,66 @@ select {
   background: var(--field);
 }
 
+.fiche-toggle {
+  grid-area: toggle;
+  display: grid;
+  grid-template-columns: 0.7rem minmax(0, 1fr);
+  grid-template-areas:
+    "mark name"
+    "mark meta";
+  column-gap: 0.45rem;
+  align-items: start;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.caret {
+  grid-area: mark;
+  width: 0.48rem;
+  height: 0.48rem;
+  margin-top: 0.32rem;
+  border-right: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  transform: rotate(-45deg);
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fiche.is-open .caret {
+  transform: rotate(45deg);
+}
+
+.fiche-toggle:hover .caret,
+.fiche-toggle:focus-visible .caret {
+  border-color: var(--red);
+}
+
+.fiche-drop {
+  grid-area: drop;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fiche.is-open .fiche-drop {
+  grid-template-rows: 1fr;
+}
+
+.fiche-drop-in {
+  min-height: 0;
+  overflow: hidden;
+}
+
 .fiche h3 {
   grid-area: name;
   margin: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   font-family: var(--display);
   font-size: 1.2rem;
   font-weight: 400;
@@ -813,15 +940,15 @@ p.fiche-go {
 }
 
 .fiche-reason {
-  grid-area: reason;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  padding-top: 0.35rem;
   color: var(--muted);
   font-size: 0.78rem;
 }
 
 .fiche .fiche-gain {
   grid-area: gain;
-  margin-top: 0.35rem;
+  margin-top: 0.2rem;
   font-size: 0.82rem;
   font-weight: 700;
 }
@@ -1026,11 +1153,10 @@ blockquote p {
   .fiche {
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
-      "name count"
-      "meta meta"
+      "toggle count"
       "gain gain"
       "go go"
-      "reason reason";
+      "drop drop";
   }
 
   a.fiche-go.btn,
@@ -1059,8 +1185,16 @@ blockquote p {
   }
 
   .stamp,
-  a.fiche-go.btn {
+  a.fiche-go.btn,
+  .fiche {
     animation: none;
+  }
+
+  .fiche-drop,
+  .caret,
+  .drawer-panel,
+  .drawer summary::after {
+    transition: none;
   }
 
   a.fiche-go.btn {
@@ -1078,6 +1212,11 @@ blockquote p {
   .stamp {
     animation: stamp-hit 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
+
+  .fiche {
+    animation: drop-in 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--i, 0) * 18ms);
+  }
 }
 
 @keyframes suivre-blink {
@@ -1093,6 +1232,18 @@ blockquote p {
     background: var(--paper);
     border-color: var(--red);
     color: var(--red);
+  }
+}
+
+@keyframes drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
