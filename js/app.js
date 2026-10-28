@@ -454,7 +454,7 @@ function stepLine(step, index) {
   else if (index === 0) pushText(line, "Premier relevé.");
   if (step.accounts == null) {
     pushText(line, "Comptes absents.");
-  } else if (index === 0) {
+  } else if (index === 0 || step.accounts_first) {
     pushText(line, `${formatInt(step.accounts)} lignes.`);
   } else if (step.accounts_same) {
     pushText(line, "Comptes inchangés.");

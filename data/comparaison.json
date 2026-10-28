@@ -1,5 +1,5 @@
 {
-  "built_at": "2026-10-28T21:20:51Z",
+  "built_at": "2026-10-28T22:15:14Z",
   "snapshot_at": "2026-10-28T00:24:00Z",
   "snapshot_stable": true,
   "frozen": true,
@@ -8,26 +8,69 @@
   "steps_omitted": 0,
   "steps": [
     {
+      "at": "2026-10-28T16:37:34Z",
+      "local": "28 oct. 17:37",
+      "utc": "16:37",
+      "source": "archive",
+      "accounts": null,
+      "accounts_same": false,
+      "added": 0,
+      "removed": 0,
+      "rewritten": 0,
+      "counts_absent": false,
+      "total": 6194112,
+      "total_delta": null,
+      "down_count": 0,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "as_of": "2026-10-28T16:34:52.533Z"
+    },
+    {
+      "at": "2026-10-28T16:39:29Z",
+      "local": "28 oct. 17:39",
+      "utc": "16:39",
+      "source": "archive",
+      "accounts": 3807,
+      "accounts_same": false,
+      "added": 0,
+      "removed": 0,
+      "rewritten": 0,
+      "counts_absent": true,
+      "total": null,
+      "total_delta": null,
+      "down_count": 0,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "blank": 4,
+      "snapshot_at": "2026-10-28T00:24:00Z",
+      "frozen": true,
+      "rejected": 328,
+      "accounts_first": true
+    },
+    {
       "at": "2026-10-28T17:35:53Z",
       "local": "28 oct. 18:35",
       "utc": "17:35",
       "source": "archive",
       "accounts": 3557,
       "accounts_same": false,
-      "added": 0,
-      "removed": 0,
+      "added": 1,
+      "removed": 252,
       "rewritten": 0,
       "counts_absent": false,
       "total": 7763554,
-      "total_delta": null,
+      "total_delta": 1569442,
       "down_count": 0,
-      "keys_added": 0,
+      "keys_added": 1,
       "keys_removed": 0,
       "blank": 5,
       "snapshot_at": "2026-10-28T00:24:00Z",
       "frozen": true,
       "rejected": 328,
-      "as_of": "2026-10-28T17:35:45.985Z"
+      "lines_delta": -250,
+      "as_of": "2026-10-28T17:35:45.985Z",
+      "counts_gap": true,
+      "ups": 4130
     },
     {
       "at": "2026-10-28T17:40:53Z",
@@ -147,7 +190,7 @@
       "at": "2026-10-28T20:56:30Z",
       "local": "28 oct. 21:56",
       "utc": "20:56",
-      "source": "site",
+      "source": "archive",
       "accounts": 3544,
       "accounts_same": false,
       "added": 0,
@@ -176,7 +219,7 @@
       "url": "https://x.com/FlavioBolsonaro",
       "kind": "rewrite",
       "local": "28 oct. 21:56",
-      "source": "site",
+      "source": "archive",
       "changes": [
         {
           "field": "motif",
@@ -193,7 +236,7 @@
       "url": "https://x.com/yairnetanyahu",
       "kind": "rewrite",
       "local": "28 oct. 21:56",
-      "source": "site",
+      "source": "archive",
       "changes": [
         {
           "field": "motif",
@@ -204,6 +247,656 @@
       ]
     },
     {
+      "name": "Ralph Weber",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/WeberProf",
+      "reason": "Personnalité politique - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Ramona Storm",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/ramonastorm/",
+      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Renaud Camus",
+      "platform": "youtube",
+      "category": "Influenceurs",
+      "url": "https://www.youtube.com/channel/UCzIqjl4-gbd85TP4mjLoBVA",
+      "reason": "Essayiste, membre de Conseil national de la résistance européenne (France) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "RicciardettiJ",
+      "platform": "x",
+      "category": "RN",
+      "url": "https://x.com/ricciardettij",
+      "reason": "Tête de liste RN à Besançon, vice-président du groupe RN BFC",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "RNJ 17",
+      "platform": "x",
+      "category": "RN",
+      "url": "https://x.com/rnjeunesse_17",
+      "reason": "RNJ de Charente-Maritime",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Robby Schlund",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/DrRobbySchlund",
+      "reason": "Personnalité politique - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Robert Eschricht",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/roberteschricht",
+      "reason": "Élu·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Roland Magerl",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/Roland_Magerl",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Rolf Wiedenhaupt",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/RWiedenhaupt",
+      "reason": "Élu·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Roman Kuffert",
+      "platform": "youtube",
+      "category": "Politiques",
+      "url": "https://www.youtube.com/channel/UC5RNPGm_xJJacLMbdJ6MFmQ",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Rüdiger Klos",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/RuedigerKlos",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Sara Winter",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/asarahuff",
+      "reason": "Youtubeur, membre de Alliance pour le Brésil (Brésil) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Sarah Wood",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/sarahrileymusic/",
+      "reason": "Membre de Reform UK (Royaume-Uni) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Siegbert Droese",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/siegbertdroese/",
+      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Sikos Zsolt",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/zsoleszface91/",
+      "reason": "Membre de Mouvement Notre patrie (Hongrie) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Silke Schöps",
+      "platform": "tiktok",
+      "category": "Politiques",
+      "url": "https://www.tiktok.com/@silke.schoeps",
+      "reason": "Personnalité politique - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Sjöbopartiet",
+      "platform": "facebook",
+      "category": "Partis & mouvements",
+      "url": "https://www.facebook.com/sjobopartiet",
+      "reason": "Idéologie : right-wing populism : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Song Si-in",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/sidoonge",
+      "reason": "Youtubeur, orientation : extrême droite (Corée du Sud) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Sorin Oltenasu",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/sorin_oltenasu/",
+      "reason": "Membre de Parti S.O.S. Roumanie (Roumanie) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Stefan Henze",
+      "platform": "youtube",
+      "category": "Politiques",
+      "url": "https://www.youtube.com/channel/UCSb5ZxcB2wVBRLYPAKNy22Q",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Stefan Keuter",
+      "platform": "youtube",
+      "category": "Politiques",
+      "url": "https://www.youtube.com/channel/UC4nBCYs-wD0sHny9LkLb5wQ",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Stefan Löw",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/Stefan_Loew_MdL",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Stefan Marzischewski-Drewes",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/marzischewski/",
+      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Stefan Möller",
+      "platform": "youtube",
+      "category": "Politiques",
+      "url": "https://www.youtube.com/channel/UCmGwWkPyRxNNkFKE8vv-v1A",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Steffen Janich",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/steffen_janich",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Steffen Kubitzki",
+      "platform": "tiktok",
+      "category": "Politiques",
+      "url": "https://www.tiktok.com/@steffenkubitzki",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Stéphanie Gayet",
+      "platform": "x",
+      "category": "RN",
+      "url": "https://x.com/StephanieGayet",
+      "reason": "Élu·e - Rassemblement national (France)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Sven Wendorf",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/SvenWendorf",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Tania Mihailuk",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/taniamihailukmp/",
+      "reason": "Membre de One Nation (Australie) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Thomas Fetsch",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/thomasfetsch_mdb/",
+      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Thomas Luhn",
+      "platform": "facebook",
+      "category": "Politiques",
+      "url": "https://www.facebook.com/61563804303020",
+      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Thomas Luhn",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/t.luhn_afd/",
+      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Thomas Röckemann",
+      "platform": "youtube",
+      "category": "Politiques",
+      "url": "https://www.youtube.com/channel/UCb3tF-IBydcZdVDts1kAQKQ",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Thomas Thumm",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/thomasthumm_mdl/",
+      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Thorsten Moriße",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/thorstenmorissemdl/",
+      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Tobias Heller - Ihr Landtagskandidat für Torgau-Oschatz",
+      "platform": "facebook",
+      "category": "Politiques",
+      "url": "https://www.facebook.com/tobiashellermdl",
+      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Tomi Immonen",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/perustomilaukaa/",
+      "reason": "Membre de Parti des Finlandais (Finlande) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Torsten Gahler",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/GahlerTorsten",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Toshinao Nakagawa",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/nakagawatoshinao2021/",
+      "reason": "Membre de Sanseitō (Japon) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Ulrich von Zons",
+      "platform": "youtube",
+      "category": "Politiques",
+      "url": "https://www.youtube.com/channel/UCAXW99qFp-p-DUyy0pl6Z-w",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Ulrike Schielke-Ziesing",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/ulschzi/",
+      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Ulrike Schielke-Ziesing",
+      "platform": "tiktok",
+      "category": "Politiques",
+      "url": "https://www.tiktok.com/@ulschzi2",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Unione di i Patriotti",
+      "platform": "x",
+      "category": "Partis & mouvements",
+      "url": "https://x.com/Unionepatriotti",
+      "reason": "Plate-forme électorale corse alliée RN/UDR",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Uwe Krell",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/uwe_krell/",
+      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Veijo Niemi",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/veijoniemi1",
+      "reason": "Député·e - Parti des Finlandais (Finlande)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Verginia Vedinaș",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/verginiavedinas/",
+      "reason": "Membre de Parti S.O.S. Roumanie (Roumanie) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Veselin Veshev",
+      "platform": "youtube",
+      "category": "Politiques",
+      "url": "https://www.youtube.com/channel/UCtIZXI4FEAfwCQQlFMDik5Q",
+      "reason": "Député·e - Renaissance (Bulgarie)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "VEYSSIERE Laurence",
+      "platform": "x",
+      "category": "RN",
+      "url": "https://x.com/l_veyssiere",
+      "reason": "Conseillère régionale RN (Nouvelle-Aquitaine)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Victor Lastécouères",
+      "platform": "instagram",
+      "category": "RN",
+      "url": "https://www.instagram.com/victorlastecoueres/",
+      "reason": "Membre de Rassemblement national (France) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Victor Lenta",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/LentaVictor",
+      "reason": "Personnalité - Les Identitaires (France)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Volker Dringenberg",
+      "platform": "tiktok",
+      "category": "Politiques",
+      "url": "https://www.tiktok.com/@volkerdringenberg",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Volker Münz",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/volker.muenz_mdb/",
+      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Volker Schnurrbusch",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/volker.schnurrbusch/",
+      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Volker Schnurrbusch",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/V_Schnurrbusch",
+      "reason": "Eurodéputé·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Wendy Lonchampt",
+      "platform": "instagram",
+      "category": "Reconquête",
+      "url": "https://www.instagram.com/wendy.lonchampt/",
+      "reason": "Membre de Reconquête (France) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Wilhelm von Gottberg",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/vonGottberg_AfD",
+      "reason": "Personnalité politique - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Wojciech Wierzejski",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/WWierzejski",
+      "reason": "Député·e - Ligue des familles polonaises (Pologne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Wolfgang Lauerwald",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/wolfganglauerwald/",
+      "reason": "Membre de Alternative pour l'Allemagne (Allemagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Wolfgang Wiehle",
+      "platform": "youtube",
+      "category": "Politiques",
+      "url": "https://www.youtube.com/channel/UC1NPmwG9IOyRclHHjx0ilnQ",
+      "reason": "Député·e - Alternative pour l'Allemagne (Allemagne)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Yolanda Couceiro Morín",
+      "platform": "instagram",
+      "category": "Influenceurs",
+      "url": "https://www.instagram.com/yolandamorin/",
+      "reason": "Figure d'extrême droite (Espagne) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Yvette Estermann",
+      "platform": "instagram",
+      "category": "Politiques",
+      "url": "https://www.instagram.com/yvetteestermann/",
+      "reason": "Membre de Union démocratique du centre (Suisse) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Zdeněk Kettner",
+      "platform": "x",
+      "category": "Politiques",
+      "url": "https://x.com/z_kettner",
+      "reason": "Personnalité politique - Liberté et démocratie directe (Tchéquie)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Éric Richermoz",
+      "platform": "youtube",
+      "category": "Politiques",
+      "url": "https://www.youtube.com/channel/UCCzd66NlnfNoAmQXJFwtHCg",
+      "reason": "Élu·e - Les Patriotes (France)",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Борис Пайкин",
+      "platform": "facebook",
+      "category": "Politiques",
+      "url": "https://www.facebook.com/paykin.online",
+      "reason": "Membre de Parti libéral-démocrate de Russie (Russie) : Wikidata",
+      "kind": "removal",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
+      "name": "Martinho de Andrade",
+      "platform": "x",
+      "category": "Influenceurs",
+      "url": "https://x.com/martinhogo60276",
+      "reason": "Vérifié par la modération",
+      "kind": "addition",
+      "local": "28 oct. 18:35",
+      "source": "archive"
+    },
+    {
       "name": "Casus Lady",
       "platform": "x",
       "category": "Influenceurs",
@@ -211,7 +904,7 @@
       "reason": "Compte satirique (proposition visiteur)",
       "kind": "removal",
       "local": "28 oct. 21:56",
-      "source": "site"
+      "source": "archive"
     },
     {
       "name": "Constantin - Nobert",
@@ -221,7 +914,7 @@
       "reason": "Influenceur (proposition visiteur)",
       "kind": "removal",
       "local": "28 oct. 21:56",
-      "source": "site"
+      "source": "archive"
     },
     {
       "name": "Destination Ciné",
@@ -231,7 +924,7 @@
       "reason": "Compte cinéma aux commentaires politiques",
       "kind": "removal",
       "local": "28 oct. 21:56",
-      "source": "site"
+      "source": "archive"
     },
     {
       "name": "Faycal Jelil",
@@ -241,7 +934,7 @@
       "reason": "Influenceur (proposition visiteur)",
       "kind": "removal",
       "local": "28 oct. 21:56",
-      "source": "site"
+      "source": "archive"
     },
     {
       "name": "GoldenBoy",
@@ -251,7 +944,7 @@
       "reason": "Vidéaste (proposition visiteur)",
       "kind": "removal",
       "local": "28 oct. 21:56",
-      "source": "site"
+      "source": "archive"
     },
     {
       "name": "JUNGO",
@@ -261,7 +954,7 @@
       "reason": "Vidéaste (proposition visiteur)",
       "kind": "removal",
       "local": "28 oct. 21:56",
-      "source": "site"
+      "source": "archive"
     },
     {
       "name": "Kroc Blanc",
@@ -271,7 +964,7 @@
       "reason": "Streamer (proposition visiteur)",
       "kind": "removal",
       "local": "28 oct. 21:56",
-      "source": "site"
+      "source": "archive"
     },
     {
       "name": "Le Sociologue",
@@ -281,7 +974,7 @@
       "reason": "Influenceur (proposition visiteur)",
       "kind": "removal",
       "local": "28 oct. 21:56",
-      "source": "site"
+      "source": "archive"
     },
     {
       "name": "Le_Crapaud47",
@@ -291,7 +984,7 @@
       "reason": "Créateur satirique",
       "kind": "removal",
       "local": "28 oct. 21:56",
-      "source": "site"
+      "source": "archive"
     },
     {
       "name": "Loreine_LAD",
@@ -301,7 +994,7 @@
       "reason": "Compte « Les Asiatiques à droite »",
       "kind": "removal",
       "local": "28 oct. 21:56",
-      "source": "site"
+      "source": "archive"
     },
     {
       "name": "Shanna",
@@ -311,7 +1004,7 @@
       "reason": "Compte (proposition visiteur)",
       "kind": "removal",
       "local": "28 oct. 21:56",
-      "source": "site"
+      "source": "archive"
     },
     {
       "name": "SOS Chrétiens d'Orient",
@@ -321,7 +1014,7 @@
       "reason": "Parti / mouvement d'extrême droite (France) : Wikidata",
       "kind": "removal",
       "local": "28 oct. 21:56",
-      "source": "site"
+      "source": "archive"
     },
     {
       "name": "👉 𝓐𝓷𝓰𝓮𝓵_𝓟𝓪𝓻𝓪𝓭𝓲𝔃𝓮 👈",
@@ -331,10 +1024,10 @@
       "reason": "Compte (proposition visiteur)",
       "kind": "removal",
       "local": "28 oct. 21:56",
-      "source": "site"
+      "source": "archive"
     }
   ],
-  "edits_hidden": 0,
+  "edits_hidden": 188,
   "downs": [],
   "downs_hidden": 0,
   "dip_count": 111,
@@ -343,69 +1036,69 @@
     {
       "name": "mlp_officiel",
       "platform": "x",
-      "before": 709889,
+      "before": 137157,
       "after": 1601370,
-      "delta": 891481
+      "delta": 1464213
     },
     {
       "name": "Sardoche",
       "platform": "x",
-      "before": 31252,
+      "before": 25909,
       "after": 184860,
-      "delta": 153608,
+      "delta": 158951,
       "url": "https://x.com/Sardoche"
     },
     {
       "name": "Coco.DTЯ ⓩ #JamaisSansZemmour",
       "platform": "x",
-      "before": 12798,
+      "before": 1204,
       "after": 47394,
-      "delta": 34596,
+      "delta": 46190,
       "url": "https://x.com/CorinneDTR"
     },
     {
       "name": "cnews",
       "platform": "x",
-      "before": 89439,
+      "before": 79260,
       "after": 117447,
-      "delta": 28008
+      "delta": 38187
     },
     {
       "name": "Europe 1",
       "platform": "x",
-      "before": 46811,
+      "before": 39015,
       "after": 68773,
-      "delta": 21962,
+      "delta": 29758,
       "url": "https://x.com/Europe1"
     },
     {
-      "name": "CerfiaFR",
+      "name": "j_bardella",
       "platform": "x",
-      "before": 41547,
-      "after": 61247,
-      "delta": 19700,
-      "url": "https://x.com/CerfiaFR"
+      "before": 67357,
+      "after": 96426,
+      "delta": 29069
     },
     {
       "name": "j_bardella",
       "platform": "instagram",
-      "before": 56675,
+      "before": 48897,
       "after": 76116,
-      "delta": 19441
+      "delta": 27219
     },
     {
-      "name": "mlp_officiel",
-      "platform": "instagram",
-      "before": 52975,
-      "after": 71695,
-      "delta": 18720
+      "name": "CerfiaFR",
+      "platform": "x",
+      "before": 34574,
+      "after": 61247,
+      "delta": 26673,
+      "url": "https://x.com/CerfiaFR"
     }
   ],
   "span": {
-    "from_total": 7763554,
+    "from_total": 6194112,
     "to_total": 11639174,
-    "delta": 3875620,
-    "keys_added": 0,
+    "delta": 5445062,
+    "keys_added": 1,
     "keys_removed": 0,
     "net_downs": 0
   },

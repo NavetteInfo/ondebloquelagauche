@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Compare les pulls d'accounts et de counts, et écrit data/comparaison.json.
 
-Le dossier lu est PULLS_DIR, sinon /pulls, sinon le dossier pulls à côté du
-dépôt. Sans ce dossier, le fichier déjà publié n'est pas écrasé. Les bruts
-ne sont pas recopiés : seulement les écarts, les totaux, et les plus fortes
-hausses. Un recul d'un ou deux points qui revient ensuite est compté, le nom
-n'est pas publié. Un recul d'au moins 10, ou un solde encore négatif à la
-fin, est nommé.
+Les JSON datés vivent dans data/historique. Le dossier externe, s'il existe,
+est PULLS_DIR, sinon /pulls, sinon le dossier pulls à côté du dépôt. Les deux
+sont lus. Sans aucune copie, le fichier déjà publié n'est pas écrasé. La
+comparaison ne publie que les écarts, les totaux, et les plus fortes hausses.
+Un recul d'un ou deux points qui revient ensuite est compté, le nom n'est pas
+publié. Un recul d'au moins 10, ou un solde encore négatif à la fin, est nommé.
 """
 
 from __future__ import annotations
@@ -66,7 +66,7 @@ SHORT_MONTHS = (
     "déc.",
 )
 _FILE_RE = re.compile(
-    r"^(accounts|counts)_(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})\.json$"
+    r"^(accounts|counts)_(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})-(\d{2})(?:_(\d+))?\.json$"
 )
 _UUID_RE = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\Z",
@@ -140,7 +140,7 @@ def _parse_utc(value) -> datetime | None:
         return None
 
 
-def _stamp_from_name(name: str) -> tuple[str, datetime] | None:
+def _stamp_from_name(name: str) -> tuple[str, datetime, int] | None:
     match = _FILE_RE.fullmatch(name)
     if not match:
         return None
@@ -155,9 +155,10 @@ def _stamp_from_name(name: str) -> tuple[str, datetime] | None:
             int(match.group(7)),
             tzinfo=PARIS,
         )
+        seq = int(match.group(8) or 0)
     except ValueError:
         return None
-    return kind, local
+    return kind, local, seq
 
 
 def _load_json(path: Path) -> dict | None:
@@ -371,9 +372,12 @@ def _discover(folder: Path) -> list[dict]:
             parsed = _stamp_from_name(path.name)
             if not parsed:
                 continue
-            kind, local = parsed
+            kind, local, seq = parsed
             clock = _clock(local)
-            slot = found.setdefault((clock["at"], 0), {"clock": clock, "source": "archive"})
+            slot = found.setdefault(
+                (clock["at"], seq),
+                {"clock": clock, "source": "archive", "seq": seq},
+            )
             slot[kind] = path
     return [found[key] for key in sorted(found)]
 
@@ -455,8 +459,39 @@ def _trim_steps(slots: list[dict]) -> tuple[list[dict], int]:
     return slots[-STEP_CAP:], omitted
 
 
+def _history_folders(folder: Path | None) -> list[Path]:
+    folders: list[Path] = []
+    history = ROOT / "data" / "historique"
+    if history.is_dir():
+        folders.append(history)
+    if folder is not None and folder.is_dir():
+        try:
+            same = folders and folder.resolve() == folders[0].resolve()
+        except OSError:
+            same = False
+        if not same:
+            folders.append(folder)
+    return folders
+
+
+def _merge_slots(folders: list[Path]) -> list[dict]:
+    found: dict[tuple[str, int], dict] = {}
+    for folder in folders:
+        for slot in _discover(folder):
+            key = (slot["clock"]["at"], int(slot.get("seq") or 0))
+            current = found.get(key)
+            if current is None:
+                found[key] = slot
+                continue
+            for kind in ("accounts", "counts"):
+                if kind in slot and kind not in current:
+                    current[kind] = slot[kind]
+    return [found[key] for key in sorted(found)]
+
+
 def build(folder: Path, data_dir: Path | None) -> dict | None:
-    slots = _discover(folder)
+    folders = _history_folders(folder)
+    slots = _merge_slots(folders)
     if data_dir is not None:
         _append_site(slots, data_dir)
     if not slots:
@@ -523,6 +558,7 @@ def build(folder: Path, data_dir: Path | None) -> dict | None:
             _remember(names, urls, grouped)
             if prev_digest is None:
                 step["accounts_same"] = False
+                step["accounts_first"] = True
             elif digest == prev_digest:
                 step["accounts_same"] = True
             else:
@@ -686,7 +722,13 @@ def build(folder: Path, data_dir: Path | None) -> dict | None:
             gains.append(gain)
 
     hidden_edits = max(0, len(edits) - EDIT_CAP)
-    edits = edits[:EDIT_CAP]
+    if len(edits) > EDIT_CAP:
+        rewrites = [card for card in edits if card.get("kind") == "rewrite"][:EDIT_CAP]
+        rest = [card for card in edits if card.get("kind") != "rewrite"]
+        room = EDIT_CAP - len(rewrites)
+        edits = rewrites + (rest[-room:] if room else [])
+    else:
+        edits = edits[:EDIT_CAP]
     snapshot_stable = None if not snapshots else len(set(snapshots)) <= 1
     frozen_stable = len(set(frozen_values)) <= 1
     rejected_stable = len(set(rejected_values)) <= 1
@@ -715,10 +757,35 @@ def build(folder: Path, data_dir: Path | None) -> dict | None:
             "net_downs": net_downs,
         },
     }
-    journal = _journal(folder / "erreurs.log")
+    journal = None
+    for candidate in reversed(folders):
+        journal = _journal(candidate / "erreurs.log")
+        if journal:
+            break
     if journal:
         doc["journal"] = journal
     return doc
+
+
+def _kept_journal(path: Path) -> dict | None:
+    previous = _load_json(path)
+    if not isinstance(previous, dict):
+        return None
+    old = previous.get("journal")
+    if not isinstance(old, dict):
+        return None
+    lines = old.get("lines")
+    http_404 = old.get("http_404")
+    if (
+        isinstance(lines, bool)
+        or isinstance(http_404, bool)
+        or not isinstance(lines, int)
+        or not isinstance(http_404, int)
+    ):
+        return None
+    if lines < 0 or http_404 < 0 or http_404 > lines or lines > 100_000:
+        return None
+    return {"lines": lines, "http_404": http_404, "other": lines - http_404}
 
 
 def write_comparaison(
@@ -727,15 +794,22 @@ def write_comparaison(
     *,
     site: bool = True,
 ) -> dict | None:
-    """Écrit la comparaison. Sans dossier de pulls, ne touche pas le fichier."""
+    """Écrit la comparaison. Sans aucune copie, ne touche pas le fichier."""
     if pulls_path is None:
         pulls_path = locate_pulls()
-    if pulls_path is None or not pulls_path.is_dir():
+    history = ROOT / "data" / "historique"
+    has_history = history.is_dir()
+    has_external = pulls_path is not None and pulls_path.is_dir()
+    if not has_history and not has_external:
         return None
-    doc = build(pulls_path, ROOT / "data" if site else None)
+    doc = build(pulls_path if has_external else history, ROOT / "data" if site else None)
     if doc is None:
         return None
     target = out_path or OUT
+    if "journal" not in doc:
+        kept = _kept_journal(target)
+        if kept:
+            doc["journal"] = kept
     payload = json.dumps(doc, ensure_ascii=False, indent=2) + "\n"
     if "\u2014" in payload or "\u2013" in payload:
         raise RuntimeError("tiret long dans la comparaison")

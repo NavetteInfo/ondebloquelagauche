@@ -15,11 +15,15 @@ import urllib.request
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 from urllib.parse import parse_qs, urlparse
 
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
 RAW = DATA / "raw"
+HISTORIQUE = DATA / "historique"
+PARIS = ZoneInfo("Europe/Paris")
+_ARCHIVE_KINDS = {"accounts", "counts", "submissions", "fiches"}
 FICHES = DATA / "fiches.json"
 ABONNES = DATA / "abonnes.json"
 # Sortie publique du dispositif, mardi 27 octobre 2026.
@@ -315,9 +319,10 @@ def _read_source(url: str) -> tuple[int, bytes]:
     return status, payload
 
 
-def fetch_json(url: str) -> dict:
+def fetch_pair(url: str) -> tuple[dict, bytes]:
     """Deux essais. Le second ne sert que si la lecture cale, pas si le JSON est faux."""
     last = None
+    payload = b""
     for attempt in range(2):
         try:
             _status, payload = _read_source(url)
@@ -339,7 +344,51 @@ def fetch_json(url: str) -> dict:
     data = json.loads(payload.decode("utf-8"))
     if not isinstance(data, dict):
         raise RuntimeError("JSON inattendu")
+    return data, payload
+
+
+def fetch_json(url: str) -> dict:
+    data, _payload = fetch_pair(url)
     return data
+
+
+def archive_payload(kind: str, payload: bytes, moment: datetime) -> Path:
+    """Conserve le JSON tel qu'il a été reçu. Un fichier déjà là n'est pas réécrit."""
+    if kind not in _ARCHIVE_KINDS:
+        raise ValueError(kind)
+    if not payload or payload.lstrip().startswith(b"<"):
+        raise ValueError("pull vide")
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=timezone.utc)
+    local = moment.astimezone(PARIS).replace(microsecond=0)
+    stamp = local.strftime("%Y-%m-%d_%H-%M-%S")
+    directory = HISTORIQUE / kind
+    directory.mkdir(parents=True, exist_ok=True)
+    try:
+        json.loads(payload.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError):
+        raise ValueError("pull vide") from None
+    path = directory / f"{kind}_{stamp}.json"
+    suffix = 2
+    while path.exists() or path.is_symlink():
+        if path.is_file() and not path.is_symlink() and path.read_bytes() == payload:
+            return path
+        path = directory / f"{kind}_{stamp}_{suffix}.json"
+        suffix += 1
+        if suffix > 50:
+            raise RuntimeError("trop de pulls à la même seconde")
+    fd, tmp_name = tempfile.mkstemp(dir=directory, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(payload)
+        os.replace(tmp_name, path)
+    except Exception:
+        try:
+            os.unlink(tmp_name)
+        except OSError:
+            pass
+        raise
+    return path
 
 
 def merge(accounts: dict, counts_doc: dict, refreshed_at: str | None = None) -> dict:
@@ -553,6 +602,8 @@ def pull_submissions(accounts: dict | None = None, pulled_at: str | None = None)
         _fill_published(doc, accounts)
         _write_json(SUBMISSIONS, doc)
         return doc
+    pulled = datetime.strptime(doc["pulled_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    archive_payload("submissions", payload, pulled)
     items, total = _submission_rows(data)
     doc["ok"] = True
     doc["message"] = ""
@@ -768,10 +819,13 @@ def _load_abonnes() -> dict:
 
 
 def refresh_once() -> dict:
-    counts_doc = fetch_json(COUNTS_URL)
-    accounts = fetch_json(ACCOUNTS_URL)
-    refreshed_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    counts_doc, counts_raw = fetch_pair(COUNTS_URL)
+    accounts, accounts_raw = fetch_pair(ACCOUNTS_URL)
+    refreshed = datetime.now(timezone.utc).replace(microsecond=0)
+    refreshed_at = refreshed.strftime("%Y-%m-%dT%H:%M:%SZ")
     with _IO_LOCK:
+        archive_payload("counts", counts_raw, refreshed)
+        archive_payload("accounts", accounts_raw, refreshed)
         merged = merge(accounts, counts_doc, refreshed_at)
         attach_followers(merged)
         RAW.mkdir(parents=True, exist_ok=True)
