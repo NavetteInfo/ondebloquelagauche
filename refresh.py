@@ -1079,6 +1079,10 @@ def refresh_once() -> dict:
 
 
 def main() -> None:
+    if len(sys.argv) > 1 and sys.argv[1] == "--deck":
+        import deck
+        deck.main()
+        return
     if len(sys.argv) > 1 and sys.argv[1] == "--followers":
         info = refresh_followers()
         print(
