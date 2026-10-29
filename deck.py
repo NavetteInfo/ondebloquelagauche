@@ -459,20 +459,23 @@ def _public_fcounts(doc: dict | None) -> dict | None:
                 counts.update(_card_count_keys(card))
     if not counts and "counts" not in doc and "cards" not in doc:
         _take_counts(doc, counts)
-    if not counts:
+    total = doc.get("total")
+    has_total = isinstance(total, int) and not isinstance(total, bool) and total > 0
+    if not counts and not has_total:
         return None
     public: dict = {"counts": counts}
-    total = doc.get("total")
-    if isinstance(total, int) and not isinstance(total, bool) and total > 0:
+    if has_total:
         public["total"] = total
-    as_of = doc.get("as_of")
-    if isinstance(as_of, str) and "T" in as_of and len(as_of) <= 40:
-        public["as_of"] = as_of
+    for field in ("as_of", "since"):
+        value = doc.get(field)
+        if isinstance(value, str) and "T" in value and len(value) <= 40:
+            public[field] = value
     if isinstance(doc.get("live"), bool):
         public["live"] = doc["live"]
-    historical = doc.get("historical_base")
-    if isinstance(historical, int) and not isinstance(historical, bool) and historical > 0:
-        public["historical_base"] = historical
+    for field in ("historical_base", "last_hour", "new_since_resume", "legacy_recorded"):
+        value = doc.get(field)
+        if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+            public[field] = value
     return public
 
 
@@ -485,7 +488,10 @@ def _read_fcounts() -> tuple[dict[str, int], dict]:
             continue
         counts.update(public["counts"])
         meta["files"].append(path.name)
-        for field in ("total", "as_of", "live", "historical_base"):
+        for field in (
+            "total", "as_of", "since", "live", "historical_base",
+            "last_hour", "new_since_resume", "legacy_recorded",
+        ):
             if field in public:
                 meta[field] = public[field]
     meta["full"] = len(counts) >= FULL_FCOUNTS
@@ -602,7 +608,7 @@ def publish() -> dict:
     if not isinstance(historical, int) or historical <= 0:
         historical = HISTORICAL_BASE
     built["historical_base"] = historical
-    if fmeta.get("full") and refresh._count(fmeta.get("total")):
+    if refresh._count(fmeta.get("total")) and fmeta.get("files"):
         built["total_blocks"] = refresh._count(fmeta.get("total"))
         if isinstance(fmeta.get("as_of"), str):
             built["as_of"] = fmeta["as_of"]
@@ -610,7 +616,7 @@ def publish() -> dict:
         file_historical = fmeta.get("historical_base")
         if isinstance(file_historical, int) and file_historical > 0:
             built["historical_base"] = file_historical
-        built["source"] = "merged.json + fcounts"
+        built["source"] = "merged.json + fcounts" if fmeta.get("full") else "merged.json + deck + fcounts"
     else:
         built["total_blocks"] = built["fiche_count_sum"]
         built["live"] = False

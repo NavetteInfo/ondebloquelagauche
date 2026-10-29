@@ -81,9 +81,14 @@ function paintCatalog(data) {
   const caption = document.querySelector(".caption");
   if (caption) {
     const when = formatUtc(data.as_of);
+    const named = data.total_blocks === data.fiche_count_sum;
     caption.textContent = when
-      ? `Somme des fiches, relevé le ${when}.`
-      : "Somme des fiches.";
+      ? (named
+        ? `Somme des fiches, relevé le ${when}.`
+        : `Compteur global de la liste, relevé le ${when}. Une partie du total n'a même pas de nom.`)
+      : (named
+        ? "Somme des fiches."
+        : "Compteur global de la liste. Une partie du total n'a même pas de nom.");
   }
   const pull = document.getElementById("pull-line");
   if (pull) {
