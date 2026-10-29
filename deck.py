@@ -56,8 +56,9 @@ def _deck_sources() -> list[Path]:
             path for path in folder.glob("deck_*.json")
             if path.is_file() and not path.is_symlink()
         ]
-        found.extend(sorted(files, key=lambda path: path.name))
-    return found
+        found.extend(files)
+    # Le nom porte l'heure : le relevé le plus récent passe en dernier, quel que soit son dossier.
+    return sorted(found, key=lambda path: path.name)
 
 
 def _read_json(path: Path) -> dict | None:
@@ -400,8 +401,9 @@ def _fcount_sources() -> list[Path]:
             path for path in folder.glob("fcounts_*.json")
             if path.is_file() and not path.is_symlink()
         ]
-        found.extend(sorted(files, key=lambda path: path.name))
-    return found
+        found.extend(files)
+    # Le nom porte l'heure : le relevé le plus récent passe en dernier, quel que soit son dossier.
+    return sorted(found, key=lambda path: path.name)
 
 
 def _count_key(key: str) -> str | None:
