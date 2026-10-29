@@ -1,5 +1,5 @@
 {
-  "built_at": "2026-10-29T00:16:48Z",
+  "built_at": "2026-10-29T00:33:33Z",
   "snapshot_at": "2026-10-28T00:24:00Z",
   "snapshot_stable": true,
   "frozen": true,
@@ -211,9 +211,9 @@
       "ups": 3879
     },
     {
-      "at": "2026-10-28T23:36:09Z",
-      "local": "29 oct. 00:36",
-      "utc": "23:36",
+      "at": "2026-10-28T23:25:14Z",
+      "local": "29 oct. 00:25",
+      "utc": "23:25",
       "source": "archive",
       "accounts": 3272,
       "accounts_same": false,
@@ -221,8 +221,8 @@
       "removed": 268,
       "rewritten": 24,
       "counts_absent": false,
-      "total": 13058281,
-      "total_delta": 1419107,
+      "total": 13001032,
+      "total_delta": 1361858,
       "down_count": 0,
       "keys_added": 0,
       "keys_removed": 0,
@@ -231,8 +231,257 @@
       "frozen": true,
       "rejected": 328,
       "lines_delta": -272,
+      "as_of": "2026-10-28T23:25:16.318Z",
+      "ups": 3864
+    },
+    {
+      "at": "2026-10-28T23:29:24Z",
+      "local": "29 oct. 00:29",
+      "utc": "23:29",
+      "source": "archive",
+      "accounts": 3272,
+      "accounts_same": true,
+      "added": 0,
+      "removed": 0,
+      "rewritten": 0,
+      "counts_absent": false,
+      "total": 13022664,
+      "total_delta": 21632,
+      "down_count": 0,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "blank": 5,
+      "snapshot_at": "2026-10-28T00:24:00Z",
+      "frozen": true,
+      "rejected": 328,
+      "as_of": "2026-10-28T23:29:19.260Z",
+      "ups": 2345
+    },
+    {
+      "at": "2026-10-28T23:34:24Z",
+      "local": "29 oct. 00:34",
+      "utc": "23:34",
+      "source": "archive",
+      "accounts": 3272,
+      "accounts_same": true,
+      "added": 0,
+      "removed": 0,
+      "rewritten": 0,
+      "counts_absent": false,
+      "total": 13049291,
+      "total_delta": 26627,
+      "down_count": 3,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "blank": 5,
+      "snapshot_at": "2026-10-28T00:24:00Z",
+      "frozen": true,
+      "rejected": 328,
+      "as_of": "2026-10-28T23:34:23.908Z",
+      "ups": 2418
+    },
+    {
+      "at": "2026-10-28T23:36:09Z",
+      "local": "29 oct. 00:36",
+      "utc": "23:36",
+      "source": "archive",
+      "accounts": 3272,
+      "accounts_same": true,
+      "added": 0,
+      "removed": 0,
+      "rewritten": 0,
+      "counts_absent": false,
+      "total": 13058281,
+      "total_delta": 8990,
+      "down_count": 0,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "blank": 5,
+      "snapshot_at": "2026-10-28T00:24:00Z",
+      "frozen": true,
+      "rejected": 328,
       "as_of": "2026-10-28T23:36:06.753Z",
-      "ups": 3865
+      "ups": 1654
+    },
+    {
+      "at": "2026-10-28T23:39:24Z",
+      "local": "29 oct. 00:39",
+      "utc": "23:39",
+      "source": "archive",
+      "accounts": 3272,
+      "accounts_same": true,
+      "added": 0,
+      "removed": 0,
+      "rewritten": 0,
+      "counts_absent": false,
+      "total": 13075257,
+      "total_delta": 16976,
+      "down_count": 1,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "blank": 5,
+      "snapshot_at": "2026-10-28T00:24:00Z",
+      "frozen": true,
+      "rejected": 328,
+      "as_of": "2026-10-28T23:39:18.241Z",
+      "ups": 2089
+    },
+    {
+      "at": "2026-10-28T23:44:24Z",
+      "local": "29 oct. 00:44",
+      "utc": "23:44",
+      "source": "archive",
+      "accounts": 3272,
+      "accounts_same": true,
+      "added": 0,
+      "removed": 0,
+      "rewritten": 0,
+      "counts_absent": false,
+      "total": 13101205,
+      "total_delta": 25948,
+      "down_count": 0,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "blank": 5,
+      "snapshot_at": "2026-10-28T00:24:00Z",
+      "frozen": true,
+      "rejected": 328,
+      "as_of": "2026-10-28T23:44:21.440Z",
+      "ups": 2294
+    },
+    {
+      "at": "2026-10-28T23:49:24Z",
+      "local": "29 oct. 00:49",
+      "utc": "23:49",
+      "source": "archive",
+      "accounts": 3272,
+      "accounts_same": true,
+      "added": 0,
+      "removed": 0,
+      "rewritten": 0,
+      "counts_absent": false,
+      "total": 13127288,
+      "total_delta": 26083,
+      "down_count": 0,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "blank": 5,
+      "snapshot_at": "2026-10-28T00:24:00Z",
+      "frozen": true,
+      "rejected": 328,
+      "as_of": "2026-10-28T23:49:27.259Z",
+      "ups": 2546
+    },
+    {
+      "at": "2026-10-28T23:54:24Z",
+      "local": "29 oct. 00:54",
+      "utc": "23:54",
+      "source": "archive",
+      "accounts": 3272,
+      "accounts_same": true,
+      "added": 0,
+      "removed": 0,
+      "rewritten": 0,
+      "counts_absent": false,
+      "total": 13149574,
+      "total_delta": 22286,
+      "down_count": 0,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "blank": 5,
+      "snapshot_at": "2026-10-28T00:24:00Z",
+      "frozen": true,
+      "rejected": 328,
+      "as_of": "2026-10-28T23:54:24.235Z",
+      "ups": 2288
+    },
+    {
+      "at": "2026-10-28T23:59:24Z",
+      "local": "29 oct. 00:59",
+      "utc": "23:59",
+      "source": "archive",
+      "accounts": 3272,
+      "accounts_same": true,
+      "added": 0,
+      "removed": 0,
+      "rewritten": 0,
+      "counts_absent": false,
+      "total": 13172448,
+      "total_delta": 22874,
+      "down_count": 0,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "blank": 5,
+      "snapshot_at": "2026-10-28T00:24:00Z",
+      "frozen": true,
+      "rejected": 328,
+      "as_of": "2026-10-28T23:59:20.413Z",
+      "ups": 2264
+    },
+    {
+      "at": "2026-10-29T00:04:24Z",
+      "local": "29 oct. 01:04",
+      "utc": "00:04",
+      "source": "archive",
+      "accounts": 3272,
+      "accounts_same": true,
+      "added": 0,
+      "removed": 0,
+      "rewritten": 0,
+      "counts_absent": false,
+      "total": 13194072,
+      "total_delta": 21624,
+      "down_count": 0,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "blank": 5,
+      "snapshot_at": "2026-10-28T00:24:00Z",
+      "frozen": true,
+      "rejected": 328,
+      "as_of": "2026-10-29T00:04:25.453Z",
+      "ups": 2410
+    },
+    {
+      "at": "2026-10-29T00:09:24Z",
+      "local": "29 oct. 01:09",
+      "utc": "00:09",
+      "source": "archive",
+      "accounts": 3272,
+      "accounts_same": true,
+      "added": 0,
+      "removed": 0,
+      "rewritten": 0,
+      "counts_absent": false,
+      "total": 13215174,
+      "total_delta": 21102,
+      "down_count": 0,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "blank": 5,
+      "snapshot_at": "2026-10-28T00:24:00Z",
+      "frozen": true,
+      "rejected": 328,
+      "as_of": "2026-10-29T00:09:20.293Z",
+      "ups": 2382
+    },
+    {
+      "at": "2026-10-29T00:14:24Z",
+      "local": "29 oct. 01:14",
+      "utc": "00:14",
+      "source": "archive",
+      "accounts": null,
+      "accounts_same": false,
+      "added": 0,
+      "removed": 0,
+      "rewritten": 0,
+      "counts_absent": false,
+      "total": 13234516,
+      "total_delta": 19342,
+      "down_count": 0,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "as_of": "2026-10-29T00:14:25.265Z",
+      "ups": 2164
     },
     {
       "at": "2026-10-29T00:16:44Z",
@@ -246,12 +495,12 @@
       "rewritten": 0,
       "counts_absent": false,
       "total": 13242515,
-      "total_delta": 184234,
+      "total_delta": 7999,
       "down_count": 0,
       "keys_added": 0,
       "keys_removed": 0,
       "as_of": "2026-10-29T00:16:37.464Z",
-      "ups": 3466
+      "ups": 1487
     }
   ],
   "edits": [
@@ -295,7 +544,7 @@
       "category": "Influenceurs",
       "url": "https://x.com/Destexhe",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -312,7 +561,7 @@
       "category": "Influenceurs",
       "url": "https://x.com/officielsoral",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -329,7 +578,7 @@
       "category": "RN",
       "url": "https://x.com/AlexandreVaraut",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -346,7 +595,7 @@
       "category": "Médias",
       "url": "https://x.com/Breizh_Info",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -363,7 +612,7 @@
       "category": "Partis & mouvements",
       "url": "https://x.com/ChezNousOff",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -380,7 +629,7 @@
       "category": "Médias",
       "url": "https://x.com/Europe1",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -397,7 +646,7 @@
       "category": "Politiques",
       "url": "https://x.com/FlavioBolsonaro",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -414,7 +663,7 @@
       "category": "Médias",
       "url": "https://www.instagram.com/frontieresmedia",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -431,7 +680,7 @@
       "category": "Politiques",
       "url": "https://x.com/G_Peltier",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -448,7 +697,7 @@
       "category": "Influenceurs",
       "url": "https://x.com/GeoffroyLejeune",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -465,7 +714,7 @@
       "category": "Influenceurs",
       "url": "https://x.com/JeanMessiha",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -482,7 +731,7 @@
       "category": "Autres",
       "url": "https://x.com/Julien_Am_off",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -499,7 +748,7 @@
       "category": "Influenceurs",
       "url": "https://x.com/LaurentObertone",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -516,7 +765,7 @@
       "category": "Médias",
       "url": "https://x.com/leJDD",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -533,7 +782,7 @@
       "category": "Influenceurs",
       "url": "https://x.com/RaptorVsWild",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -550,7 +799,7 @@
       "category": "Autres",
       "url": "https://x.com/Zemmmmmour",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -567,7 +816,7 @@
       "category": "RN",
       "url": "https://x.com/mvalet_officiel",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -584,7 +833,7 @@
       "category": "Influenceurs",
       "url": "https://x.com/milafique",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -601,7 +850,7 @@
       "category": "Partis & mouvements",
       "url": "https://x.com/Nation_x_",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -618,7 +867,7 @@
       "category": "Autres",
       "url": "https://x.com/Antemeca",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -635,7 +884,7 @@
       "category": "Politiques",
       "url": "https://x.com/PhdeVilliers",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -652,7 +901,7 @@
       "category": "Influenceurs",
       "url": "https://x.com/Samuel_Lafont",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -669,7 +918,7 @@
       "category": "Autres",
       "url": "https://x.com/towayowaiowa",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -686,7 +935,7 @@
       "category": "Partis & mouvements",
       "url": "https://x.com/droiteuniv",
       "kind": "rewrite",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive",
       "changes": [
         {
@@ -704,7 +953,7 @@
       "url": "https://x.com/Psyhodelikus",
       "reason": "« Journaliste indépendant » pro-serbe",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -714,7 +963,7 @@
       "url": "https://x.com/Ptiote3",
       "reason": "Nom X : « Patriote Z 🇫🇷🇮🇹#Reconquete »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -724,7 +973,7 @@
       "url": "https://www.tiktok.com/@raison.patriote",
       "reason": "TikTokeur « patriote »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -734,7 +983,7 @@
       "url": "https://x.com/renard_patriote",
       "reason": "Bio X : « #Remigration #UnionDesDroites »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -744,7 +993,7 @@
       "url": "https://x.com/Riposte_R",
       "reason": "Bio X : « compte de soutien à Reconquête »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -754,7 +1003,7 @@
       "url": "https://x.com/Ben_voyons2022",
       "reason": "Militant Reconquête",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -764,7 +1013,7 @@
       "url": "https://x.com/romualddu13",
       "reason": "Soutien de Zemmour",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -774,7 +1023,7 @@
       "url": "https://x.com/LeSommierRgis",
       "reason": "Journaliste, catégorie Wikipédia « Extrême droite sur Internet en France » (France) : Wikipédia",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -784,7 +1033,7 @@
       "url": "https://x.com/Sardoche",
       "reason": "Streamer aux prises de position de droite radicale",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -794,7 +1043,7 @@
       "url": "https://x.com/Yvon15854596",
       "reason": "Bio X : « Reconquête ! Dans un prenier temps une »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -804,7 +1053,7 @@
       "url": "https://x.com/Steve_Laws_",
       "reason": "Bio X : « Founder of @remigrationnow_ »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -814,7 +1063,7 @@
       "url": "https://x.com/starsky007",
       "reason": "Bio X : « pour #Zemmour et #Reconquête »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -824,7 +1073,7 @@
       "url": "https://x.com/stayone10",
       "reason": "Bio X : « populiste, anti-immigrationniste, complotiste… »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -834,7 +1083,7 @@
       "url": "https://x.com/zezette2022",
       "reason": "Bio X : « 100% Zemmour💤... 100% Reconquête🌿 »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -844,7 +1093,7 @@
       "url": "https://x.com/steph16656",
       "reason": "Compte « à droite toute »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -854,7 +1103,7 @@
       "url": "https://x.com/SwordOfSalomon",
       "reason": "Compte militant d'extrême droite",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -864,7 +1113,7 @@
       "url": "https://x.com/SJallamion",
       "reason": "Ex-policier, auteur",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -874,7 +1123,7 @@
       "url": "https://x.com/TannhausPierre",
       "reason": "Bio X : « Zemmour »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -884,7 +1133,7 @@
       "url": "https://x.com/TatianaVentose",
       "reason": "Analyste politique souverainiste",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -894,7 +1143,7 @@
       "url": "https://www.tiktok.com/@louise.offi",
       "reason": "Compte fan de Louise Montangon (UNI)",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -904,7 +1153,7 @@
       "url": "https://x.com/Mrpolitique88",
       "reason": "Bio X : « Soutien à Jordan Bardella et au RN »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -914,7 +1163,7 @@
       "url": "https://x.com/Templier711",
       "reason": "Bio X : « 🇲🇫 #udr 🇲🇫 #RN 🇲🇫 🐷@CanonFrancais🐷 »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -924,7 +1173,7 @@
       "url": "https://x.com/thierryCHO33128",
       "reason": "Bio X : « Médecin retraité. Reconquête, 🇪🇺 des nations, 🥰❤️ma »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -934,7 +1183,7 @@
       "url": "https://x.com/OERTHERT",
       "reason": "Bio X : « Monsieur Zemmour merci d’aimer et de »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -944,7 +1193,7 @@
       "url": "https://x.com/Tigrero28757044",
       "reason": "Bio X : « RN d'abord »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -954,7 +1203,7 @@
       "url": "https://x.com/titibellini",
       "reason": "Bio X : « Enracinement et transmission. Identitaire. »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -964,7 +1213,7 @@
       "url": "https://x.com/Mtnrl73",
       "reason": "Bio X : « #RN 🇨🇵 @MLP_officiel »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -974,7 +1223,7 @@
       "url": "https://x.com/marinejordanrn",
       "reason": "Bio X : « compte soutenons le RN »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -984,7 +1233,7 @@
       "url": "https://x.com/TrumpDailyPosts",
       "reason": "Compte non officiel relayant Donald Trump",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -994,7 +1243,7 @@
       "url": "https://x.com/TwitchGauchiste",
       "reason": "Compte anti-gauche (extraits de streams)",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1004,7 +1253,7 @@
       "url": "https://x.com/UnionPatriotesF",
       "reason": "Bio X : « @Reconquete_off|@RNational_off »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1014,7 +1263,7 @@
       "url": "https://x.com/urbany73",
       "reason": "Bio X : « Zemmour un jour Zemmour toujours »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1024,7 +1273,7 @@
       "url": "https://x.com/VallooValloo",
       "reason": "Bio X : « Adhérente Les Patriotes. »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1034,7 +1283,7 @@
       "url": "https://x.com/volga207",
       "reason": "Compte pro-RN, anti-gauche",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1044,7 +1293,7 @@
       "url": "https://x.com/PsyGuy007",
       "reason": "Influenceur « patriote » pro-MAGA",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1054,7 +1303,7 @@
       "url": "https://x.com/xaviermallet77",
       "reason": "Bio X : « - Seine-et-Marne - Reconquête! »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1064,7 +1313,7 @@
       "url": "https://x.com/silure21000",
       "reason": "Bio X : « !!🇫🇷 Seul Éric zemmour et l'équipe de Reconquête »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1074,7 +1323,7 @@
       "url": "https://x.com/YoungBobRB",
       "reason": "Bio X : « Christian Pro-life Remigration activist »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1084,7 +1333,7 @@
       "url": "https://x.com/SylvieNellinge1",
       "reason": "Bio X : « #jesoutiensZemmour »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1094,7 +1343,7 @@
       "url": "https://x.com/n_zemmour",
       "reason": "Nom X : « Zemmour n'a pas dit son dernier mot »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1104,7 +1353,7 @@
       "url": "https://x.com/Zemmourienne92",
       "reason": "Nom X : « Zemmourienne 🇫🇷✝️ »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1114,7 +1363,7 @@
       "url": "https://x.com/zerbibshoshana",
       "reason": "Bio X : « Reconquête »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1124,7 +1373,7 @@
       "url": "https://x.com/Zyannah7",
       "reason": "Bio X : « pour cuisiner. A la #Reconquête! Ça urge! #UnionDesDroites »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1134,7 +1383,7 @@
       "url": "https://x.com/BruhatSylvie",
       "reason": "Bio X : « Zemmourienne de la premiere »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1144,7 +1393,7 @@
       "url": "https://x.com/aebele631974",
       "reason": "Bio X : « #Zemmour »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1154,7 +1403,7 @@
       "url": "https://x.com/ERICZEMMOUR2022",
       "reason": "Bio X : « de soutien à Éric Zemmour. | Ce compte a vocation à »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1164,7 +1413,7 @@
       "url": "https://x.com/obsevydial",
       "reason": "Militant RN",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1174,7 +1423,7 @@
       "url": "https://x.com/LouBalian",
       "reason": "Bio X : « Remigration »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1184,7 +1433,7 @@
       "url": "https://x.com/QuietStrenght",
       "reason": "Bio X : « #Trump🇺🇲 #Zemmour🇫🇷 #UnionDesDroites »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1194,7 +1443,7 @@
       "url": "https://x.com/Violette126649",
       "reason": "Bio X : « Adhérente #Reconquête ! »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1204,7 +1453,7 @@
       "url": "https://x.com/jeajavaka",
       "reason": "Bio X : « ! 💙🤍❤️ #ÉricZemmour 🌿 #SarahKnafo ❤️ »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1214,7 +1463,7 @@
       "url": "https://x.com/Pandeamonium121",
       "reason": "Compte de soutien à Reconquête",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1224,7 +1473,7 @@
       "url": "https://x.com/CharlesFyda",
       "reason": "Bio X : « Zemmour »",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     },
     {
@@ -1234,14 +1483,14 @@
       "url": "https://x.com/EnerveVeve",
       "reason": "Compte de soutien à Reconquête",
       "kind": "removal",
-      "local": "29 oct. 00:36",
+      "local": "29 oct. 00:25",
       "source": "archive"
     }
   ],
   "edits_hidden": 480,
   "downs": [],
   "downs_hidden": 0,
-  "dip_count": 111,
+  "dip_count": 115,
   "dip_max": 2,
   "gains": [
     {
@@ -1314,8 +1563,8 @@
     "net_downs": 0
   },
   "journal": {
-    "lines": 47,
-    "http_404": 46,
+    "lines": 113,
+    "http_404": 112,
     "other": 1
   }
 }
