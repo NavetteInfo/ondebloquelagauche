@@ -555,7 +555,8 @@ h2 {
   transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.drawer.is-open summary::after {
+.drawer.is-open summary::after,
+.drawer[open]:not(.js-drawer) summary::after {
   transform: rotate(45deg);
 }
 
@@ -565,7 +566,8 @@ h2 {
   transition: grid-template-rows 320ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.drawer.is-open .drawer-panel {
+.drawer.is-open .drawer-panel,
+.drawer[open]:not(.js-drawer) .drawer-panel {
   grid-template-rows: 1fr;
 }
 
@@ -576,8 +578,26 @@ h2 {
   scrollbar-color: var(--ink) var(--paper);
 }
 
-.drawer.is-open .drawer-inner {
+.drawer.is-open .drawer-inner,
+.drawer[open]:not(.js-drawer) .drawer-inner {
   overflow: auto;
+}
+
+.notice > .drawer,
+.cgu > .drawer {
+  margin-top: 0;
+  border-top: 0;
+}
+
+.notice > .drawer summary,
+.cgu > .drawer summary {
+  align-items: flex-end;
+  padding: 0 0 0.15rem;
+}
+
+.drawer summary h2 {
+  margin: 0;
+  min-width: 0;
 }
 
 .drawer-inner .pull-steps {

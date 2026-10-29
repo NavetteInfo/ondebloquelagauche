@@ -507,6 +507,9 @@ function fieldLabel(field) {
 function bindDrawer(details) {
   const summary = details.querySelector("summary");
   const panel = details.querySelector(".drawer-panel");
+  if (!summary || !panel || details.dataset.bound === "1") return;
+  details.dataset.bound = "1";
+  details.classList.add("js-drawer");
   summary.addEventListener("click", (event) => {
     event.preventDefault();
     if (details.classList.contains("is-open")) {
@@ -524,14 +527,34 @@ function bindDrawer(details) {
       window.setTimeout(hide, 400);
       return;
     }
-    details.open = true;
-    if (reduceMotion.matches) {
-      details.classList.add("is-open");
-      return;
-    }
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => details.classList.add("is-open"));
-    });
+    revealDrawer(details);
+  });
+}
+
+function revealDrawer(details) {
+  if (!details || details.classList.contains("is-open")) return;
+  details.open = true;
+  if (reduceMotion.matches) {
+    details.classList.add("is-open");
+    return;
+  }
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => details.classList.add("is-open"));
+  });
+}
+
+function bindStaticDrawers() {
+  document.querySelectorAll("#notice .drawer, #cgu .drawer").forEach(bindDrawer);
+  const openId = (id) => {
+    if (id !== "notice" && id !== "cgu") return;
+    revealDrawer(document.querySelector(`#${id} .drawer`));
+  };
+  openId(location.hash.slice(1));
+  window.addEventListener("hashchange", () => openId(location.hash.slice(1)));
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("a[href='#notice'], a[href='#cgu']");
+    if (!link) return;
+    openId(link.getAttribute("href").slice(1));
   });
 }
 
@@ -846,4 +869,5 @@ async function init() {
   }
 }
 
+bindStaticDrawers();
 if ($("#list")) init();
