@@ -2,9 +2,9 @@
 """Empile les tranches deck déjà déposées sur la base publiée.
 
 Chaque JSON ne couvre qu'une partie de la liste. Une tranche met à jour
-ou ajoute ses fiches. Elle n'efface pas les fiches absentes. Le compteur
-vient de /api/counts quand la carte des comptes est complète, sinon du
-dernier relevé complet déjà archivé.
+ou ajoute ses fiches. Elle n'efface pas les fiches absentes. Le chiffre
+d'une fiche vient de la carte deck. Les fiches absentes de ces cartes
+gardent le dernier chiffre déjà publié. Ce passage ne lit pas /api/counts.
 """
 
 from __future__ import annotations
@@ -22,8 +22,8 @@ ROOT = refresh.ROOT
 DATA = refresh.DATA
 MERGED = DATA / "merged.json"
 DECK_DIR = DATA / "deck"
-MIN_COUNTS = 1000
 MIN_FICHES = 1000
+HISTORICAL_BASE = 1_400_000
 
 
 def _pulls_root() -> Path | None:
@@ -381,62 +381,25 @@ def _copy_decks(paths: list[Path]) -> list[str]:
     return copied
 
 
-def _usable_counts(doc: dict | None) -> bool:
-    if not isinstance(doc, dict):
-        return False
-    counts = doc.get("counts")
-    return (
-        isinstance(counts, dict)
-        and len(counts) >= MIN_COUNTS
-        and refresh._count(doc.get("total")) > 0
-    )
-
-
-def _archive_counts() -> dict | None:
-    folders = [refresh.HISTORIQUE / "counts"]
-    pulls = _pulls_root()
-    if pulls is not None:
-        folders.append(pulls / "counts")
-    best: tuple[str, dict] | None = None
-    for folder in folders:
-        if not folder.is_dir():
+def _held_by_url(previous: dict | None) -> dict[tuple[str, str], int]:
+    """Dernier chiffre déjà publié, par réseau et URL. Pas une nouvelle lecture."""
+    found: dict[tuple[str, str], int] = {}
+    if not isinstance(previous, dict):
+        return found
+    for fiche in previous.get("fiches") or []:
+        if not isinstance(fiche, dict):
             continue
-        for path in sorted(folder.glob("counts_*.json")):
-            if not path.is_file() or path.is_symlink():
-                continue
-            doc = _read_json(path)
-            if not _usable_counts(doc):
-                continue
-            if best is None or path.name >= best[0]:
-                best = (path.name, doc)
-    return None if best is None else best[1]
-
-
-def _counts() -> tuple[dict, str, bytes | None]:
-    live = None
-    raw = None
-    try:
-        live, raw = refresh.fetch_pair(refresh.COUNTS_URL)
-    except Exception as exc:
-        print(f"compteur en direct inutilisable : {exc}", file=sys.stderr)
-    if _usable_counts(live):
-        return live, "api/counts", raw
-    archived = _archive_counts()
-    if archived is None:
-        raise RuntimeError("aucun compteur complet")
-    mixed = dict(archived)
-    if isinstance(live, dict) and refresh._count(live.get("total")):
-        for field in ("total", "as_of", "live", "historical_base", "last_hour"):
-            if live.get(field) not in (None, ""):
-                mixed[field] = live[field]
-        print(
-            "carte des comptes vide, total en direct conservé, "
-            "chiffres par fiche pris dans le dernier relevé complet",
-            file=sys.stderr,
-        )
-        return mixed, "api/counts + archive counts", None
-    print("compteur en direct incomplet, relevé archivé conservé", file=sys.stderr)
-    return archived, "archive counts", None
+        platform = str(fiche.get("platform") or "").strip().lower()
+        url = refresh.safe_profile_url(str(fiche.get("url") or ""))
+        number = fiche.get("count")
+        if platform not in refresh.PLATFORMS or not url:
+            continue
+        if isinstance(number, bool) or not isinstance(number, int):
+            continue
+        if number < 0 or number > refresh._COUNT_CAP:
+            continue
+        found[(platform, url)] = number
+    return found
 
 
 def publish() -> dict:
@@ -458,15 +421,8 @@ def publish() -> dict:
         raise RuntimeError("merge trop court")
     if len(state.get("curated") or []) < 100:
         raise RuntimeError("liste affichée absente")
-    counts_doc, counts_label, counts_raw = _counts()
-    counts = dict(counts_doc.get("counts") or {})
-    for key, value in (state.get("fallback_counts") or {}).items():
-        if counts_label == "api/counts":
-            counts.setdefault(key, value)
-        else:
-            counts[key] = value
-    counts_doc = dict(counts_doc)
-    counts_doc["counts"] = counts
+    previous = _read_json(refresh.FICHES) or {}
+    counts = dict(state.get("fallback_counts") or {})
     refreshed = datetime.now(timezone.utc).replace(microsecond=0)
     refreshed_at = refreshed.strftime("%Y-%m-%dT%H:%M:%SZ")
     directory = (state.get("curated") or [], state.get("socials") or {})
@@ -475,22 +431,45 @@ def publish() -> dict:
             "entries": state["entries"],
             "snapshot_at": state.get("snapshot_at"),
         },
-        counts_doc,
+        {
+            "counts": counts,
+            "total": 0,
+            "as_of": refreshed_at,
+            "live": False,
+        },
         refreshed_at,
         directory if directory[0] else None,
     )
+    held = _held_by_url(previous)
+    for fiche in built["fiches"]:
+        if fiche["count"]:
+            continue
+        number = held.get((fiche["platform"], fiche["url"]))
+        if number:
+            fiche["count"] = number
+    built["fiches"].sort(key=lambda fiche: (-fiche["count"], fiche["name"].casefold()))
+    built["fiche_count_sum"] = sum(fiche["count"] for fiche in built["fiches"])
+    historical = previous.get("historical_base")
+    if not isinstance(historical, int) or historical <= 0:
+        historical = HISTORICAL_BASE
+    built["historical_base"] = historical
+    built["total_blocks"] = built["fiche_count_sum"]
+    built["live"] = False
+    built["as_of"] = refreshed_at
     refresh.attach_followers(built)
-    built["source"] = f"merged.json + {counts_label}"
-    previous = _read_json(refresh.FICHES) or {}
+    built["source"] = "merged.json + deck"
     old_count = previous.get("fiche_count")
+    old_sum = previous.get("fiche_count_sum")
     if built["fiche_count"] < MIN_FICHES:
         raise RuntimeError(f"fiches trop courtes : {built['fiche_count']}")
     if isinstance(old_count, int) and built["fiche_count"] + 50 < old_count:
         raise RuntimeError(
             f"le merge passe de {old_count} à {built['fiche_count']} fiches"
         )
-    if built.get("total_blocks") != counts_doc.get("total"):
-        raise RuntimeError("le total a bougé pendant le merge")
+    if isinstance(old_sum, int) and old_sum > 0 and built["fiche_count_sum"] * 2 < old_sum:
+        raise RuntimeError(
+            f"la somme passe de {old_sum} à {built['fiche_count_sum']}"
+        )
     copied = _copy_decks(sources)
     state["merged_at"] = refreshed_at
     state["deck_files"] = used
@@ -512,17 +491,6 @@ def publish() -> dict:
     }
     refresh._write_json(MERGED, public)
     refresh._write_json(refresh.FICHES, built)
-    if counts_raw is not None:
-        folder = refresh.HISTORIQUE / "counts"
-        before = {path.name for path in folder.glob("counts_*.json")} if folder.is_dir() else set()
-        refresh.archive_payload("counts", counts_raw, refreshed)
-        after = {path.name for path in folder.glob("counts_*.json")}
-        if after - before:
-            try:
-                import pulls
-                pulls.write_comparaison(pulls_path=refresh.HISTORIQUE, site=False)
-            except Exception as exc:
-                print(f"comparaison non écrite : {exc}", file=sys.stderr)
     return {
         "fiches": built["fiche_count"],
         "names": built["name_count"],

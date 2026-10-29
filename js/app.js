@@ -82,8 +82,8 @@ function paintCatalog(data) {
   if (caption) {
     const when = formatUtc(data.as_of);
     caption.textContent = when
-      ? `Compteur global de la liste, relevé le ${when}. Une partie du total n'a même pas de nom.`
-      : "Compteur global de la liste. Une partie du total n'a même pas de nom.";
+      ? `Somme des fiches, relevé le ${when}.`
+      : "Somme des fiches.";
   }
   const pull = document.getElementById("pull-line");
   if (pull) {

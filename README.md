@@ -24,7 +24,7 @@ HOST=0.0.0.0 PORT=8080 REFRESH_SECONDS=300 python3 server.py
 
 La copie GitHub Pages est mise à jour autrement. L'action `Relevé` part toutes les 15 minutes, aux minutes 8, 23, 38 et 53 UTC, fait un seul `python3 refresh.py`, puis pousse le résultat. Ce push relance le build. Sans changement dans les fichiers publiés, elle ne pousse rien.
 
-Les fichiers `deck_*.json` déjà déposés ne couvrent qu'une partie de la liste. `python3 refresh.py --deck` les empile sur la base déjà publiée, écrit `data/merged.json`, relit `/api/counts`, et refait les fiches. Une tranche ajoute ou met à jour ses fiches. Elle ne retire pas celles qui manquent. Si le compteur en direct n'a pas de carte complète, le dernier relevé complet archivé reste en place. L'action `Deck` fait ce passage toutes les heures, à la minute 17 UTC. Elle ne lit pas `/api/accounts`. Sur la machine qui reçoit les JSON, `deck-hourly.sh` fait le même passage à la minute 12 UTC, puis pousse.
+Les fichiers `deck_*.json` déjà déposés ne couvrent qu'une partie de la liste. `python3 refresh.py --deck` les empile sur la base déjà publiée, écrit `data/merged.json`, et refait les fiches. Le chiffre d'une fiche vient de la carte. Une fiche absente de ces cartes garde son dernier chiffre. Ce passage ne lit pas `/api/counts`. Le total affiché est la somme des fiches. Une tranche ajoute ou met à jour ses fiches. Elle ne retire pas celles qui manquent. L'action `Deck` fait ce passage toutes les heures, à la minute 17 UTC. Elle ne lit pas `/api/accounts`. Sur la machine qui reçoit les JSON, `deck-hourly.sh` fait le même passage à la minute 12 UTC, puis pousse.
 
 Un seul passage, sans serveur :
 

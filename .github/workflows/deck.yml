@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Empiler les decks et relire le compteur
+      - name: Empiler les decks
         run: python3 refresh.py --deck
       - name: Garder un relevé complet
         run: |
