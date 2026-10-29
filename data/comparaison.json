@@ -1,5 +1,5 @@
 {
-  "built_at": "2026-10-28T23:36:12Z",
+  "built_at": "2026-10-29T00:16:48Z",
   "snapshot_at": "2026-10-28T00:24:00Z",
   "snapshot_stable": true,
   "frozen": true,
@@ -233,6 +233,25 @@
       "lines_delta": -272,
       "as_of": "2026-10-28T23:36:06.753Z",
       "ups": 3865
+    },
+    {
+      "at": "2026-10-29T00:16:44Z",
+      "local": "29 oct. 01:16",
+      "utc": "00:16",
+      "source": "archive",
+      "accounts": null,
+      "accounts_same": false,
+      "added": 0,
+      "removed": 0,
+      "rewritten": 0,
+      "counts_absent": false,
+      "total": 13242515,
+      "total_delta": 184234,
+      "down_count": 0,
+      "keys_added": 0,
+      "keys_removed": 0,
+      "as_of": "2026-10-29T00:16:37.464Z",
+      "ups": 3466
     }
   ],
   "edits": [
@@ -1229,8 +1248,8 @@
       "name": "mlp_officiel",
       "platform": "x",
       "before": 137157,
-      "after": 1616322,
-      "delta": 1479165
+      "after": 1618303,
+      "delta": 1481146
     },
     {
       "name": "Sardoche",
@@ -1244,8 +1263,8 @@
       "name": "cnews",
       "platform": "x",
       "before": 79260,
-      "after": 130895,
-      "delta": 51635
+      "after": 132742,
+      "delta": 53482
     },
     {
       "name": "Coco.DTЯ ⓩ #JamaisSansZemmour",
@@ -1259,23 +1278,23 @@
       "name": "Europe 1",
       "platform": "x",
       "before": 39015,
-      "after": 79660,
-      "delta": 40645,
+      "after": 81230,
+      "delta": 42215,
       "url": "https://x.com/Europe1"
     },
     {
       "name": "j_bardella",
       "platform": "x",
       "before": 67357,
-      "after": 104703,
-      "delta": 37346
+      "after": 106009,
+      "delta": 38652
     },
     {
       "name": "j_bardella",
       "platform": "instagram",
       "before": 48897,
-      "after": 84991,
-      "delta": 36094
+      "after": 85950,
+      "delta": 37053
     },
     {
       "name": "CerfiaFR",
@@ -1288,8 +1307,8 @@
   ],
   "span": {
     "from_total": 6194112,
-    "to_total": 13058281,
-    "delta": 6864169,
+    "to_total": 13242515,
+    "delta": 7048403,
     "keys_added": 1,
     "keys_removed": 0,
     "net_downs": 0
