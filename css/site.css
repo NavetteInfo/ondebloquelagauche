@@ -579,15 +579,13 @@ h2 {
   margin-top: 0;
 }
 
-.pull-steps,
-.pull-gains {
+.pull-steps {
   margin: 0.45rem 0 0;
   padding: 0;
   list-style: none;
 }
 
 .pull-step,
-.pull-gains li,
 .edit {
   padding: 0.7rem 0;
   border-top: 2px solid var(--line);
@@ -610,27 +608,8 @@ h2 {
 }
 
 .pull-step p,
-.edit p,
-.pull-gains li {
+.edit p {
   margin: 0;
-}
-
-.pull-gains li {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: baseline;
-  font-weight: 700;
-}
-
-.pull-gains span {
-  min-width: 0;
-  overflow-wrap: break-word;
-}
-
-.pull-gains strong {
-  flex: none;
-  font-variant-numeric: tabular-nums;
 }
 
 .edit h3 {

@@ -607,8 +607,7 @@ function paintComparaison(data) {
   const line = document.getElementById("pulls-line");
   const stepsHost = document.getElementById("pulls-steps");
   const editsHost = document.getElementById("pulls-edits");
-  const countsHost = document.getElementById("pulls-counts");
-  if (!line || !stepsHost || !editsHost || !countsHost || !data || typeof data !== "object") return;
+  if (!line || !stepsHost || !editsHost || !data || typeof data !== "object") return;
   const bits = ["Les heures du tableau sont celles de Paris."];
   if (data.snapshot_stable && data.snapshot_at) {
     const when = formatUtc(data.snapshot_at);
@@ -699,64 +698,6 @@ function paintComparaison(data) {
     details.append(summary, panel);
     bindDrawer(details);
     editsHost.append(details);
-  }
-
-  const span = data.span || {};
-  const gains = Array.isArray(data.gains) ? data.gains : [];
-  const downs = Array.isArray(data.downs) ? data.downs : [];
-  countsHost.replaceChildren();
-  countsHost.append(node("p", "pull-label", "Compteur"));
-  if (span.from_total != null && span.to_total != null) {
-    let sentence = `Du premier relevé au dernier, le compteur passe de ${formatInt(span.from_total)} à ${formatInt(span.to_total)}`;
-    if (span.delta > 0) sentence += `, soit +${formatInt(span.delta)}.`;
-    else if (span.delta < 0) sentence += `, soit ${formatInt(-span.delta)} de moins.`;
-    else sentence += ", sans écart.";
-    if (span.keys_added || span.keys_removed) {
-      const parts = [];
-      if (span.keys_added) parts.push(plural(span.keys_added, "clé apparaît", "clés apparaissent"));
-      if (span.keys_removed) parts.push(plural(span.keys_removed, "clé disparaît", "clés disparaissent"));
-      sentence += ` ${parts.join(", ")}.`;
-    } else {
-      sentence += " Aucune clé n'apparaît ni ne disparaît.";
-    }
-    sentence += span.net_downs
-      ? ` ${plural(span.net_downs, "compteur finit plus bas", "compteurs finissent plus bas")}.`
-      : " Aucun compteur ne finit plus bas qu'au début.";
-    countsHost.append(node("p", "howto", sentence));
-  }
-  if (gains.length) {
-    const list = node("ol", "pull-gains");
-    gains.forEach((item) => {
-      const row = document.createElement("li");
-      const network = PLATFORM_LABEL[item.platform] || "";
-      row.append(node("span", "", [network, item.name].filter(Boolean).join(", ")));
-      row.append(node("strong", "", `+${formatInt(item.delta)}`));
-      list.append(row);
-    });
-    countsHost.append(list);
-  }
-  if (downs.length) {
-    countsHost.append(node("p", "pull-label", "Reculs à retenir"));
-    const list = node("ol", "pull-gains");
-    downs.forEach((item) => {
-      const row = document.createElement("li");
-      const network = PLATFORM_LABEL[item.platform] || "";
-      row.append(node("span", "", [network, item.name, item.local].filter(Boolean).join(", ")));
-      row.append(node("strong", "mark", `${formatInt(item.before)} à ${formatInt(item.after)}`));
-      list.append(row);
-    });
-    countsHost.append(list);
-    if (data.downs_hidden) {
-      countsHost.append(node("p", "howto", `Et ${plural(data.downs_hidden, "autre recul", "autres reculs")}.`));
-    }
-  }
-  if (data.dip_count) {
-    const ampleur = data.dip_max <= 1 ? "d'un point" : `de ${formatInt(data.dip_max)} points au plus`;
-    countsHost.append(node(
-      "p",
-      "howto",
-      `${plural(data.dip_count, "compteur a baissé", "compteurs ont baissé")} ${ampleur} entre deux relevés, puis ${data.dip_count > 1 ? "sont revenus" : "est revenu"}. Le nom n'est pas repris pour un écart aussi court.`,
-    ));
   }
 }
 
