@@ -22,7 +22,7 @@ HOST=0.0.0.0 PORT=8080 REFRESH_SECONDS=300 python3 server.py
 
 `REFRESH_SECONDS` ne descend pas sous 300. Cette boucle ne part que si quelqu'un lance `server.py`. Rien ne le relance.
 
-La copie GitHub Pages est mise à jour autrement. L'action `Relevé` part toutes les 15 minutes, fait un seul `python3 refresh.py`, puis pousse le résultat. Ce push relance le build. Sans changement dans les fichiers publiés, elle ne pousse rien.
+La copie GitHub Pages est mise à jour autrement. L'action `Relevé` part toutes les 15 minutes, aux minutes 8, 23, 38 et 53 UTC, fait un seul `python3 refresh.py`, puis pousse le résultat. Ce push relance le build. Sans changement dans les fichiers publiés, elle ne pousse rien.
 
 Un seul passage, sans serveur :
 
