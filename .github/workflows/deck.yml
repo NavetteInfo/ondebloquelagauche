@@ -40,6 +40,9 @@ jobs:
           git config user.name "Navette"
           git config user.email "253750988+NavetteInfo@users.noreply.github.com"
           git add data/merged.json data/fiches.json data/deck data/historique data/comparaison.json
+          if [ -d data/fcounts ]; then
+            git add data/fcounts
+          fi
           if git diff --cached --quiet; then
             echo "aucun changement"
             exit 0

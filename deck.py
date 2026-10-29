@@ -2,9 +2,10 @@
 """Empile les tranches deck déjà déposées sur la base publiée.
 
 Chaque JSON ne couvre qu'une partie de la liste. Une tranche met à jour
-ou ajoute ses fiches. Elle n'efface pas les fiches absentes. Le chiffre
-d'une fiche vient de la carte deck. Les fiches absentes de ces cartes
-gardent le dernier chiffre déjà publié. Ce passage ne lit pas /api/counts.
+ou ajoute ses fiches. Elle n'efface pas les fiches absentes. Le chiffre d'une fiche vient d'un JSON déjà déposé dans fcounts, sinon
+de la carte deck. Les fiches absentes de ces fichiers gardent le dernier
+chiffre déjà publié. Un fichier qui demande une session est ignoré.
+Ce passage ne lit pas /api/counts.
 """
 
 from __future__ import annotations
@@ -22,7 +23,9 @@ ROOT = refresh.ROOT
 DATA = refresh.DATA
 MERGED = DATA / "merged.json"
 DECK_DIR = DATA / "deck"
+FCOUNTS_DIR = DATA / "fcounts"
 MIN_FICHES = 1000
+FULL_FCOUNTS = 1000
 HISTORICAL_BASE = 1_400_000
 
 
@@ -381,6 +384,150 @@ def _copy_decks(paths: list[Path]) -> list[str]:
     return copied
 
 
+def _fcount_sources() -> list[Path]:
+    found: list[Path] = []
+    seen: set[Path] = set()
+    candidates = []
+    pulls = _pulls_root()
+    if pulls is not None:
+        candidates.append(pulls / "fcounts")
+    candidates.append(FCOUNTS_DIR)
+    for folder in candidates:
+        if not folder.is_dir() or folder in seen:
+            continue
+        seen.add(folder)
+        files = [
+            path for path in folder.glob("fcounts_*.json")
+            if path.is_file() and not path.is_symlink()
+        ]
+        found.extend(sorted(files, key=lambda path: path.name))
+    return found
+
+
+def _count_key(key: str) -> str | None:
+    text = key.strip().lower()
+    if not text or ":" not in text or len(text) > 220:
+        return None
+    platform, _, ident = text.partition(":")
+    if platform not in refresh.PLATFORMS or not ident:
+        return None
+    if any(ord(char) < 32 for char in text):
+        return None
+    return text
+
+
+def _take_counts(raw: dict, into: dict[str, int]) -> None:
+    for key, value in raw.items():
+        if not isinstance(key, str):
+            continue
+        name = _count_key(key)
+        number = refresh._count(value)
+        if name and number:
+            into[name] = number
+
+
+def _card_count_keys(card: dict) -> dict[str, int]:
+    raw = card.get("c")
+    if not isinstance(raw, dict):
+        return {}
+    found: dict[str, int] = {}
+    platforms = list(_links(card)) or ["x"]
+    for alias, value in raw.items():
+        if not isinstance(alias, str):
+            continue
+        number = refresh._count(value)
+        if not number:
+            continue
+        for platform in platforms:
+            if platform in refresh.PLATFORMS:
+                found[f"{platform}:{alias.strip().lower()}"] = number
+    return found
+
+
+def _public_fcounts(doc: dict | None) -> dict | None:
+    """Garde les chiffres. Une demande de session, une notice ou un cookie ne passent pas."""
+    if not isinstance(doc, dict) or doc.get("error") or doc.get("need_session"):
+        return None
+    counts: dict[str, int] = {}
+    raw = doc.get("counts")
+    if isinstance(raw, dict):
+        _take_counts(raw, counts)
+    cards = doc.get("cards")
+    if isinstance(cards, list):
+        for card in cards:
+            if isinstance(card, dict):
+                counts.update(_card_count_keys(card))
+    if not counts and "counts" not in doc and "cards" not in doc:
+        _take_counts(doc, counts)
+    if not counts:
+        return None
+    public: dict = {"counts": counts}
+    total = doc.get("total")
+    if isinstance(total, int) and not isinstance(total, bool) and total > 0:
+        public["total"] = total
+    as_of = doc.get("as_of")
+    if isinstance(as_of, str) and "T" in as_of and len(as_of) <= 40:
+        public["as_of"] = as_of
+    if isinstance(doc.get("live"), bool):
+        public["live"] = doc["live"]
+    historical = doc.get("historical_base")
+    if isinstance(historical, int) and not isinstance(historical, bool) and historical > 0:
+        public["historical_base"] = historical
+    return public
+
+
+def _read_fcounts() -> tuple[dict[str, int], dict]:
+    counts: dict[str, int] = {}
+    meta: dict = {"files": []}
+    for path in _fcount_sources():
+        public = _public_fcounts(_read_json(path))
+        if public is None:
+            continue
+        counts.update(public["counts"])
+        meta["files"].append(path.name)
+        for field in ("total", "as_of", "live", "historical_base"):
+            if field in public:
+                meta[field] = public[field]
+    meta["full"] = len(counts) >= FULL_FCOUNTS
+    return counts, meta
+
+
+def _copy_fcounts(paths: list[Path]) -> list[str]:
+    FCOUNTS_DIR.mkdir(parents=True, exist_ok=True)
+    for path in list(FCOUNTS_DIR.glob("fcounts_*.json")):
+        if not path.is_file() or path.is_symlink():
+            continue
+        public = _public_fcounts(_read_json(path))
+        if public is None:
+            path.unlink()
+            continue
+        payload = _deck_bytes(public)
+        if path.read_bytes() != payload:
+            path.write_bytes(payload)
+    known: dict[str, str] = {}
+    for path in FCOUNTS_DIR.glob("fcounts_*.json"):
+        if path.is_file() and not path.is_symlink():
+            known[hashlib.sha256(path.read_bytes()).hexdigest()] = path.name
+    copied: list[str] = []
+    for src in paths:
+        public = _public_fcounts(_read_json(src))
+        if public is None:
+            continue
+        payload = _deck_bytes(public)
+        digest = hashlib.sha256(payload).hexdigest()
+        if digest in known:
+            continue
+        target = FCOUNTS_DIR / src.name
+        suffix = 2
+        while target.exists():
+            target = FCOUNTS_DIR / f"{src.stem}_{suffix}{src.suffix}"
+            suffix += 1
+        target.write_bytes(payload)
+        known[digest] = target.name
+        copied.append(target.name)
+    return copied
+
+
 def _held_by_url(previous: dict | None) -> dict[tuple[str, str], int]:
     """Dernier chiffre déjà publié, par réseau et URL. Pas une nouvelle lecture."""
     found: dict[tuple[str, str], int] = {}
@@ -422,7 +569,9 @@ def publish() -> dict:
     if len(state.get("curated") or []) < 100:
         raise RuntimeError("liste affichée absente")
     previous = _read_json(refresh.FICHES) or {}
+    fcounts, fmeta = _read_fcounts()
     counts = dict(state.get("fallback_counts") or {})
+    counts.update(fcounts)
     refreshed = datetime.now(timezone.utc).replace(microsecond=0)
     refreshed_at = refreshed.strftime("%Y-%m-%dT%H:%M:%SZ")
     directory = (state.get("curated") or [], state.get("socials") or {})
@@ -453,11 +602,21 @@ def publish() -> dict:
     if not isinstance(historical, int) or historical <= 0:
         historical = HISTORICAL_BASE
     built["historical_base"] = historical
-    built["total_blocks"] = built["fiche_count_sum"]
-    built["live"] = False
-    built["as_of"] = refreshed_at
+    if fmeta.get("full") and refresh._count(fmeta.get("total")):
+        built["total_blocks"] = refresh._count(fmeta.get("total"))
+        if isinstance(fmeta.get("as_of"), str):
+            built["as_of"] = fmeta["as_of"]
+        built["live"] = bool(fmeta.get("live"))
+        file_historical = fmeta.get("historical_base")
+        if isinstance(file_historical, int) and file_historical > 0:
+            built["historical_base"] = file_historical
+        built["source"] = "merged.json + fcounts"
+    else:
+        built["total_blocks"] = built["fiche_count_sum"]
+        built["live"] = False
+        built["as_of"] = refreshed_at
+        built["source"] = "merged.json + deck" + (" + fcounts" if fcounts else "")
     refresh.attach_followers(built)
-    built["source"] = "merged.json + deck"
     old_count = previous.get("fiche_count")
     old_sum = previous.get("fiche_count_sum")
     if built["fiche_count"] < MIN_FICHES:
@@ -471,6 +630,7 @@ def publish() -> dict:
             f"la somme passe de {old_sum} à {built['fiche_count_sum']}"
         )
     copied = _copy_decks(sources)
+    copied_counts = _copy_fcounts(_fcount_sources())
     state["merged_at"] = refreshed_at
     state["deck_files"] = used
     state["source"] = built["source"]
@@ -501,6 +661,8 @@ def publish() -> dict:
         "added": public["added"],
         "updated": public["updated"],
         "copied": copied,
+        "fcounts": len(fcounts),
+        "copied_counts": copied_counts,
         "refreshed_at": refreshed_at,
     }
 
@@ -511,7 +673,8 @@ def main() -> None:
         f"ok fiches={info['fiches']} total={info['total']} "
         f"as_of={info['as_of']} source={info['source']} "
         f"cartes={info['cards']} ajouts={info['added']} "
-        f"maj={info['updated']} copies={len(info['copied'])}"
+        f"maj={info['updated']} copies={len(info['copied'])} "
+        f"fcounts={info['fcounts']}"
     )
 
 
