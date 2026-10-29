@@ -445,6 +445,14 @@ function pushText(parent, text, marked) {
   else parent.append(document.createTextNode(text));
 }
 
+function majorStep(step) {
+  if (!step || typeof step !== "object") return false;
+  if (step.accounts_first) return true;
+  if (step.added || step.removed || step.rewritten || step.lines_delta) return true;
+  if (step.keys_added || step.keys_removed) return true;
+  return typeof step.total_delta === "number" && step.total_delta < 0;
+}
+
 function stepLine(step, index) {
   const line = document.createElement("p");
   if (step.source === "site") pushText(line, "Relevé du site.");
@@ -600,17 +608,45 @@ function paintComparaison(data) {
   if (!steps.length) {
     stepsHost.append(node("p", "howto", "Aucune copie à comparer."));
   } else {
-    const list = node("ol", "pull-steps");
+    const major = [];
     steps.forEach((step, index) => {
-      const item = node("li", "pull-step");
-      const when = step.source === "site" && step.utc
-        ? `${step.local} Paris, ${step.utc} UTC`
-        : `${step.local || ""} Paris`;
-      item.append(node("p", "pull-when", when.trim()));
-      item.append(stepLine(step, index));
-      list.append(item);
+      if (majorStep(step)) major.push({ step, index });
     });
-    stepsHost.append(list);
+    const quiet = steps.length - major.length;
+    if (!major.length) {
+      stepsHost.append(node("p", "howto", "Tous les relevés laissent le fichier en place."));
+    } else {
+      if (quiet) {
+        stepsHost.append(node(
+          "p",
+          "howto",
+          `${plural(quiet, "relevé laisse", "relevés laissent")} le fichier en place.`,
+        ));
+      }
+      const details = document.createElement("details");
+      details.className = "drawer";
+      const summary = document.createElement("summary");
+      summary.textContent = `Changements majeurs, ${plural(major.length, "relevé", "relevés")}`;
+      const panel = document.createElement("div");
+      panel.className = "drawer-panel";
+      const inner = document.createElement("div");
+      inner.className = "drawer-inner";
+      const list = node("ol", "pull-steps");
+      major.forEach(({ step, index }) => {
+        const item = node("li", "pull-step");
+        const when = step.source === "site" && step.utc
+          ? `${step.local} Paris, ${step.utc} UTC`
+          : `${step.local || ""} Paris`;
+        item.append(node("p", "pull-when", when.trim()));
+        item.append(stepLine(step, index));
+        list.append(item);
+      });
+      inner.append(list);
+      panel.append(inner);
+      details.append(summary, panel);
+      bindDrawer(details);
+      stepsHost.append(details);
+    }
   }
 
   const edits = Array.isArray(data.edits) ? data.edits : [];

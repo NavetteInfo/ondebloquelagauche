@@ -580,6 +580,10 @@ h2 {
   overflow: auto;
 }
 
+.drawer-inner .pull-steps {
+  margin-top: 0;
+}
+
 .pull-steps,
 .pull-gains {
   margin: 0.45rem 0 0;
