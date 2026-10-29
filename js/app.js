@@ -191,7 +191,7 @@ function paintFollowers(data) {
   const matched = Number(info.matched) || 0;
   const compared = Number(info.compared) || 0;
   if (matched <= 0) {
-    node.textContent = "Abonnés : leur followers.js ne retombe sur aucune fiche.";
+    node.textContent = "Abonnés : le pull accounts ne retombe sur aucune fiche.";
     return;
   }
   const baseDay = String(info.baseline || "").slice(0, 10);
@@ -209,7 +209,7 @@ function paintFollowers(data) {
   } else if (from) {
     span = `depuis ${from}.`;
   }
-  node.textContent = `Abonnés pris dans leur followers.js, relus toutes les heures. ${formatInt(matched)} fiches ont un chiffre. ${formatInt(compared)} ont un écart ${span} Un relevé arrondi au millier reste sans écart.`;
+  node.textContent = `Abonnés pris dans le pull accounts. ${formatInt(matched)} fiches ont un chiffre. ${formatInt(compared)} ont un écart ${span} Un relevé arrondi au millier reste sans écart.`;
 }
 
 function followerLine(fiche) {
