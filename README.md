@@ -36,8 +36,6 @@ Le dernier passage reste dans `data/raw/` (non versionné). Chaque réponse JSON
 
 `data/comparaison.json` compare les pulls de `data/historique`, puis ceux de `PULLS_DIR`, sinon `/pulls`, sinon le dossier `pulls` à côté du dépôt. Le relevé brut du site est ajouté s'il est plus récent ou différent. `python3 pulls.py` reconstruit ce fichier. Sans aucune de ces copies, le fichier déjà publié reste en place. La comparaison ne publie que les écarts. Le serveur Python rend la comparaison, pas les JSON datés. La copie GitHub Pages sert les fichiers du dépôt, donc aussi `data/historique/`.
 
-Le compteur de passages vit dans `data/visits.json` (non versionné). Il augmente quand un navigateur ouvre la page : en-tête `User-Agent` de navigateur, `Accept: text/html`, une langue, `Sec-Fetch-Mode: navigate` et `Sec-Fetch-Dest: document`. Les scripts, les préchargements, les aperçus et les robots ne comptent pas. Une image ou le relevé non plus. `/api/visits` renvoie le total et le jour en cours, en UTC. Le chiffre est écrit dans la page, sous le compteur global, avant le tiroir. Une copie sans ce serveur laisse la ligne visible et dit que le registre n'y est pas tenu.
-
 ## Docker
 
 ```bash
@@ -55,7 +53,7 @@ SITE_URL=https://exemple.fr python3 server.py
 
 La carte est `media/card.jpg` (1200×630). Les balises `twitter:` et `og:` sont avant la politique de sécurité. Une URL déjà partagée sur X reste en cache environ 7 jours : `?v=2` force une nouvelle lecture. Le `robots.txt` du dépôt autorise `Twitterbot`. X lit celui de `https://navetteinfo.github.io/robots.txt`, qui reste une 404 sans site utilisateur.
 
-Seuls `GET` et `HEAD` passent. Le reste reçoit un 405 et compte dans la même file. Le serveur ne rend pas les chemins en point (dont `.git`), `data/raw/`, `data/visits.json`, `data/historique/`, ni le code. Le relevé public est `data/fiches.json`. Les liens vers les profils partent sans Referer.
+Seuls `GET` et `HEAD` passent. Le reste reçoit un 405 et compte dans la même file. Le serveur ne rend pas les chemins en point (dont `.git`), `data/raw/`, `data/historique/`, ni le code. Le relevé public est `data/fiches.json`. Les liens vers les profils partent sans Referer.
 
 ## File d'attente
 

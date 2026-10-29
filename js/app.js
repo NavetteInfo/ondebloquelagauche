@@ -777,51 +777,10 @@ async function loadFiches() {
   return response.json();
 }
 
-function paintVisits(data) {
-  const node = document.getElementById("visits");
-  const note = document.getElementById("visits-note");
-  if (!node || !data) return;
-  const total = Number(data.total) || 0;
-  const today = Number(data.today) || 0;
-  node.textContent = formatInt(total);
-  if (!note) return;
-  if (total <= 0) {
-    note.textContent = "Aucun passage pour l'instant. Le registre attend.";
-    return;
-  }
-  if (total === 1) {
-    note.textContent = "Un passage. Le registre vient de s'ouvrir.";
-    return;
-  }
-  note.textContent = `Dont ${formatInt(today)} aujourd'hui. Le registre, lui, ne débloque rien.`;
-}
-
 function endpoint(name) {
   const here = new URL(document.baseURI);
   if (!here.pathname.endsWith("/")) here.pathname = here.pathname.replace(/[^/]*$/, "");
   return new URL(name, here).href;
-}
-
-function markVisitsMissing() {
-  const note = document.getElementById("visits-note");
-  if (note) {
-    note.textContent = "Le registre des passages est sur le serveur. Cette copie ne le tient pas.";
-  }
-}
-
-async function loadVisits() {
-  const node = document.getElementById("visits");
-  if (!node) return;
-  try {
-    const response = await fetch(endpoint("api/visits"), { cache: "no-store" });
-    if (!response.ok) {
-      if (node.dataset.held !== "1") markVisitsMissing();
-      return;
-    }
-    paintVisits(await response.json());
-  } catch {
-    if (node.dataset.held !== "1") markVisitsMissing();
-  }
 }
 
 async function watchLive() {
@@ -834,7 +793,6 @@ async function watchLive() {
     if (!response.ok) throw new Error(String(response.status));
     const status = await response.json();
     paintLive(status);
-    loadVisits();
     const blocksMoved = status.ok && status.as_of && status.as_of !== seenAsOf;
     const fansMoved = status.followers_at && status.followers_at !== seenFollowers;
     if (blocksMoved || fansMoved) {
@@ -865,7 +823,6 @@ async function init() {
     }
     bind();
     render();
-    loadVisits();
     watchLive();
     liveTimer = window.setInterval(watchLive, 15000);
   } catch {

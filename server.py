@@ -15,7 +15,6 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from refresh import FICHES, refresh_followers, refresh_once
-from visits import countable, record_visit, snapshot as visit_snapshot
 
 ROOT = Path(__file__).resolve().parent
 HOST = os.environ.get("HOST", "0.0.0.0")
@@ -106,10 +105,6 @@ def bare_path(url_path: str) -> str:
     if len(path) > 1 and path.endswith("/"):
         path = path[:-1]
     return path
-
-
-def _fr_int(value: int) -> str:
-    return f"{value:,}".replace(",", "\u202f")
 
 
 def site_origin() -> str:
@@ -365,19 +360,7 @@ class Handler(SimpleHTTPRequestHandler):
         self._bytes(200, body, _TYPES[path.suffix.lower()], cache=cache)
 
     def _page(self) -> None:
-        snap = visit_snapshot()
-        if countable(self.command, self.headers):
-            try:
-                snap = record_visit()
-            except Exception as exc:
-                print(f"compteur raté: {exc}", flush=True)
-        shown = _fr_int(int(snap["total"]))
         text = (ROOT / "index.html").read_text(encoding="utf-8")
-        text = text.replace(
-            '<strong id="visits">…</strong>',
-            f'<strong id="visits" data-held="1">{shown}</strong>',
-            1,
-        )
         self._serve_text(text, "text/html; charset=utf-8")
 
     def _route(self) -> None:
@@ -385,10 +368,6 @@ class Handler(SimpleHTTPRequestHandler):
         if path == "/api/status":
             with _lock:
                 body = json.dumps(_status, ensure_ascii=False).encode("utf-8")
-            self._bytes(200, body, "application/json; charset=utf-8")
-            return
-        if path == "/api/visits":
-            body = json.dumps(visit_snapshot(), ensure_ascii=False).encode("utf-8")
             self._bytes(200, body, "application/json; charset=utf-8")
             return
         if path in {"/", "/index.html"}:
