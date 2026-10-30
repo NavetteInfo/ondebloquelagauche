@@ -31,6 +31,8 @@ LAUNCH_DAY = "2026-10-27"
 _DAY_RE = re.compile(r"\d{4}-\d{2}-\d{2}\Z")
 _STAMP_RE = re.compile(r"\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}Z)?\Z")
 _FOLLOWER_KEY_RE = re.compile(r"[a-z]+:/[a-z0-9._~:@/-]{1,200}\Z")
+PODIUM_SOURCE = "followers.js + Le Podium 2027"
+_FOLLOWER_SOURCES = ("followers.js", "accounts pull", PODIUM_SOURCE)
 _FOLLOWER_FIELDS = (
     "followers_before",
     "followers_after",
@@ -44,6 +46,9 @@ COUNTS_URL = "https://onbloquelextremedroite.fun/api/counts"
 ACCOUNTS_URL = "https://onbloquelextremedroite.fun/api/accounts"
 SUBMISSIONS_URL = "https://onbloquelextremedroite.fun/api/submissions"
 FOLLOWERS_URL = "https://onbloquelextremedroite.fun/followers.js"
+# followers.js cite Le Podium 2027 (CC BY 4.0). Son classement sert quand le script ne répond plus.
+PODIUM_URL = "https://lepodium2027.fr/data/classement.json"
+PODIUM_HOST = "lepodium2027.fr"
 ACCOUNTS_JS_URL = "https://onbloquelextremedroite.fun/accounts.js"
 SOCIALS_JS_URL = "https://onbloquelextremedroite.fun/socials.js"
 _DIR_CATS = {
@@ -257,6 +262,8 @@ def _follower_table() -> tuple[dict[str, dict], dict]:
         value = payload.get(field)
         if isinstance(value, str) and _STAMP_RE.fullmatch(value):
             meta[field] = value
+    if payload.get("source") in _FOLLOWER_SOURCES:
+        meta["source"] = payload["source"]
     entries = payload.get("entries")
     if not isinstance(entries, list):
         return {}, meta
@@ -302,7 +309,7 @@ def attach_followers(doc: dict) -> None:
         "latest": meta["latest"] or None,
         "matched": matched,
         "compared": compared,
-        "source": "followers.js",
+        "source": meta["source"],
     }
 
 
@@ -950,6 +957,77 @@ def _parse_followers_js(text: str) -> dict[str, dict]:
     return table
 
 
+def _read_podium() -> dict:
+    """GET du classement public du Podium. Pas d'autre hôte."""
+    parsed = urlparse(PODIUM_URL)
+    if parsed.scheme != "https" or parsed.hostname != PODIUM_HOST:
+        raise RuntimeError("hôte inattendu")
+    request = urllib.request.Request(
+        PODIUM_URL,
+        headers={"Accept": "application/json", "User-Agent": USER_AGENT},
+    )
+    with urllib.request.urlopen(request, timeout=60) as response:
+        if urlparse(response.geturl()).hostname != PODIUM_HOST:
+            raise RuntimeError("hôte inattendu")
+        payload = response.read(MAX_BYTES + 1)
+    if len(payload) > MAX_BYTES:
+        raise RuntimeError("réponse trop grosse")
+    try:
+        doc = json.loads(payload.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise RuntimeError("classement illisible") from exc
+    if not isinstance(doc, dict):
+        raise RuntimeError("classement inattendu")
+    return doc
+
+
+def _parse_podium(doc: dict) -> dict[str, dict]:
+    rows = doc.get("comptes")
+    if not isinstance(rows, list) or len(rows) > 20000:
+        raise RuntimeError("classement inattendu")
+    table: dict[str, dict] = {}
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        network = str(row.get("network") or "").strip().lower()
+        handle = str(row.get("handle") or "").strip().lower().lstrip("@/")
+        key = f"{network}:/{handle}"
+        if not handle or not _FOLLOWER_KEY_RE.fullmatch(key) or ".." in key:
+            continue
+        count = _pos_int(row.get("followers"))
+        day = str(row.get("updated") or "")[:10]
+        if count is None or not _DAY_RE.fullmatch(day):
+            continue
+        table[key] = {"count": count, "date": day}
+    if not table:
+        raise RuntimeError("classement vide")
+    return table
+
+
+def _held_followers(previous: dict) -> dict[str, dict]:
+    """Les derniers chiffres gardés, pour les comptes que le Podium ne suit pas."""
+    table: dict[str, dict] = {}
+    entries = previous.get("entries")
+    if not isinstance(entries, list):
+        return table
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        key = entry.get("key")
+        count = _pos_int(entry.get("after"))
+        day = entry.get("to")
+        if (
+            isinstance(key, str)
+            and _FOLLOWER_KEY_RE.fullmatch(key)
+            and ".." not in key
+            and count is not None
+            and isinstance(day, str)
+            and _DAY_RE.fullmatch(day)
+        ):
+            table[key] = {"count": count, "date": day}
+    return table
+
+
 def _kept_before(entry: dict) -> tuple[int, str] | None:
     before = entry.get("before")
     start = entry.get("from")
@@ -962,7 +1040,9 @@ def _kept_before(entry: dict) -> tuple[int, str] | None:
     return before, start
 
 
-def _build_abonnes(previous: dict, table: dict[str, dict], latest: str) -> dict:
+def _build_abonnes(
+    previous: dict, table: dict[str, dict], latest: str, source: str = "followers.js"
+) -> dict:
     baseline = ""
     raw_base = previous.get("baseline")
     if isinstance(raw_base, str) and _STAMP_RE.fullmatch(raw_base):
@@ -993,20 +1073,20 @@ def _build_abonnes(previous: dict, table: dict[str, dict], latest: str) -> dict:
         entries.append(entry)
     if baseline:
         note = (
-            f"Extrait de followers.js relu le {_stamp_fr(latest)}. "
+            f"Extrait de {source} relu le {_stamp_fr(latest)}. "
             f"L'écart, quand il existe, compare au relevé du {_stamp_fr(baseline)}. "
             "Les chiffres arrondis au millier n'ont pas d'écart."
         )
     else:
         note = (
-            f"Extrait de followers.js relu le {_stamp_fr(latest)}. "
+            f"Extrait de {source} relu le {_stamp_fr(latest)}. "
             "Pas d'écart tant qu'un relevé précédent n'est pas gardé. "
             "Les chiffres arrondis au millier n'ont pas d'écart."
         )
     return {
         "baseline": baseline,
         "latest": latest,
-        "source": "followers.js",
+        "source": source,
         "note": note,
         "entries": entries,
     }
@@ -1014,10 +1094,32 @@ def _build_abonnes(previous: dict, table: dict[str, dict], latest: str) -> dict:
 
 def refresh_followers() -> dict:
     """Relit followers.js. Le chiffre bouge. L'écart reste calé sur le relevé de base."""
-    table = _parse_followers_js(_read_followers())
+    source = "followers.js"
+    podium: dict[str, dict] = {}
+    try:
+        table = _parse_followers_js(_read_followers())
+    except (urllib.error.URLError, RuntimeError, OSError) as exc:
+        # followers.js répond 410 depuis le 29 octobre. Le Podium ne suit que candidats et partis.
+        print(f"followers.js non relu : {exc}", file=sys.stderr)
+        podium = _parse_podium(_read_podium())
+        source = PODIUM_SOURCE
+        table = {}
     latest = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     with _IO_LOCK:
-        built = _build_abonnes(_load_abonnes(), table, latest)
+        previous = _load_abonnes()
+        if podium:
+            table = _held_followers(previous)
+            table.update({key: item for key, item in podium.items() if key in table})
+        built = _build_abonnes(previous, table, latest, source)
+        if podium:
+            held = previous.get("latest")
+            held_at = _stamp_fr(held) if isinstance(held, str) and _STAMP_RE.fullmatch(held) else "dernier relevé"
+            built["note"] = (
+                f"Le Podium 2027 relu le {_stamp_fr(latest)}, pour les comptes qu'il suit. "
+                f"Les autres chiffres restent ceux du {held_at}. "
+                f"L'écart, quand il existe, compare au relevé du {_stamp_fr(built['baseline'])}. "
+                "Les chiffres arrondis au millier n'ont pas d'écart."
+            )
         _write_json(ABONNES, built)
         matched = 0
         compared = 0
@@ -1038,6 +1140,8 @@ def refresh_followers() -> dict:
         "baseline": built["baseline"],
         "latest": latest,
         "keys": len(built["entries"]),
+        "source": source,
+        "podium": len(podium),
         "matched": matched,
         "compared": compared,
         "total_blocks": blocks,
@@ -1088,7 +1192,7 @@ def main() -> None:
         print(
             f"ok abonnés={info['keys']} fiches={info['matched']} "
             f"écarts={info['compared']} latest={info['latest']} "
-            f"total={info['total_blocks']}"
+            f"total={info['total_blocks']} source={info['source']} podium={info['podium']}"
         )
         return
     merged = refresh_once()

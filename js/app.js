@@ -214,7 +214,10 @@ function paintFollowers(data) {
   } else if (from) {
     span = `depuis ${from}.`;
   }
-  node.textContent = `Abonnés pris dans le pull accounts. ${formatInt(matched)} fiches ont un chiffre. ${formatInt(compared)} ont un écart ${span} Un relevé arrondi au millier reste sans écart.`;
+  const origin = String(info.source || "").includes("Podium")
+    ? "Abonnés du Podium 2027 pour les comptes qu'il suit, sinon du pull accounts."
+    : "Abonnés pris dans le pull accounts.";
+  node.textContent = `${origin} ${formatInt(matched)} fiches ont un chiffre. ${formatInt(compared)} ont un écart ${span} Un relevé arrondi au millier reste sans écart.`;
 }
 
 function followerLine(fiche) {
