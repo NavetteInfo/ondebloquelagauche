@@ -948,6 +948,17 @@ p.fiche-go {
   text-transform: uppercase;
 }
 
+.fiche-count .day-gain {
+  display: block;
+  color: var(--red);
+  font-size: 0.74rem;
+}
+
+.fiche-count .day-gain.flat {
+  color: var(--muted);
+  font-weight: 400;
+}
+
 .fiche-reason {
   overflow-wrap: break-word;
   padding-top: 0.35rem;

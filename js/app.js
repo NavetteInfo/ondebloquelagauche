@@ -320,6 +320,14 @@ function renderRow(fiche, index) {
   unit.className = "unit";
   unit.textContent = "blocages";
   count.append(num, unit);
+  const dayGain = Number(fiche.day_gain);
+  if (fiche.day_gain !== undefined && fiche.day_gain !== null && Number.isFinite(dayGain)) {
+    const day = document.createElement("span");
+    day.className = dayGain > 0 ? "day-gain" : "day-gain flat";
+    day.textContent = `${dayGain < 0 ? "\u2212" : "+"}${formatInt(Math.abs(dayGain))}`;
+    day.title = "Écart avec le chiffre publié environ 24 h plus tôt";
+    count.append(day);
+  }
 
   const href = safeProfileUrl(fiche.url);
   let action;

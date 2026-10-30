@@ -13,6 +13,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -456,6 +457,61 @@ def _day_delta(total: int, as_of) -> dict | None:
     }
 
 
+def _published_before(ref: datetime) -> dict | None:
+    """Le fiches.json publié le plus près de ref, lu dans l'historique git."""
+    try:
+        log = subprocess.run(
+            ["git", "log", "--format=%H %cI", "--since", (ref - timedelta(hours=12)).isoformat(),
+             "--until", (ref + timedelta(hours=12)).isoformat(), "--", "data/fiches.json"],
+            cwd=ROOT, capture_output=True, text=True, timeout=30, check=True,
+        ).stdout.split()
+    except (OSError, subprocess.SubprocessError):
+        return None
+    best = None
+    for sha, when in zip(log[::2], log[1::2]):
+        stamp = _stamp(when)
+        if stamp is None:
+            continue
+        gap = abs((stamp - ref).total_seconds())
+        if best is None or gap < best[0]:
+            best = (gap, sha)
+    if best is None:
+        return None
+    try:
+        blob = subprocess.run(
+            ["git", "show", f"{best[1]}:data/fiches.json"],
+            cwd=ROOT, capture_output=True, timeout=30, check=True,
+        ).stdout
+        doc = json.loads(blob.decode("utf-8"))
+    except (OSError, subprocess.SubprocessError, UnicodeError, json.JSONDecodeError):
+        return None
+    return doc if isinstance(doc, dict) else None
+
+
+def _attach_day_gains(built: dict) -> None:
+    """Écart de chaque fiche avec le chiffre publié pour elle environ 24 h plus tôt."""
+    for fiche in built["fiches"]:
+        fiche.pop("day_gain", None)
+    built["day_gain_from"] = None
+    delta = built.get("day_delta") or {}
+    ref = _stamp(delta.get("from")) or _stamp(built.get("as_of"))
+    if ref is None:
+        return
+    if not delta.get("from"):
+        ref -= timedelta(hours=24)
+    past = _published_before(ref)
+    if not past:
+        return
+    then = _held_by_url(past)
+    if not then:
+        return
+    for fiche in built["fiches"]:
+        number = then.get((fiche["platform"], fiche["url"]))
+        if number and fiche["count"]:
+            fiche["day_gain"] = fiche["count"] - number
+    built["day_gain_from"] = past.get("as_of") if isinstance(past.get("as_of"), str) else None
+
+
 def _count_key(key: str) -> str | None:
     text = key.strip().lower()
     if not text or ":" not in text or len(text) > 220:
@@ -675,6 +731,7 @@ def publish() -> dict:
         built["as_of"] = refreshed_at
         built["source"] = "merged.json + deck" + (" + fcounts" if fcounts else "")
     built["day_delta"] = _day_delta(built["total_blocks"], built.get("as_of"))
+    _attach_day_gains(built)
     refresh.attach_followers(built)
     old_count = previous.get("fiche_count")
     old_sum = previous.get("fiche_count_sum")
