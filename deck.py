@@ -14,7 +14,7 @@ import hashlib
 import json
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import refresh
@@ -406,6 +406,56 @@ def _fcount_sources() -> list[Path]:
     return sorted(found, key=lambda path: path.name)
 
 
+def _stamp(value) -> datetime | None:
+    if not isinstance(value, str) or len(value) > 40:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(timezone.utc)
+    except ValueError:
+        return None
+
+
+def _total_history() -> list[tuple[datetime, int]]:
+    """Les totaux datés : historique/counts jusqu'au changement d'API, fcounts ensuite."""
+    folders = [DATA / "historique" / "counts", FCOUNTS_DIR]
+    pulls = _pulls_root()
+    if pulls is not None:
+        folders.append(pulls / "fcounts")
+    seen: dict[datetime, int] = {}
+    for folder in folders:
+        if not folder.is_dir():
+            continue
+        for path in folder.glob("*.json"):
+            if not path.is_file() or path.is_symlink():
+                continue
+            doc = _read_json(path)
+            if not isinstance(doc, dict) or doc.get("need_session"):
+                continue
+            when = _stamp(doc.get("as_of"))
+            total = refresh._count(doc.get("total"))
+            if when and total:
+                seen[when] = total
+    return sorted(seen.items())
+
+
+def _day_delta(total: int, as_of) -> dict | None:
+    """Écart du total sur 24 h, pris au relevé le plus proche de cette heure, et au moins 12 h avant."""
+    now = _stamp(as_of)
+    if now is None or not total:
+        return None
+    day = now - timedelta(hours=24)
+    history = [row for row in _total_history() if row[0] <= now - timedelta(hours=12)]
+    if not history:
+        return None
+    ref = min(history, key=lambda row: abs((row[0] - day).total_seconds()))
+    return {
+        "from": ref[0].replace(microsecond=0).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "from_total": ref[1],
+        "blocks": total - ref[1],
+        "hours": round((now - ref[0]).total_seconds() / 3600, 1),
+    }
+
+
 def _count_key(key: str) -> str | None:
     text = key.strip().lower()
     if not text or ":" not in text or len(text) > 220:
@@ -624,6 +674,7 @@ def publish() -> dict:
         built["live"] = False
         built["as_of"] = refreshed_at
         built["source"] = "merged.json + deck" + (" + fcounts" if fcounts else "")
+    built["day_delta"] = _day_delta(built["total_blocks"], built.get("as_of"))
     refresh.attach_followers(built)
     old_count = previous.get("fiche_count")
     old_sum = previous.get("fiche_count_sum")

@@ -65,11 +65,31 @@ function formatUtc(iso) {
   return `${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()} à ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())} UTC`;
 }
 
+function paintDayDelta(delta) {
+  const node = document.getElementById("day-delta");
+  if (!node) return;
+  const blocks = delta && Number(delta.blocks);
+  if (!delta || !Number.isFinite(blocks)) {
+    node.hidden = true;
+    return;
+  }
+  const hours = Math.round(Number(delta.hours) || 0);
+  const since = formatStamp(String(delta.from || ""), true);
+  const span = hours === 24 ? "en 24\u00A0h" : `en ${hours}\u00A0h`;
+  const sign = blocks < 0 ? "\u2212" : "+";
+  node.textContent = `${sign}${formatInt(Math.abs(blocks))} `;
+  const label = document.createElement("span");
+  label.textContent = since ? `${span}, depuis le ${since.replace(" UTC", "\u00A0UTC")}` : span;
+  node.append(label);
+  node.hidden = false;
+}
+
 function paintCatalog(data) {
   all = Array.isArray(data.fiches) ? data.fiches : [];
   seenAsOf = data.as_of || seenAsOf;
   seenFollowers = (data.followers && data.followers.latest) || seenFollowers;
   setText("total-blocks", data.total_blocks);
+  paintDayDelta(data.day_delta);
   setText("fiche-count", data.fiche_count);
   setText("name-count", data.name_count);
   setText("fiche-sum", data.fiche_count_sum);

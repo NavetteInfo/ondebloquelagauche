@@ -364,6 +364,37 @@ h2 {
   letter-spacing: -0.05em;
 }
 
+.total-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.4rem 0.8rem;
+}
+
+.day-delta {
+  max-width: 9rem;
+  margin: 0 0 0.35rem;
+  color: var(--red);
+  font-family: var(--display);
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.day-delta span {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+.day-delta[hidden] {
+  display: none;
+}
+
 .caption,
 .howto,
 .attr,
